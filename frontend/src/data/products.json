@@ -1,0 +1,53 @@
+[
+  {
+    "id": "chocolate-bar-100",
+    "name": "Chocolate Bar 100%",
+    "description": "Pure chocolate, crafted directly from fine aroma cocoa. Intense and authentic flavor, perfect for cocoa lovers in its most natural form.",
+    "images": ["/assets/images/products/chocolate-bar-100.jpg"]
+  },
+  {
+    "id": "chocolate-nibs-salt",
+    "name": "Chocolate Bar with Cocoa Nibs and Sea Salt",
+    "description": "65% chocolate with toasted cocoa nibs and a touch of sea salt. Crunchy and perfectly balanced between sweet and salty.",
+    "images": [
+      "/assets/images/products/chocolate-bar-100.jpg",
+      "/assets/images/products/chocolate-nibs-salt-alt.jpg"
+    ]
+  },
+  {
+    "id": "chocolate-coffee",
+    "name": "Chocolate Bar with Coffee",
+    "description": "65% chocolate with coffee, made with high-altitude coffee beans from Palanda. Perfect to start the day with energy and rich aroma.",
+    "images": ["/assets/images/products/chocolate-coffee.jpg"]
+  },
+  {
+    "id": "fruit-bonbons",
+    "name": "Bonbons with Exotic Fruit Filling",
+    "description": "Bonbons filled with local and exotic fruits. A sweet and fruity combination that highlights the richness of the Amazon.",
+    "images": [
+      "/assets/images/products/fruit-bonbons.jpg",
+      "/assets/images/products/fruit-bonbons-alt.jpg"
+    ]
+  },
+  {
+    "id": "cocoa-nibs",
+    "name": "Natural Cocoa Nibs",
+    "description": "Toasted cocoa nibs, pure and natural. Perfect as a healthy snack, for baking, or to enhance desserts.",
+    "images": ["/assets/images/products/cocoa-nibs.jpg"]
+  },
+  {
+    "id": "cocoa-liqueur",
+    "name": "Sweet Cocoa Liqueur (20°)",
+    "description": "Artisanal liqueur, smooth and sweet. Ideal to enjoy and share.",
+    "images": ["/assets/images/products/cocoa-liqueur.jpg"]
+  },
+  {
+    "id": "cocoa-cocktail",
+    "name": "Cocoa Cocktail (12°)",
+    "description": "Smooth, sweet, and refreshing beverage. Best enjoyed chilled, perfect for special gatherings.",
+    "images": [
+      "/assets/images/products/cocoa-cocktail.jpg",
+      "/assets/images/products/cocoa-cocktail-alt.jpg"
+    ]
+  }
+]
