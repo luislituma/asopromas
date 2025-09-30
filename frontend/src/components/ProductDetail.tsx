@@ -36,13 +36,13 @@ const ProductDetail: FC = () => {
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Product not found</h2>
-        <p className="text-gray-600 mb-6">The requested product does not exist.</p>
+        <h2 className="text-2xl font-semibold mb-4">Producto no encontrado</h2>
+        <p className="text-gray-600 mb-6">El producto solicitado no existe.</p>
         <button
           onClick={() => navigate(-1)}
           className="px-4 py-2 bg-gray-200 rounded-md"
         >
-          Go back
+          Regresar
         </button>
       </div>
     );
@@ -70,7 +70,7 @@ const ProductDetail: FC = () => {
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={`w-12 h-12 rounded-md overflow-hidden border-2 ${i === current ? "border-[#8B4513]" : "border-transparent"} focus:outline-none`}
-                    aria-label={`View image ${i + 1}`}
+                    aria-label={`Ver imagen ${i + 1}`}
                   >
                     <img src={img} alt={`${product.name} thumb ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                   </button>
@@ -86,23 +86,38 @@ const ProductDetail: FC = () => {
 
           {/* Static brand/location info — ajusta si lo quieres por producto */}
           <div className="text-sm text-gray-600 mb-4">
-            <span className="font-medium">Brand:</span> KUJEÑITO •{" "}
-            <span className="font-medium">Organization:</span> ASOPROMAS •{" "}
-            <span className="font-medium">Origin:</span> Playas de Cuje, Zumbi, Zamora Chinchipe
+            <span className="font-medium">Marca:</span> KUJEÑITO •{" "}
+            <span className="font-medium">Organización:</span> ASOPROMAS •{" "}
+            <span className="font-medium">Origen:</span> Playas de Cuje, Zumbi, Zamora Chinchipe
           </div>
 
-          <p className="text-gray-700 mb-6">{product.description}</p>
+          <p className="text-gray-700 mb-8 text-lg leading-relaxed">{product.description}</p>
 
-          <div className="flex items-center gap-4">
-            <ButtonBuy productId={product.id} productName={product.name} />
-            <Link to="/products" className="text-sm text-gray-600 hover:text-gray-800">
-              ← Back to catalog
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+            <ButtonBuy 
+              productId={product.id} 
+              productName={product.name}
+              variant="whatsapp"
+              size="lg"
+            />
+            <div className="text-sm text-gray-500">
+              💬 Respuesta inmediata por WhatsApp
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <Link 
+              to="/products" 
+              className="inline-flex items-center text-sm text-gray-600 hover:text-amber-600 transition-colors duration-200 group"
+            >
+              <span className="transform transition-transform duration-200 group-hover:-translate-x-1">←</span>
+              <span className="ml-2">Volver al catálogo</span>
             </Link>
           </div>
 
           {/* Extra: suggestions / related products placeholder */}
           <div className="mt-10">
-            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-3">You may also like</h3>
+            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-3">También te puede gustar</h3>
             {/* Aquí puedes mapear y mostrar 2-3 productos relacionados */}
             <div className="flex gap-3">
               {/* placeholder cards */}

@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Award, Users, Heart } from 'lucide-react';
+import { ChevronRight, Award, Users, Heart, ShoppingBag } from 'lucide-react';
 import asopromasLogo from '../assets/icons/logo.svg';
 import ButtonBuy from '../components/ButtonBuy';
 import CTA from '../components/CTA';
@@ -8,93 +8,152 @@ import CTA from '../components/CTA';
 const Landing: FC = () => {
   const features = [
     {
-      icon: <Award className="h-8 w-8 text-brown-600" />,
-      title: "Premium Quality",
-      description: "Our chocolates are crafted from the finest cacao beans in Ecuador"
+      icon: <Award className="h-8 w-8 text-amber-600" />,
+      title: "Calidad Premium",
+      description: "Nuestros chocolates están elaborados con los mejores granos de cacao del Ecuador"
     },
     {
-      icon: <Users className="h-8 w-8 text-brown-600" />,
-      title: "Community First",
-      description: "Supporting local farmers and their families through fair trade practices"
+      icon: <Users className="h-8 w-8 text-amber-600" />,
+      title: "Comunidad Primero",
+      description: "Apoyando a los agricultores locales y sus familias a través de prácticas de comercio justo"
     },
     {
-      icon: <Heart className="h-8 w-8 text-brown-600" />,
-      title: "Sustainable Future",
-      description: "Committed to environmentally conscious farming methods"
+      icon: <Heart className="h-8 w-8 text-amber-600" />,
+      title: "Futuro Sostenible",
+      description: "Comprometidos con métodos de cultivo conscientes del medio ambiente"
     }
   ];
 
   const products = [
     {
       image: "/src/assets/images/products/chocolate-bar.jpg",
-      title: "Artisanal Chocolate Bars",
-      description: "Experience the pure taste of Ecuador in every bite",
+      title: "Barras de Chocolate Artesanales",
+      description: "Experimenta el sabor puro del Ecuador en cada bocado",
       link: "/products/chocolate-bar"
     },
     {
       image: "/src/assets/images/products/chocolate-drink.jpg",
-      title: "Premium Cocoa Drinks",
-      description: "Rich and aromatic beverages for chocolate lovers",
+      title: "Bebidas de Cacao Premium",
+      description: "Bebidas ricas y aromáticas para los amantes del chocolate",
       link: "/products/chocolate-drink"
     },
     {
       image: "/src/assets/images/products/cocoa-liquor.jpg",
-      title: "Pure Cocoa Liquor",
-      description: "The essence of fine Ecuadorian cacao",
+      title: "Licor de Cacao Puro",
+      description: "La esencia del fino cacao ecuatoriano",
       link: "/products/cocoa-liquor"
     }
   ];
 
-  return (    
+  return (
+
     <div className="flex flex-col min-h-screen">
+      {/* Call to Action */}
       <div>
         <CTA />
       </div>
+
+      {/* Final CTA Section */}
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-brown-800 to-brown-600 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-5xl font-bold mb-6">
-                Discover the Finest Ecuadorian Chocolate
-              </h1>
-              <p className="text-xl mb-8 text-brown-100">
-                ASOPROMAS brings you premium quality cacao products from the heart of Zamora Chinchipe
+      <section className="relative min-h-screen flex items-center bg-black text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/15 to-transparent transform rotate-12"></div>
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-blue-400/10 to-transparent transform -rotate-12"></div>
+        </div>
+
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-10 w-16 h-16 bg-emerald-500/25 rounded-full blur-lg animate-pulse delay-500"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Columna Izquierda: Texto */}
+            <div className="text-center lg:text-left space-y-8">
+              <div className="space-y-4">
+                <div className="inline-block px-4 py-2 bg-emerald-500/20 backdrop-blur-sm rounded-full border border-emerald-400/40">
+                  <span className="text-emerald-300 font-medium text-sm">🇪🇨 Desde Ecuador para el Mundo</span>
+                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                  Descubre el
+                  <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                    Chocolate
+                  </span>
+                  <span className="block text-blue-100">Ecuatoriano</span>
+                </h1>
+              </div>
+
+              <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                ASOPROMAS te trae productos de cacao de calidad premium desde el corazón de
+                <span className="font-semibold text-amber-400"> Zamora Chinchipe</span>,
+                donde cada grano cuenta una historia de tradición y excelencia.
               </p>
-              <div className="flex gap-4">
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   to="/products"
-                  className="bg-white text-brown-600 px-8 py-3 rounded-lg hover:bg-brown-50 transition-colors inline-flex items-center"
+                  className="group relative overflow-hidden bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 inline-flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
                 >
-                  Explore Products
-                  <ChevronRight className="ml-2 h-5 w-5" />
+                  <span className="relative z-10 flex items-center">
+                    <ShoppingBag className="mr-3 h-5 w-5" />
+                    Explorar Productos
+                    <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </span>
                 </Link>
+
                 <Link
                   to="/about"
-                  className="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-brown-600 transition-colors"
+                  className="group border-2 border-blue-400 text-blue-300 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-500 hover:text-white transition-all duration-300 inline-flex items-center justify-center backdrop-blur-sm"
                 >
-                  Learn More
+                  <Award className="mr-3 h-5 w-5" />
+                  Nuestra Historia
+                  <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-600/50">
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-amber-400">15+</div>
+                  <div className="text-sm text-gray-400">Años de Experiencia</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-emerald-400">100%</div>
+                  <div className="text-sm text-gray-400">Cacao Premium</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-blue-400">100+</div>
+                  <div className="text-sm text-gray-400">Familias Productoras</div>
+                </div>
+              </div>
             </div>
-            <div className="md:w-1/2 flex justify-center">
-              <img
-                src={asopromasLogo}
-                alt="ASOPROMAS"
-                className="h-64 w-auto filter drop-shadow-xl"
-              />
+
+            {/* Columna Derecha: Imagen */}
+            <div className="relative flex justify-center lg:justify-end">
+              <div className="relative">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-blue-500/15 rounded-full blur-3xl transform scale-110"></div>
+
+                {/* Logo Container */}
+                <div className="relative bg-gray-800/40 backdrop-blur-md rounded-3xl p-12 border border-gray-600/50 shadow-2xl">
+                  <img
+                    src={asopromasLogo}
+                    alt="ASOPROMAS"
+                    className="h-48 sm:h-64 lg:h-80 w-auto filter drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
+                  />
+
+                  {/* Floating badges */}
+                  <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+                    🏆 Premium
+                  </div>
+                  <div className="absolute -bottom-4 -left-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+                    🌱 Orgánico
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="absolute bottom-0 w-full overflow-hidden">
-          <svg
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-            className="relative block h-20 w-full"
-            fill="white"
-          >
-            <path d="M321.39 56.44c58-10.79 114.16-30.13 172-41.86 82.39-16.72 168.19-17.73 250.45-.39C823.78 31 906.67 72 985.66 92.83c70.05 18.48 146.53 26.09 214.34 3V120H0V0c67.23 25.24 138.96 52.2 321.39 56.44z" />
-          </svg>
         </div>
       </section>
 
@@ -102,8 +161,8 @@ const Landing: FC = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose ASOPROMAS?</h2>
-            <div className="h-1 w-20 bg-brown-600 mx-auto"></div>
+            <h2 className="text-3xl font-bold mb-4">¿Por qué elegir ASOPROMAS?</h2>
+            <div className="h-1 w-96 bg-amber-600 mx-auto"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -124,8 +183,8 @@ const Landing: FC = () => {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Featured Products</h2>
-            <div className="h-1 w-20 bg-brown-600 mx-auto"></div>
+            <h2 className="text-3xl font-bold mb-4">Productos Destacados</h2>
+            <div className="h-1 w-20 bg-amber-600 mx-auto"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {products.map((product, index) => (
@@ -142,7 +201,7 @@ const Landing: FC = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-brown-600 transition-colors">
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-amber-600 transition-colors">
                     {product.title}
                   </h3>
                   <p className="text-gray-600">{product.description}</p>
@@ -157,41 +216,43 @@ const Landing: FC = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-8">Our Story</h2>
+            <h2 className="text-3xl font-bold mb-8">Nuestra Historia</h2>
             <p className="text-gray-600 mb-6 text-lg">
-              ASOPROMAS is a proud association of cacao producers in Zamora Chinchipe, Ecuador. 
-              Our journey began with a simple mission: to produce the finest quality cacao while 
-              supporting our local farming communities.
+              ASOPROMAS es una orgullosa asociación de productores de cacao en Zamora Chinchipe, Ecuador.
+              Nuestro viaje comenzó con una misión simple: producir cacao de la más alta calidad mientras
+              apoyamos a nuestras comunidades agrícolas locales.
             </p>
             <p className="text-gray-600 mb-8 text-lg">
-              Today, we continue to uphold these values, combining traditional farming wisdom 
-              with modern sustainable practices to create exceptional chocolate products that 
-              are enjoyed around the world.
+              Hoy, continuamos manteniendo estos valores, combinando la sabiduría agrícola tradicional
+              con prácticas sostenibles modernas para crear productos de chocolate excepcionales que
+              son disfrutados en todo el mundo.
             </p>
             <Link
               to="/about"
-              className="inline-flex items-center text-brown-600 hover:text-brown-700 font-semibold"
+              className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold"
             >
-              Learn more about our journey
+              Conoce nuestro camino
               <ChevronRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="h-64 w-full rounded-lg">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-8 text-amber-950">Ready to Experience Our Products?</h2>
-          <p className="text-xl mb-8 text-brown-100">
-            Discover the rich flavors of our premium chocolate and cocoa products
-          </p>
-          
-        </div>
 
-            <div className='flex justify-center'>
-                <ButtonBuy />
-                </div>
+      <section className="py-16 bg-amber-50">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-8 text-amber-950">¿Listo para Experimentar Nuestros Productos?</h2>
+          <p className="text-xl mb-8 text-amber-800">
+            Descubre los ricos sabores de nuestros productos premium de chocolate y cacao
+          </p>
+          <div className='flex justify-center'>
+            <ButtonBuy
+              productName="Productos de Chocolate Premium ASOPROMAS"
+              variant="whatsapp"
+              size="lg"
+            />
+          </div>
+        </div>
       </section>
     </div>
   );

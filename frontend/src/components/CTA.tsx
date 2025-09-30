@@ -2,8 +2,6 @@ import { useEffect, useState, type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import chocolate1 from '../assets/images/products/chocolate.png';
-import chocolate2 from '../assets/images/products/chocolate-bar.jpg';
-import chocolate3 from '../assets/images/products/chocolate-drink.jpg';
 
 
 interface CTAProps {
@@ -24,19 +22,19 @@ const CTA: FC<CTAProps> = ({ className = '' }) => {
     return () => clearInterval(interval);
   }, [images.length]);
   return (
-    <section className={`relative overflow-hidden bg-gradient-to-r from-[#411900]  to-[#ffffff] ${className}`}>
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className={`relative overflow-hidden bg-gradient-to-r from-[#411900]  to-[#ffffff] min-h-screen ${className}`}>
+      <div className="w-full h-full px-4 py-16 sm:px-6 sm:py-24 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* Columna Izquierda: Texto */}
         <div className="text-center lg:text-left">
           <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Discover Our Premium
-            <span className="block text-amber-300">Cacao Collection</span>
+            Descubre Nuestra
+            <span className="block text-amber-300">Colección Premium de Cacao</span>
           </h2>
 
           <p className="mt-6 text-lg text-amber-100 max-w-xl mx-auto lg:mx-0">
-            From bean to bar, experience the authentic taste of Ecuador. 
-            Explore our fine aroma cacao and artisanal chocolate creations.
+            Del grano a la barra, experimenta el sabor auténtico del Ecuador. 
+            Explora nuestro cacao de fino aroma y creaciones artesanales de chocolate.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-56">
@@ -49,16 +47,10 @@ const CTA: FC<CTAProps> = ({ className = '' }) => {
                 shadow-lg hover:shadow-xl"
             >
               <ShoppingBag className="w-5 h-5" />
-              View Catalog
+              Ver Catálogo
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
 
-            <Link
-              to="/about"
-              className="text-lg font-semibold text-white hover:text-amber-200 transition-colors duration-300"
-            >
-              Learn More →
-            </Link>
           </div>
         </div>
 

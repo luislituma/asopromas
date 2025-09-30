@@ -39,19 +39,19 @@ const Contact: FC = () => {
     const contactInfo = [
         {
             icon: <Mail className="h-6 w-6 text-brown-600" />,
-            title: "Email",
+            title: "Correo",
             details: "info@asopromas.com",
             link: "mailto:info@asopromas.com"
         },
         {
             icon: <Phone className="h-6 w-6 text-brown-600" />,
-            title: "Phone",
+            title: "Teléfono",
             details: "+593 (07) 2605-120",
             link: "tel:+59372605120"
         },
         {
             icon: <MapPin className="h-6 w-6 text-brown-600" />,
-            title: "Location",
+            title: "Ubicación",
             details: "Zamora Chinchipe, Ecuador",
             link: "https://maps.app.goo.gl/vBXruvC58KCSA6xcA"
         }
@@ -62,11 +62,11 @@ const Contact: FC = () => {
             {/* Header */}
             <div className="text-center mb-16">
                 <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl mb-4">
-                    Contact Us
+                    Contáctanos
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Do you have questions about our products or are you interested in getting to know us?
-                    We would love to hear from you.
+                    ¿Tienes preguntas sobre nuestros productos o te interesa conocernos mejor?
+                    Nos encantaría saber de ti.
                 </p>
             </div>
 
@@ -74,7 +74,7 @@ const Contact: FC = () => {
                 {/* Contact Information */}
                 <div className="space-y-8">                    
                     <div className="bg-white border rounded-2xl shadow-lg p-8 space-y-8">
-                        <h2 className="text-lg font-medium text-amber-800">Our Information</h2>
+                        <h2 className="text-lg font-medium text-amber-800">Nuestra Información</h2>
                         {contactInfo.map((item, index) => (
                             <a
                                 key={index}
@@ -112,10 +112,10 @@ const Contact: FC = () => {
                 {/* Contact Form */}
                 <div className="bg-white border rounded-2xl shadow-xl p-8 flex flex-col">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <h2 className="text-lg font-medium text-amber-800">Send us a message</h2>
+                        <h2 className="text-lg font-medium text-amber-800">Envíanos un mensaje</h2>
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                Name
+                                Nombre
                             </label>
                             <input
                                 type="text"
@@ -125,13 +125,13 @@ const Contact: FC = () => {
                                 onChange={handleChange}
                                 required
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
-                                placeholder="Your name"
+                                placeholder="Tu nombre"
                             />
                         </div>
 
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email
+                                Correo Electrónico
                             </label>
                             <input
                                 type="email"
@@ -141,13 +141,13 @@ const Contact: FC = () => {
                                 onChange={handleChange}
                                 required
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
-                                placeholder="your.email@example.com"
+                                placeholder="tu.correo@ejemplo.com"
                             />
                         </div>
 
                         <div>
                             <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                                Subject
+                                Asunto
                             </label>
                             <input
                                 type="text"
@@ -157,13 +157,13 @@ const Contact: FC = () => {
                                 onChange={handleChange}
                                 required
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
-                                placeholder="What is it about?"
+                                placeholder="¿De qué se trata?"
                             />
                         </div>
 
                         <div>
                             <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                                Message
+                                Mensaje
                             </label>
                             <textarea
                                 id="message"
@@ -173,7 +173,7 @@ const Contact: FC = () => {
                                 required
                                 rows={4}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
-                                placeholder="Your message here..."
+                                placeholder="Tu mensaje aquí..."
                             ></textarea>
                         </div>
 
@@ -186,7 +186,7 @@ const Contact: FC = () => {
                                             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B4513] transition-colors
                                             disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
-                                {isSubmitted ? 'Message Sent!' : 'Send Message'}
+                                {isSubmitted ? '¡Mensaje Enviado!' : 'Enviar Mensaje'}
                             </button>
                         </div>
                     </form>

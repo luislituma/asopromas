@@ -7,9 +7,9 @@ const ProductsPage: FC = () => {
   return (
     <main className="container mx-auto px-4 py-12">
       <header className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold">KUJEÑITO — Our Products</h1>
+        <h1 className="text-4xl font-extrabold">KUJEÑITO — Nuestros Productos</h1>
         <p className="text-gray-600 max-w-2xl mx-auto mt-3">
-          Crafted by ASOPROMAS in Playas de Cuje, Zumbi, Zamora Chinchipe.
+          Elaborados con amor por ASOPROMAS en Playas de Cuje, Zumbi, Zamora Chinchipe.
         </p>
       </header>
 

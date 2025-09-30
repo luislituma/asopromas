@@ -1,14 +1,14 @@
 [
   {
     "id": "chocolate-bar-100",
-    "name": "Chocolate Bar 100%",
-    "description": "Pure chocolate, crafted directly from fine aroma cocoa. Intense and authentic flavor, perfect for cocoa lovers in its most natural form.",
+    "name": "Barra de Chocolate 100%",
+    "description": "Chocolate puro, elaborado directamente del cacao de fino aroma. Sabor intenso y auténtico, perfecto para los amantes del cacao en su forma más natural.",
     "images": ["/assets/images/products/chocolate-bar-100.jpg"]
   },
   {
     "id": "chocolate-nibs-salt",
-    "name": "Chocolate Bar with Cocoa Nibs and Sea Salt",
-    "description": "65% chocolate with toasted cocoa nibs and a touch of sea salt. Crunchy and perfectly balanced between sweet and salty.",
+    "name": "Barra de Chocolate con Nibs de Cacao y Sal Marina",
+    "description": "Chocolate al 65% con nibs de cacao tostados y un toque de sal marina. Crujiente y perfectamente equilibrado entre dulce y salado.",
     "images": [
       "/assets/images/products/chocolate-bar-100.jpg",
       "/assets/images/products/chocolate-nibs-salt-alt.jpg"
@@ -16,14 +16,14 @@
   },
   {
     "id": "chocolate-coffee",
-    "name": "Chocolate Bar with Coffee",
-    "description": "65% chocolate with coffee, made with high-altitude coffee beans from Palanda. Perfect to start the day with energy and rich aroma.",
+    "name": "Barra de Chocolate con Café",
+    "description": "Chocolate al 65% con café, elaborado con granos de café de altura de Palanda. Perfecto para empezar el día con energía y rico aroma.",
     "images": ["/assets/images/products/chocolate-coffee.jpg"]
   },
   {
     "id": "fruit-bonbons",
-    "name": "Bonbons with Exotic Fruit Filling",
-    "description": "Bonbons filled with local and exotic fruits. A sweet and fruity combination that highlights the richness of the Amazon.",
+    "name": "Bombones con Relleno de Frutas Exóticas",
+    "description": "Bombones rellenos con frutas locales y exóticas. Una combinación dulce y afrutada que resalta la riqueza de la Amazonía.",
     "images": [
       "/assets/images/products/fruit-bonbons.jpg",
       "/assets/images/products/fruit-bonbons-alt.jpg"
@@ -31,20 +31,20 @@
   },
   {
     "id": "cocoa-nibs",
-    "name": "Natural Cocoa Nibs",
-    "description": "Toasted cocoa nibs, pure and natural. Perfect as a healthy snack, for baking, or to enhance desserts.",
+    "name": "Nibs de Cacao Natural",
+    "description": "Nibs de cacao tostados, puros y naturales. Perfectos como snack saludable, para repostería o para realzar postres.",
     "images": ["/assets/images/products/cocoa-nibs.jpg"]
   },
   {
     "id": "cocoa-liqueur",
-    "name": "Sweet Cocoa Liqueur (20°)",
-    "description": "Artisanal liqueur, smooth and sweet. Ideal to enjoy and share.",
+    "name": "Licor Dulce de Cacao (20°)",
+    "description": "Licor artesanal, suave y dulce. Ideal para disfrutar y compartir.",
     "images": ["/assets/images/products/cocoa-liqueur.jpg"]
   },
   {
     "id": "cocoa-cocktail",
-    "name": "Cocoa Cocktail (12°)",
-    "description": "Smooth, sweet, and refreshing beverage. Best enjoyed chilled, perfect for special gatherings.",
+    "name": "Cóctel de Cacao (12°)",
+    "description": "Bebida suave, dulce y refrescante. Se disfruta mejor fría, perfecta para reuniones especiales.",
     "images": [
       "/assets/images/products/cocoa-cocktail.jpg",
       "/assets/images/products/cocoa-cocktail-alt.jpg"

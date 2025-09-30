@@ -49,14 +49,19 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
       <div className="px-4 pb-4 flex items-center justify-between">
         <Link
           to={`/products/${product.id}`}
-          className="text-sm text-gray-600 hover:text-gray-800"
-          aria-label={`View details for ${product.name}`}
+          className="text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200 hover:underline"
+          aria-label={`Ver detalles de ${product.name}`}
         >
-          View details
+          Ver detalles →
         </Link>
 
         {/* Botón para comprar / WhatsApp */}
-        <ButtonBuy productId={product.id} productName={product.name} />
+        <ButtonBuy 
+          productId={product.id} 
+          productName={product.name}
+          variant="whatsapp"
+          size="sm"
+        />
       </div>
     </article>
   );
