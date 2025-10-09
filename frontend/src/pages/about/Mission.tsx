@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Target, Eye, Heart, Award } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const Mission: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Misión y Visión - ASOPROMAS | Cacao Premium Ecuador',
+    description: 'Conoce la misión y visión de ASOPROMAS: producir cacao de fino aroma de la más alta calidad, promoviendo el desarrollo sostenible de las comunidades rurales de Zamora Chinchipe.',
+    keywords: 'misión ASOPROMAS, visión ASOPROMAS, cacao sostenible, desarrollo rural Ecuador, Zamora Chinchipe',
+    url: '/about/mission',
+    type: 'article'
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50">
       {/* Breadcrumbs */}

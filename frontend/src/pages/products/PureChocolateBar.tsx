@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, Heart, Leaf, Star } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const PureChocolateBar: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Barra de Chocolate 100% Puro KUJEÑITO",
+    description: "Chocolate 100% puro elaborado con cacao de fino aroma de Zamora Chinchipe. Sabor intenso y auténtico del mejor cacao ecuatoriano.",
+    price: "12.99",
+    currency: "USD",
+    category: "Chocolate Artesanal",
+    image: "/assets/images/products/chocolate-bar-100.jpg",
+    url: "/products/pure-chocolate-bar"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Barra de Chocolate 100% Puro KUJEÑITO - ASOPROMAS',
+    description: 'Chocolate 100% puro KUJEÑITO elaborado con cacao de fino aroma de Zamora Chinchipe. Sabor intenso y auténtico del mejor cacao ecuatoriano. ¡Compra ahora!',
+    keywords: 'chocolate 100% puro, KUJEÑITO, chocolate Ecuador, cacao fino aroma, chocolate artesanal, ASOPROMAS',
+    url: '/products/pure-chocolate-bar',
+    type: 'product',
+    image: '/assets/images/products/chocolate-bar-100.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Breadcrumb */}

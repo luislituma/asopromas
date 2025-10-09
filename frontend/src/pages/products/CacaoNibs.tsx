@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import ButtonBuy from "../../components/ButtonBuy";
 import { motion } from "framer-motion";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const CacaoNibs: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Nibs Naturales de Cacao KUJEÑITO",
+    description: "Fragmentos crujientes de granos de cacao tostados, el superalimento ancestral en su forma más pura, llenos de nutrientes y sabor auténtico.",
+    price: "16.99",
+    currency: "USD",
+    category: "Superalimento",
+    image: "/assets/images/products/cacao-nibs.jpg",
+    url: "/products/cacao-nibs"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Nibs de Cacao Premium KUJEÑITO - Superalimento Natural | ASOPROMAS',
+    description: 'Nibs de cacao KUJEÑITO: fragmentos crujientes de cacao tostado, superalimento rico en antioxidantes, magnesio y hierro. ¡El poder del cacao puro!',
+    keywords: 'nibs cacao Ecuador, superalimento cacao, cacao crujiente, antioxidantes naturales, KUJEÑITO nibs, cacao saludable',
+    url: '/products/cacao-nibs',
+    type: 'product',
+    image: '/assets/images/products/cacao-nibs.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="container mx-auto px-6 py-12">
       <motion.div

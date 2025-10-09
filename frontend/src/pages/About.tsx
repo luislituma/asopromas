@@ -1,8 +1,19 @@
 import { type FC } from 'react';
 import { Leaf, Users, Handshake } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSEO } from '../hooks/useSEO';
 
 const About: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Nosotros - ASOPROMAS | Asociación de Productores de Cacao Ecuador',
+    description: 'Conoce ASOPROMAS, asociación de productores de cacao de Zamora Chinchipe. Fortaleciendo comunidades rurales a través del cacao de fino aroma desde 1985.',
+    keywords: 'ASOPROMAS, productores cacao Ecuador, Zamora Chinchipe, cacao fino aroma, cooperativa agrícola, desarrollo rural',
+    url: '/about',
+    type: 'article',
+    image: '/assets/images/hero-cacao.jpg'
+  });
+
   const values = [
     {
       icon: <Leaf className="h-8 w-8 text-brown-600" />,

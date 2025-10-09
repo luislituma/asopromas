@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Heart, Wine, Star, Droplets } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const CacaoCocktail: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Cóctel de Cacao KUJEÑITO",
+    description: "Bebida premium que combina cacao ecuatoriano con ingredientes selectos. Una experiencia sensorial única para paladares exigentes.",
+    price: "19.99",
+    currency: "USD",
+    category: "Bebida Premium",
+    image: "/assets/images/products/cacao-cocktail.jpg",
+    url: "/products/cacao-cocktail"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Cóctel de Cacao KUJEÑITO - Bebida Premium | ASOPROMAS',
+    description: 'Cóctel KUJEÑITO: bebida premium que combina cacao ecuatoriano con ingredientes selectos. Experiencia sensorial única para momentos especiales.',
+    keywords: 'cóctel cacao Ecuador, bebida premium KUJEÑITO, cóctel artesanal, bebida gourmet cacao, experiencia sensorial',
+    url: '/products/cacao-cocktail',
+    type: 'product',
+    image: '/assets/images/products/cacao-cocktail.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Breadcrumb */}

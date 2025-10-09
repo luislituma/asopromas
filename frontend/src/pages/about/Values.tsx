@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Heart, Shield, Users, Leaf, Handshake, Star } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const Values: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Valores Organizacionales - ASOPROMAS | Compromiso y Sostenibilidad',
+    description: 'Conoce los valores que guían a ASOPROMAS: compromiso, integridad, solidaridad, sostenibilidad, respeto y excelencia en la producción de cacao ecuatoriano.',
+    keywords: 'valores ASOPROMAS, sostenibilidad cacao, compromiso ambiental Ecuador, integridad cooperativa, solidaridad rural',
+    url: '/about/values',
+    type: 'article'
+  });
+
   const values = [
     {
       icon: <Heart className="w-8 h-8" />,

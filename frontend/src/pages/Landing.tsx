@@ -4,21 +4,32 @@ import { ChevronRight, Award, Users, Heart, ShoppingBag } from 'lucide-react';
 import asopromasLogo from '../assets/icons/logo.svg';
 import ButtonBuy from '../components/ButtonBuy';
 import CTA from '../components/CTA';
+import { useSEO } from '../hooks/useSEO';
 
 const Landing: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'ASOPROMAS - Cacao Premium y Chocolate Artesanal del Ecuador',
+    description: 'Descubre los productos KUJEÑITO de ASOPROMAS: chocolate 100% puro, barras artesanales y productos derivados del cacao de fino aroma de Zamora Chinchipe, Ecuador.',
+    keywords: 'ASOPROMAS, KUJEÑITO, cacao Ecuador, chocolate artesanal, cacao fino aroma, Zamora Chinchipe, chocolate orgánico, comercio justo',
+    url: '/',
+    type: 'website',
+    image: '/assets/images/hero-cacao.jpg'
+  });
+
   const features = [
     {
-      icon: <Award className="h-8 w-8 text-amber-600" />,
+      icon: <Award className="h-8 w-8 text-amber-600" aria-hidden="true" />,
       title: "Calidad Premium",
       description: "Nuestros chocolates están elaborados con los mejores granos de cacao del Ecuador"
     },
     {
-      icon: <Users className="h-8 w-8 text-amber-600" />,
+      icon: <Users className="h-8 w-8 text-amber-600" aria-hidden="true" />,
       title: "Comunidad Primero",
       description: "Apoyando a los agricultores locales y sus familias a través de prácticas de comercio justo"
     },
     {
-      icon: <Heart className="h-8 w-8 text-amber-600" />,
+      icon: <Heart className="h-8 w-8 text-amber-600" aria-hidden="true" />,
       title: "Futuro Sostenible",
       description: "Comprometidos con métodos de cultivo conscientes del medio ambiente"
     }
@@ -55,17 +66,20 @@ const Landing: FC = () => {
 
       {/* Final CTA Section */}
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center bg-black text-white overflow-hidden">
+      <section 
+        className="relative min-h-screen flex items-center bg-black text-white overflow-hidden"
+        aria-labelledby="hero-heading"
+      >
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 opacity-30" aria-hidden="true">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/15 to-transparent transform rotate-12"></div>
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-blue-400/10 to-transparent transform -rotate-12"></div>
         </div>
 
         {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 right-10 w-16 h-16 bg-emerald-500/25 rounded-full blur-lg animate-pulse delay-500"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-amber-500/30 rounded-full blur-xl animate-pulse" aria-hidden="true"></div>
+        <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse delay-1000" aria-hidden="true"></div>
+        <div className="absolute top-1/2 right-10 w-16 h-16 bg-emerald-500/25 rounded-full blur-lg animate-pulse delay-500" aria-hidden="true"></div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -75,7 +89,10 @@ const Landing: FC = () => {
                 <div className="inline-block px-4 py-2 bg-emerald-500/20 backdrop-blur-sm rounded-full border border-emerald-400/40">
                   <span className="text-emerald-300 font-medium text-sm">🇪🇨 Desde Ecuador para el Mundo</span>
                 </div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                <h1 
+                  id="hero-heading"
+                  className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
+                >
                   Descubre el
                   <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
                     Chocolate

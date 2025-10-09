@@ -1,0 +1,12 @@
+# ASOPROMAS - Default OG Image
+
+Este archivo representa la imagen por defecto para Open Graph.
+En producción, reemplazar con una imagen real de 1200x630px.
+
+Imagen recomendada:
+- Tamaño: 1200x630 pixels
+- Formato: JPG o PNG
+- Contenido: Logo ASOPROMAS + productos KUJEÑITO + texto descriptivo
+- Peso: < 300KB
+
+Ubicación final: /assets/images/og-default.jpg

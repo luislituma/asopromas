@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, Heart, Sparkles, Star, Cherry } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const FruitBonbons: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Bombones con Relleno de Frutas Exóticas KUJEÑITO",
+    description: "Bombones rellenos con frutas locales y exóticas. Una combinación dulce y afrutada que resalta la riqueza de la Amazonía.",
+    price: "18.99",
+    currency: "USD",
+    category: "Bombones Artesanales",
+    image: "/assets/images/products/fruit-bonbons.jpg",
+    url: "/products/fruit-bonbons"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Bombones con Frutas Exóticas KUJEÑITO - Sabores Amazónicos | ASOPROMAS',
+    description: 'Bombones KUJEÑITO rellenos con frutas exóticas de la Amazonía ecuatoriana. Combinación perfecta de chocolate premium y sabores tropicales únicos.',
+    keywords: 'bombones frutas exóticas, KUJEÑITO bombones, chocolate frutas amazónicas, bombones artesanales Ecuador',
+    url: '/products/fruit-bonbons',
+    type: 'product',
+    image: '/assets/images/products/fruit-bonbons.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
       {/* Breadcrumb */}

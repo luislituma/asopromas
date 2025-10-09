@@ -22,16 +22,26 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
 
   return (
     <article
-      className={`group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition transform hover:-translate-y-1 ${className}`}
+      className={`group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition transform hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[#411900] focus-within:ring-offset-2 ${className}`}
       aria-labelledby={`product-${product.id}-title`}
+      aria-describedby={`product-${product.id}-description`}
     >
-      <Link to={`/products/${product.id}`} className="block">
+      <Link 
+        to={`/products/${product.id}`} 
+        className="block focus-visible"
+        aria-label={`Ver producto ${product.name}`}
+      >
         <div className="relative h-56 bg-gray-100 overflow-hidden">
           <img
             src={thumb}
-            alt={product.name}
+            alt={`Imagen de ${product.name}`}
             loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              // Fallback image if main image fails to load
+              const target = e.target as HTMLImageElement;
+              target.src = fallbackImage;
+            }}
           />
         </div>
 
@@ -40,7 +50,10 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
             {product.name}
           </h3>
 
-          <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+          <p 
+            id={`product-${product.id}-description`}
+            className="text-sm text-gray-600 mb-4 line-clamp-3"
+          >
             {product.description}
           </p>
         </div>
@@ -49,8 +62,8 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
       <div className="px-4 pb-4 flex items-center justify-between">
         <Link
           to={`/products/${product.id}`}
-          className="text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200 hover:underline"
-          aria-label={`Ver detalles de ${product.name}`}
+          className="text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200 hover:underline focus-visible"
+          aria-label={`Ver detalles completos de ${product.name}`}
         >
           Ver detalles →
         </Link>

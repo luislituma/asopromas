@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Award, Shield, Globe, CheckCircle } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const Certifications: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Certificaciones - ASOPROMAS | Cacao Orgánico Certificado Ecuador',
+    description: 'ASOPROMAS cuenta con certificaciones USDA Organic, Fair Trade, Rainforest Alliance y más. Cacao orgánico certificado de la más alta calidad de Ecuador.',
+    keywords: 'certificaciones ASOPROMAS, cacao orgánico certificado, USDA Organic Ecuador, Fair Trade cacao, Rainforest Alliance',
+    url: '/about/certifications',
+    type: 'article'
+  });
+
   const certifications = [
     {
       name: 'USDA Organic',

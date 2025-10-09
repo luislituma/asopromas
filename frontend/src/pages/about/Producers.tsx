@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Users, MapPin, Heart, Award, TrendingUp, Home } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const Producers: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Nuestros Productores - ASOPROMAS | Familias Cacaoteras de Ecuador',
+    description: 'Conoce a los productores de cacao de ASOPROMAS: 150 familias de Zamora Chinchipe dedicadas al cultivo sostenible de cacao de fino aroma ecuatoriano.',
+    keywords: 'productores cacao Ecuador, familias cacaoteras, Zamora Chinchipe agricultores, comercio justo cacao, agricultores ASOPROMAS',
+    url: '/about/producers',
+    type: 'article'
+  });
+
   const producers = [
     {
       name: 'María Elena Vargas',

@@ -1,17 +1,45 @@
-import { type FC } from 'react';
-import { Outlet } from 'react-router-dom';
+import { type FC, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import SkipLinks from './SkipLinks';
+import ScreenReaderAnnouncer from './ScreenReaderAnnouncer';
+import { useA11y } from '../hooks/useA11y';
 
 const Layout: FC = () => {
+  const location = useLocation();
+  const { announcePageChange, focusMainContent } = useA11y();
+
+  useEffect(() => {
+    // Announce page changes to screen readers
+    const pageTitle = document.title;
+    announcePageChange(`Navegando a ${pageTitle}`);
+    
+    // Focus main content for keyboard users
+    focusMainContent();
+  }, [location, announcePageChange, focusMainContent]);
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <SkipLinks />
+      <ScreenReaderAnnouncer />
+      
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        
+        <main 
+          id="main-content" 
+          className="flex-1"
+          role="main"
+          aria-label="Contenido principal"
+          tabIndex={-1}
+        >
+          <Outlet />
+        </main>
+        
+        <Footer />
+      </div>
+    </>
   );
 };
         

@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, Heart, Sparkles, Star, Coffee } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const ChocolateNibsSalt: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Chocolate con Nibs de Cacao y Sal Marina KUJEÑITO",
+    description: "Chocolate al 65% con nibs de cacao tostados y un toque de sal marina. Perfectamente equilibrado entre dulce y salado.",
+    price: "14.99",
+    currency: "USD",
+    category: "Chocolate Gourmet",
+    image: "/assets/images/products/chocolate-nibs-salt.jpg",
+    url: "/products/chocolate-nibs-salt"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Chocolate con Nibs y Sal Marina KUJEÑITO - ASOPROMAS',
+    description: 'Chocolate KUJEÑITO al 65% con nibs de cacao tostados y sal marina. Experiencia gourmet que equilibra dulce y salado. ¡Compra online!',
+    keywords: 'chocolate nibs sal, chocolate gourmet Ecuador, KUJEÑITO nibs, chocolate salado, cacao con sal marina',
+    url: '/products/chocolate-nibs-salt',
+    type: 'product',
+    image: '/assets/images/products/chocolate-nibs-salt.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50">
       {/* Breadcrumb */}

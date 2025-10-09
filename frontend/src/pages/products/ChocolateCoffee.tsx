@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, Heart, Coffee, Star, Zap } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const ChocolateCoffee: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Chocolate con Café KUJEÑITO",
+    description: "Chocolate al 65% con café de altura de Palanda. Perfecto para empezar el día con energía y rico aroma.",
+    price: "13.99",
+    currency: "USD",
+    category: "Chocolate Energético",
+    image: "/assets/images/products/chocolate-coffee.jpg",
+    url: "/products/chocolate-coffee"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Chocolate con Café KUJEÑITO - Energía y Sabor | ASOPROMAS',
+    description: 'Chocolate KUJEÑITO al 65% con café de altura de Palanda. Combinación perfecta de cacao ecuatoriano y café premium para energizar tu día.',
+    keywords: 'chocolate café Ecuador, KUJEÑITO café, chocolate energético, café Palanda, chocolate estimulante',
+    url: '/products/chocolate-coffee',
+    type: 'product',
+    image: '/assets/images/products/chocolate-coffee.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Breadcrumb */}

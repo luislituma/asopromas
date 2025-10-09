@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /about/
+Allow: /products/
+Allow: /contact
+
+# Sitemap location
+Sitemap: https://asopromas.com/sitemap.xml
+
+# Crawl delay (optional - 1 second between requests)
+Crawl-delay: 1

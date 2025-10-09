@@ -64,23 +64,37 @@ const ButtonBuy: FC<Props> = ({
         group
         relative overflow-hidden
         backdrop-blur-sm
+        focus-visible
       `}
-      aria-label={`Comprar ${productName ?? "producto"} vía WhatsApp`}
+      aria-label={productName 
+        ? `Contactar por WhatsApp para comprar ${productName}` 
+        : "Contactar por WhatsApp para información sobre productos"
+      }
+      aria-describedby={productId ? `product-${productId}-description` : undefined}
     >
       {variant === "whatsapp" ? (
-        <MessageCircle className={`${iconSize[size]} transition-transform duration-300 group-hover:rotate-12 drop-shadow-md`} />
+        <MessageCircle 
+          className={`${iconSize[size]} transition-transform duration-300 group-hover:rotate-12 drop-shadow-md`}
+          aria-hidden="true"
+        />
       ) : (
-        <ShoppingCart className={`${iconSize[size]} transition-transform duration-300 group-hover:scale-110 drop-shadow-md`} />
+        <ShoppingCart 
+          className={`${iconSize[size]} transition-transform duration-300 group-hover:scale-110 drop-shadow-md`}
+          aria-hidden="true"
+        />
       )}
       <span className="font-bold tracking-wide">
         {variant === "whatsapp" ? "WhatsApp" : "Comprar"}
       </span>
       
       {/* Efecto de brillo dorado - temática chocolate */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-300/20 to-amber-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div 
+        className="absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-300/20 to-amber-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        aria-hidden="true"
+      ></div>
       
       {/* Partículas de chocolate flotantes */}
-      <div className="absolute inset-0 rounded-xl overflow-hidden">
+      <div className="absolute inset-0 rounded-xl overflow-hidden" aria-hidden="true">
         <div className="absolute top-1 left-2 w-1 h-1 bg-yellow-300/40 rounded-full animate-pulse"></div>
         <div className="absolute bottom-2 right-3 w-0.5 h-0.5 bg-amber-200/50 rounded-full animate-pulse delay-300"></div>
         <div className="absolute top-3 right-1 w-0.5 h-0.5 bg-yellow-400/30 rounded-full animate-pulse delay-700"></div>

@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Leaf, TreePine, Award, Shield, Globe, Recycle } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const Sustainability: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Sostenibilidad Ambiental - ASOPROMAS | Cacao Ecológico Ecuador',
+    description: 'Descubre las prácticas sostenibles de ASOPROMAS: agroforestería, economía circular, conservación del suelo y certificaciones ambientales en Zamora Chinchipe.',
+    keywords: 'sostenibilidad cacao Ecuador, agroforestería cacao, agricultura ecológica, certificación orgánica Ecuador, carbono neutral cacao',
+    url: '/about/sustainability',
+    type: 'article'
+  });
+
   const initiatives = [
     {
       icon: <TreePine className="w-8 h-8" />,

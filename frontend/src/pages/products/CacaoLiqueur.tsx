@@ -2,8 +2,32 @@ import { type FC } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, Heart, Wine, Star, Clock } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
+import { useSEO } from "../../hooks/useSEO";
+import { generateProductSchema } from "../../utils/schema";
 
 const CacaoLiqueur: FC = () => {
+  // Generate Product Schema
+  const productSchema = generateProductSchema({
+    name: "Licor Dulce de Cacao KUJEÑITO",
+    description: "Licor artesanal elaborado con cacao de fino aroma de Zamora Chinchipe. Experiencia única que combina tradición y sofisticación.",
+    price: "24.99",
+    currency: "USD",
+    category: "Licor Artesanal",
+    image: "/assets/images/products/cacao-liqueur.jpg",
+    url: "/products/cacao-liqueur"
+  });
+
+  // SEO Configuration
+  useSEO({
+    title: 'Licor Dulce de Cacao KUJEÑITO - Tradición Artesanal | ASOPROMAS',
+    description: 'Licor KUJEÑITO elaborado con cacao fino de aroma de Ecuador. Experiencia única que combina tradición ancestral y sofisticación moderna.',
+    keywords: 'licor cacao Ecuador, licor artesanal KUJEÑITO, bebida alcohólica cacao, licor fino Ecuador, destilado cacao',
+    url: '/products/cacao-liqueur',
+    type: 'product',
+    image: '/assets/images/products/cacao-liqueur.jpg',
+    schema: productSchema
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
       {/* Breadcrumb */}

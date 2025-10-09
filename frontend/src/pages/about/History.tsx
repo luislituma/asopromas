@@ -1,8 +1,18 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Calendar, Users, Award } from 'lucide-react';
+import { useSEO } from '../../hooks/useSEO';
 
 const History: FC = () => {
+  // SEO Configuration
+  useSEO({
+    title: 'Historia de ASOPROMAS - 40 Años Cultivando Tradición | Ecuador',
+    description: 'Descubre la historia de ASOPROMAS desde 1985: cuatro décadas cultivando cacao de fino aroma en Zamora Chinchipe, fortaleciendo comunidades rurales del Ecuador.',
+    keywords: 'historia ASOPROMAS, cacao Ecuador historia, Zamora Chinchipe agricultura, cooperativa cacao, tradición cacaotera Ecuador',
+    url: '/about/history',
+    type: 'article'
+  });
+
   const milestones = [
     {
       year: '1985',

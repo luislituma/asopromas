@@ -2,8 +2,18 @@ import { type FC } from 'react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const Contact: FC = () => {
+    // SEO Configuration
+    useSEO({
+        title: 'Contacto - ASOPROMAS | Cacao Premium Ecuador',
+        description: 'Contáctanos para conocer más sobre nuestros productos KUJEÑITO y servicios. ASOPROMAS - Zamora Chinchipe, Ecuador. Teléfono: +593 (07) 2605-120',
+        keywords: 'contacto ASOPROMAS, información productos KUJEÑITO, Zamora Chinchipe contacto, cacao Ecuador contacto',
+        url: '/contact',
+        type: 'website'
+    });
+
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
