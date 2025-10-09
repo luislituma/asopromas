@@ -1,5 +1,4 @@
 import { type FC } from "react";
-import { Link } from "react-router-dom";
 import ButtonBuy from "../../components/ButtonBuy";
 import { motion } from "framer-motion";
 import { useSEO } from "../../hooks/useSEO";
@@ -35,12 +34,6 @@ const CacaoNibs: FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <nav className="mb-8">
-          <Link to="/products" className="text-gray-600 hover:text-gray-900">
-            ← Back to Products
-          </Link>
-        </nav>
-
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold text-gray-900">Natural Cacao Nibs</h1>

@@ -106,23 +106,6 @@ const Certifications: FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Link to="/" className="text-gray-500 hover:text-blue-600 transition-colors">
-              Inicio
-            </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <Link to="/about" className="text-gray-500 hover:text-blue-600 transition-colors">
-              Nosotros
-            </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-blue-600 font-medium">Certificaciones</span>
-          </nav>
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>

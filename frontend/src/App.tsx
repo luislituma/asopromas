@@ -24,9 +24,12 @@ import PureChocolateBar from './pages/products/PureChocolateBar';
 import ChocolateNibsSalt from './pages/products/ChocolateNibsSalt';
 import ChocolateCoffee from './pages/products/ChocolateCoffee';
 import FruitBonbons from './pages/products/FruitBonbons';
-import CacaoNibs from './pages/products/CacaoNibs';
 import CacaoLiqueur from './pages/products/CacaoLiqueur';
 import CacaoCocktail from './pages/products/CacaoCocktail';
+import CocoaNibs from './pages/products/CocoaNibs';
+import CocoaPowder from './pages/products/CocoaPowder';
+import CocoaLiquor from './pages/products/CocoaLiquor';
+import Pralines from './pages/products/Pralines';
 
 const App: FC = () => {
   return (
@@ -46,9 +49,12 @@ const App: FC = () => {
         <Route path="products/chocolate-nibs-salt" element={<ChocolateNibsSalt />} />
         <Route path="products/chocolate-coffee" element={<ChocolateCoffee />} />
         <Route path="products/fruit-bonbons" element={<FruitBonbons />} />
-        <Route path="products/cacao-nibs" element={<CacaoNibs />} />
         <Route path="products/cacao-liqueur" element={<CacaoLiqueur />} />
         <Route path="products/cacao-cocktail" element={<CacaoCocktail />} />
+        <Route path="products/cocoa-nibs" element={<CocoaNibs />} />
+        <Route path="products/cocoa-powder" element={<CocoaPowder />} />
+        <Route path="products/cocoa-liquor" element={<CocoaLiquor />} />
+        <Route path="products/pralines" element={<Pralines />} />
       </Route>
     </Routes>
   );

@@ -1,6 +1,5 @@
 import { type FC } from "react";
-import { Link } from "react-router-dom";
-import { ChevronRight, Award, Heart, Wine, Star, Clock } from "lucide-react";
+import { Award, Heart, Wine, Star, Clock } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
 import { useSEO } from "../../hooks/useSEO";
 import { generateProductSchema } from "../../utils/schema";
@@ -30,17 +29,6 @@ const CacaoLiqueur: FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
-      {/* Breadcrumb */}
-      <div className="container mx-auto px-6 py-4">
-        <nav className="flex items-center gap-2 text-sm text-gray-600">
-          <Link to="/" className="hover:text-red-600 transition-colors">Inicio</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link to="/products" className="hover:text-red-600 transition-colors">Productos</Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-red-600 font-medium">Licor Dulce de Cacao</span>
-        </nav>
-      </div>
-
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-red-900 to-orange-800 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>

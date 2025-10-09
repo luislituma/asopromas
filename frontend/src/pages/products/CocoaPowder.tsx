@@ -56,23 +56,6 @@ const CocoaPowder: FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-orange-50">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Link to="/" className="text-gray-500 hover:text-orange-600 transition-colors">
-              Inicio
-            </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <Link to="/products" className="text-gray-500 hover:text-orange-600 transition-colors">
-              Productos
-            </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-orange-600 font-medium">Cacao en Polvo</span>
-          </nav>
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-orange-900 via-orange-800 to-orange-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
