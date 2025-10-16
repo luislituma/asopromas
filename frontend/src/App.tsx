@@ -2,8 +2,14 @@ import { type FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 
+// Configuration
+import { SITE_CONFIG } from './config/site';
+
 // Layouts
 import Layout from './components/Layout';
+
+// Coming Soon Page
+import ComingSoon from './pages/ComingSoon';
 
 // Pages
 import Landing from './pages/Landing';
@@ -31,7 +37,16 @@ import CocoaPowder from './pages/products/CocoaPowder';
 import CocoaLiquor from './pages/products/CocoaLiquor';
 import Pralines from './pages/products/Pralines';
 
+// Configuración: cambiar a false cuando quieras mostrar el sitio completo
+const COMING_SOON_MODE = SITE_CONFIG.COMING_SOON_MODE;
+
 const App: FC = () => {
+  // Si está en modo "Coming Soon", mostrar solo esa página
+  if (COMING_SOON_MODE) {
+    return <ComingSoon />;
+  }
+
+  // Sitio completo cuando COMING_SOON_MODE = false
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
