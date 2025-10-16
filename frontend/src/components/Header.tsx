@@ -164,7 +164,6 @@ const Header: FC = () => {
                         >
                             {navLinks.map((link) => {
                                 const isProducts = link.text === 'Productos';
-                                const isAbout = link.text === 'Nosotros';
                                 const hasSub = link.submenu && link.submenu.length > 0;
 
                                 return (
