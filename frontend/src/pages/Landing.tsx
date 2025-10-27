@@ -2,7 +2,6 @@ import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Award, Users, Heart, ShoppingBag } from 'lucide-react';
 import asopromasLogo from '../assets/icons/logo.svg';
-import ButtonBuy from '../components/ButtonBuy';
 import CTA from '../components/CTA';
 import { useSEO } from '../hooks/useSEO';
 
