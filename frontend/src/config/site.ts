@@ -1,7 +1,7 @@
 // Configuración del sitio
 export const SITE_CONFIG = {
   // Cambiar a false cuando quieras mostrar el sitio completo
-  COMING_SOON_MODE: true,
+  COMING_SOON_MODE: false,
   
   // Fecha objetivo para el contador (en días desde hoy)
   LAUNCH_DAYS_FROM_NOW: 12,
