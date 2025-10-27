@@ -26,6 +26,37 @@ const OrderSummary: FC<OrderSummaryProps> = ({
     window.print();
   };
 
+  // Función para generar PDF como base64 (para envío por email)
+  const generatePDFBase64 = async (): Promise<string | null> => {
+    if (!summaryRef.current) return null;
+
+    try {
+      const canvas = await html2canvas(summaryRef.current, {
+        scale: 2,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Retornar PDF como base64
+      return pdf.output('dataurlstring');
+    } catch (error) {
+      console.error('Error generating PDF base64:', error);
+      return null;
+    }
+  };
+
   const handleDownloadPDF = async () => {
     if (!summaryRef.current) return;
 
@@ -235,12 +266,12 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             <div className="border-t-2 border-gray-200 pt-6">
               <div className="max-w-sm ml-auto space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-medium text-gray-900">${totalPrice.toFixed(2)}</span>
+                  <span className="text-gray-600">Subtotal (sin IVA):</span>
+                  <span className="font-medium text-gray-900">${(totalPrice / 1.15).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">IVA (12%):</span>
-                  <span className="font-medium text-gray-900">${(totalPrice * 0.12).toFixed(2)}</span>
+                  <span className="text-gray-600">IVA (15%):</span>
+                  <span className="font-medium text-gray-900">${(totalPrice - (totalPrice / 1.15)).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Envío:</span>
@@ -249,7 +280,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                 <div className="border-t-2 border-amber-500 pt-3 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">TOTAL:</span>
                   <span className="text-2xl font-bold text-amber-600">
-                    ${(totalPrice * 1.12).toFixed(2)}
+                    ${totalPrice.toFixed(2)}
                   </span>
                 </div>
               </div>

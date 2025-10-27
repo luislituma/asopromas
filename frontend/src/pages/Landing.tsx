@@ -39,13 +39,13 @@ const Landing: FC = () => {
       image: "/src/assets/images/products/chocolate-bar.jpg",
       title: "Barras de Chocolate Artesanales",
       description: "Experimenta el sabor puro del Ecuador en cada bocado",
-      link: "/products/chocolate-bar"
+      link: "/products/pure-chocolate-bar"
     },
     {
       image: "/src/assets/images/products/chocolate-drink.jpg",
       title: "Bebidas de Cacao Premium",
       description: "Bebidas ricas y aromáticas para los amantes del chocolate",
-      link: "/products/chocolate-drink"
+      link: "/products/cacao-cocktail"
     },
     {
       image: "/src/assets/images/products/cocoa-liquor.jpg",
