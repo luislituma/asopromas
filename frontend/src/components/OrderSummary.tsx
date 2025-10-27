@@ -26,37 +26,6 @@ const OrderSummary: FC<OrderSummaryProps> = ({
     window.print();
   };
 
-  // Función para generar PDF como base64 (para envío por email)
-  const generatePDFBase64 = async (): Promise<string | null> => {
-    if (!summaryRef.current) return null;
-
-    try {
-      const canvas = await html2canvas(summaryRef.current, {
-        scale: 2,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      
-      // Retornar PDF como base64
-      return pdf.output('dataurlstring');
-    } catch (error) {
-      console.error('Error generating PDF base64:', error);
-      return null;
-    }
-  };
-
   const handleDownloadPDF = async () => {
     if (!summaryRef.current) return;
 
