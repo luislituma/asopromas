@@ -8,6 +8,7 @@ export type Product = {
   name: string;
   description: string;
   images?: string[];
+  price?: number;
 };
 
 interface Props {
@@ -72,8 +73,8 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
         <ButtonBuy 
           productId={product.id} 
           productName={product.name}
-          variant="whatsapp"
-          size="sm"
+          productPrice={product.price || 19.99}
+          productImage={thumb}
         />
       </div>
     </article>

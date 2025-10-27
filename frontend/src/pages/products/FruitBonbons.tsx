@@ -71,9 +71,10 @@ const FruitBonbons: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productName="Bombones con Frutas Exóticas KUJEÑITO - ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="fruit-bonbons-exotic"
+                  productName="Bombones con Frutas Exóticas KUJEÑITO"
+                  productPrice={22.99}
+                  productImage="/assets/images/products/fruit-bonbons.jpg"
                 />
               </div>
             </div>
@@ -271,9 +272,10 @@ const FruitBonbons: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productName="Bombones con Frutas Exóticas KUJEÑITO - ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productId="fruit-bonbons-exotic"
+              productName="Bombones con Frutas Exóticas KUJEÑITO"
+              productPrice={22.99}
+              productImage="/assets/images/products/fruit-bonbons.jpg"
             />
           </div>
         </div>

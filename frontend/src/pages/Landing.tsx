@@ -66,7 +66,7 @@ const Landing: FC = () => {
 
       {/* Final CTA Section */}
       {/* Hero Section */}
-      <section 
+      <section
         className="relative min-h-screen flex items-center bg-black text-white overflow-hidden"
         aria-labelledby="hero-heading"
       >
@@ -89,7 +89,7 @@ const Landing: FC = () => {
                 <div className="inline-block px-4 py-2 bg-emerald-500/20 backdrop-blur-sm rounded-full border border-emerald-400/40">
                   <span className="text-emerald-300 font-medium text-sm">🇪🇨 Desde Ecuador para el Mundo</span>
                 </div>
-                <h1 
+                <h1
                   id="hero-heading"
                   className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
                 >
@@ -263,11 +263,11 @@ const Landing: FC = () => {
             Descubre los ricos sabores de nuestros productos premium de chocolate y cacao
           </p>
           <div className='flex justify-center'>
-            <ButtonBuy
-              productName="Productos de Chocolate Premium ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
-            />
+            <Link to="/products">
+              <button className="bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                Comprar
+              </button>
+            </Link>
           </div>
         </div>
       </section>

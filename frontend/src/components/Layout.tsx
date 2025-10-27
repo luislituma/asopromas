@@ -2,6 +2,7 @@ import { type FC, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import CartWidget from './CartWidget';
 import SkipLinks from './SkipLinks';
 import ScreenReaderAnnouncer from './ScreenReaderAnnouncer';
 import { useA11y } from '../hooks/useA11y';
@@ -38,6 +39,7 @@ const Layout: FC = () => {
         </main>
         
         <Footer />
+        <CartWidget />
       </div>
     </>
   );

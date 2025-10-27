@@ -70,9 +70,10 @@ const CocoaPowder: FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <ButtonBuy 
+                  productId="cocoa-powder-premium"
                   productName="Cacao en Polvo Premium ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productPrice={13.99}
+                  productImage="/assets/images/products/cocoa-powder.jpg"
                 />
                 <Link
                   to="/products"
@@ -154,9 +155,10 @@ const CocoaPowder: FC = () => {
                       {product.price}
                     </span>
                     <ButtonBuy 
+                      productId={`cocoa-powder-${product.name.toLowerCase().replace(/\s+/g, '-')}`}
                       productName={product.name}
-                      variant="whatsapp"
-                      size="sm"
+                      productPrice={parseFloat(product.price.replace('$', ''))}
+                      productImage="/assets/images/products/cocoa-powder.jpg"
                     />
                   </div>
                 </div>
@@ -301,9 +303,10 @@ const CocoaPowder: FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <ButtonBuy 
+              productId="cocoa-powder-pack"
               productName="Pack Completo Cacao en Polvo ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productPrice={49.99}
+              productImage="/assets/images/products/cocoa-powder-pack.jpg"
             />
             <Link
               to="/contact"

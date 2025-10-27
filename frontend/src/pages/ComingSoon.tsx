@@ -6,16 +6,16 @@ import { SITE_CONFIG } from '../config/site';
 const ComingSoon: FC = () => {
   // SEO - Actualizar título de la página
   useEffect(() => {
-    document.title = 'ASOPROMAS - Próximamente | Chocolate Artesanal de Manabí';
+    document.title = 'ASOPROMAS - Próximamente | Chocolate Artesanal de Zamora Chinchipe';
     
     // Meta description
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Muy pronto: nuevo sitio web de ASOPROMAS con chocolate y cacao artesanal de primera calidad directo desde Manabí, Ecuador.');
+      metaDescription.setAttribute('content', 'Muy pronto: nuevo sitio web de ASOPROMAS con chocolate y cacao artesanal de primera calidad directo desde Zamora Chinchipe, Ecuador.');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'Muy pronto: nuevo sitio web de ASOPROMAS con chocolate y cacao artesanal de primera calidad directo desde Zamora-Chinchipe, Ecuador.';
+      meta.content = 'Muy pronto: nuevo sitio web de ASOPROMAS con chocolate y cacao artesanal de primera calidad directo desde Zamora Chinchipe, Ecuador.';
       document.head.appendChild(meta);
     }
   }, []);

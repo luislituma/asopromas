@@ -9,6 +9,7 @@ type ProductJson = {
   name: string;
   description: string;
   images?: string[];
+  price?: number;
 };
 
 const ProductDetail: FC = () => {
@@ -97,8 +98,8 @@ const ProductDetail: FC = () => {
             <ButtonBuy 
               productId={product.id} 
               productName={product.name}
-              variant="whatsapp"
-              size="lg"
+              productPrice={product.price || 19.99}
+              productImage={images[0]}
             />
             <div className="text-sm text-gray-500">
               💬 Respuesta inmediata por WhatsApp

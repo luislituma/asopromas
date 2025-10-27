@@ -71,9 +71,10 @@ const ChocolateCoffee: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productName="Chocolate con Café de Palanda KUJEÑITO - ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="chocolate-coffee-palanda"
+                  productName="Chocolate con Café de Palanda KUJEÑITO"
+                  productPrice={18.99}
+                  productImage="/assets/images/products/chocolate-coffee.jpg"
                 />
               </div>
             </div>
@@ -241,9 +242,10 @@ const ChocolateCoffee: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productName="Chocolate con Café de Palanda KUJEÑITO - ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productId="chocolate-coffee-palanda"
+              productName="Chocolate con Café de Palanda KUJEÑITO"
+              productPrice={18.99}
+              productImage="/assets/images/products/chocolate-coffee.jpg"
             />
           </div>
         </div>

@@ -71,9 +71,10 @@ const CacaoLiqueur: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productName="Licor Dulce de Cacao KUJEÑITO 20° - ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="cacao-liqueur-20"
+                  productName="Licor Dulce de Cacao KUJEÑITO 20°"
+                  productPrice={24.99}
+                  productImage="/assets/images/products/cacao-liqueur.jpg"
                 />
               </div>
             </div>
@@ -271,9 +272,10 @@ const CacaoLiqueur: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productName="Licor Dulce de Cacao KUJEÑITO 20° - ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productId="cacao-liqueur-20"
+              productName="Licor Dulce de Cacao KUJEÑITO 20°"
+              productPrice={24.99}
+              productImage="/assets/images/products/cacao-liqueur.jpg"
             />
           </div>
         </div>

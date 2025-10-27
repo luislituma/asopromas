@@ -28,7 +28,7 @@ const CocoaLiquorComponent: FC = () => {
               <li>100% Cacao puro</li>
               <li>Sin aditivos</li>
               <li>Proceso controlado de fermentación</li>
-              <li>Origen: Manabí, Ecuador</li>
+              <li>Origen: Zamora Chinchipe, Ecuador</li>
             </ul>
           </div>
 

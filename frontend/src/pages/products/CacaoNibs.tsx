@@ -50,7 +50,12 @@ const CacaoNibs: FC = () => {
                 <li>Perfect for healthy snacking</li>
               </ul>
               <div className="pt-6">
-                <ButtonBuy />
+                <ButtonBuy 
+                  productId="cacao-nibs-premium"
+                  productName="Nibs de Cacao Premium ASOPROMAS"
+                  productPrice={16.99}
+                  productImage="/assets/images/products/cacao-nibs.jpg"
+                />
               </div>
             </div>
           </div>

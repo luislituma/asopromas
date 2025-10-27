@@ -70,9 +70,10 @@ const Pralines: FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <ButtonBuy 
+                  productId="pralines-artisan"
                   productName="Pralines Artesanales ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productPrice={19.99}
+                  productImage="/assets/images/products/pralines.jpg"
                 />
                 <Link
                   to="/products"
@@ -140,9 +141,10 @@ const Pralines: FC = () => {
                       {praline.price}
                     </span>
                     <ButtonBuy 
+                      productId={`praline-${praline.name.toLowerCase().replace(/\s+/g, '-')}`}
                       productName={praline.name}
-                      variant="whatsapp"
-                      size="sm"
+                      productPrice={parseFloat(praline.price.replace('$', ''))}
+                      productImage={praline.image}
                     />
                   </div>
                 </div>
@@ -281,9 +283,10 @@ const Pralines: FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <ButtonBuy 
+              productId="pralines-collection"
               productName="Colección Completa de Pralines ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productPrice={65.99}
+              productImage="/assets/images/products/pralines-collection.jpg"
             />
             <Link
               to="/contact"

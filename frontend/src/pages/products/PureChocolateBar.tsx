@@ -71,9 +71,10 @@ const PureChocolateBar: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productName="Barra de Chocolate 100% KUJEÑITO - ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="pure-chocolate-bar-100"
+                  productName="Barra de Chocolate 100% KUJEÑITO"
+                  productPrice={15.99}
+                  productImage="/assets/images/products/chocolate-bar.jpg"
                 />
               </div>
             </div>
@@ -241,9 +242,10 @@ const PureChocolateBar: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productName="Barra de Chocolate 100% KUJEÑITO - ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productId="pure-chocolate-bar-100"
+              productName="Barra de Chocolate 100% KUJEÑITO"
+              productPrice={15.99}
+              productImage="/assets/images/products/chocolate-bar.jpg"
             />
           </div>
         </div>

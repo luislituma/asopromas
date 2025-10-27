@@ -71,9 +71,10 @@ const ChocolateNibsSalt: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productName="Chocolate con Nibs y Sal Marina KUJEÑITO - ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="chocolate-nibs-salt"
+                  productName="Chocolate con Nibs y Sal Marina KUJEÑITO"
+                  productPrice={17.99}
+                  productImage="/assets/images/products/chocolate-nibs-salt.jpg"
                 />
               </div>
             </div>
@@ -241,9 +242,10 @@ const ChocolateNibsSalt: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productName="Chocolate con Nibs y Sal Marina KUJEÑITO - ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productId="chocolate-nibs-salt"
+              productName="Chocolate con Nibs y Sal Marina KUJEÑITO"
+              productPrice={17.99}
+              productImage="/assets/images/products/chocolate-nibs-salt.jpg"
             />
           </div>
         </div>

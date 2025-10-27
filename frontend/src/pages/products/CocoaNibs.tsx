@@ -86,9 +86,10 @@ const CocoaNibs: FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <ButtonBuy 
-                  productName="Nibs de Cacao Premium ASOPROMAS"
-                  variant="whatsapp"
-                  size="lg"
+                  productId="cocoa-nibs-premium"
+                  productName="Nibs de Cacao Premium"
+                  productPrice={14.99}
+                  productImage="/assets/images/products/cocoa-nibs.jpg"
                 />
                 <Link
                   to="/products"
@@ -164,9 +165,10 @@ const CocoaNibs: FC = () => {
                       {product.price}
                     </span>
                     <ButtonBuy 
+                      productId={`cocoa-nibs-${product.name.toLowerCase().replace(/\s+/g, '-')}`}
                       productName={product.name}
-                      variant="whatsapp"
-                      size="sm"
+                      productPrice={parseFloat(product.price.replace('$', ''))}
+                      productImage="/assets/images/products/cocoa-nibs.jpg"
                     />
                   </div>
                 </div>
@@ -364,9 +366,10 @@ const CocoaNibs: FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <ButtonBuy 
+              productId="cocoa-nibs-collection"
               productName="Colección Completa Nibs de Cacao ASOPROMAS"
-              variant="whatsapp"
-              size="lg"
+              productPrice={59.99}
+              productImage="/assets/images/products/cocoa-nibs-collection.jpg"
             />
             <Link
               to="/contact"

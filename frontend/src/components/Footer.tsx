@@ -52,7 +52,7 @@ const Footer: FC = () => {
                 </h2>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed text-center sm:text-left max-w-xs mb-4">
-                Cacao de origen premium, elaborado con pasión por nuestra comunidad desde 1985.
+                Cacao de origen premium, elaborado con pasión por nuestra comunidad desde 2000.
               </p>
               <address 
                 className="w-full bg-gradient-to-r from-gray-200/40 to-gray-300/30 p-3 rounded-lg border border-gray-400/20 not-italic"
@@ -205,16 +205,14 @@ const Footer: FC = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="container mx-auto px-4 lg:px-6 py-6 bg-gradient-to-r from-gray-100/60 to-gray-50/40 rounded-t-xl border-t border-gray-300/30">
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            <div className="text-center sm:text-left">
-              <p className="text-gray-700 text-sm font-medium">
-                © {new Date().getFullYear()} <span className="font-bold text-gray-900">ASOPROMAS</span> - Todos los derechos reservados.
-              </p>
-              <p className="text-gray-600 text-xs mt-1">
-                Hecho en <span className="text-yellow-500 text-xl" role="img" aria-label="bandera de Ecuador">🇪🇨</span> para promover el cacao ecuatoriano
-              </p>
-            </div>
+        <div className="text-center container mx-auto px-4 lg:px-6 py-6 bg-gradient-to-r from-gray-100/60 to-gray-50/40 rounded-t-xl border-t border-gray-300/30">
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <p className="text-gray-700 text-sm font-medium">
+              © {new Date().getFullYear()} <span className="font-bold text-gray-900">ASOPROMAS</span> - Todos los derechos reservados.
+            </p>
+            <p className="text-gray-600 text-xs">
+              Hecho en <span className="text-yellow-500 text-xl" role="img" aria-label="bandera de Ecuador">🇪🇨</span> para promover el cacao ecuatoriano
+            </p>
           </div>
         </div>
       </div>

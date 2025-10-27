@@ -17,7 +17,7 @@ const ChocolateBarComponent: FC = () => {
         <div>
           <h1 className="text-4xl font-bold mb-4">Barra de Chocolate</h1>
           <p className="text-gray-600 mb-6">
-            Nuestro chocolate fino de aroma, elaborado con el mejor cacao de Manabí,
+            Nuestro chocolate fino de aroma, elaborado con el mejor cacao de Zamora Chinchipe,
             ofrece una experiencia única de sabor que combina notas frutales y florales.
           </p>
 
@@ -27,7 +27,7 @@ const ChocolateBarComponent: FC = () => {
               <li>70% Cacao fino de aroma</li>
               <li>Sin aditivos artificiales</li>
               <li>Proceso artesanal</li>
-              <li>Origen: Manabí, Ecuador</li>
+              <li>Origen: Zamora Chinchipe, Ecuador</li>
             </ul>
           </div>
 

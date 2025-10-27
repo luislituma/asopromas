@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   COMING_SOON_MODE: true,
   
   // Fecha objetivo para el contador (en días desde hoy)
-  LAUNCH_DAYS_FROM_NOW: 14,
+  LAUNCH_DAYS_FROM_NOW: 12,
   
   // Información de contacto
   CONTACT_EMAIL: 'info@asopromas.com',
@@ -12,5 +12,5 @@ export const SITE_CONFIG = {
   
   // Configuración del sitio
   SITE_NAME: 'ASOPROMAS',
-  SITE_DESCRIPTION: 'Asociación de Productores de Cacao de Manabí'
+  SITE_DESCRIPTION: 'Asociación de Producción de Cacao y Derivados Aromas del Sur'
 };
