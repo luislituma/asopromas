@@ -10,6 +10,7 @@ interface AddToCartButtonProps {
   variant?: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  showText?: boolean;
 }
 
 const AddToCartButton: FC<AddToCartButtonProps> = ({
@@ -19,16 +20,17 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
   productImage,
   variant,
   className = '',
-  size = 'md'
+  size = 'md',
+  showText = true
 }) => {
   const { addItem } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
 
   const sizeClasses = {
-    sm: 'w-10 h-10 text-sm',
-    md: 'w-12 h-12 text-base',
-    lg: 'w-14 h-14 text-lg'
+    sm: showText ? 'px-4 py-2 text-sm' : 'w-10 h-10 text-sm',
+    md: showText ? 'px-6 py-3 text-base' : 'w-12 h-12 text-base',
+    lg: showText ? 'px-8 py-4 text-lg' : 'w-14 h-14 text-lg'
   };
 
   const iconSizes = {
@@ -69,16 +71,16 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         onClick={handleAddToCart}
         disabled={isAdded}
         className={`
-          group relative inline-flex items-center justify-center
-          ${sizeClasses[size]} rounded-full
+          group relative inline-flex items-center justify-center gap-2
+          ${sizeClasses[size]} ${showText ? 'rounded-lg' : 'rounded-full'}
           ${isAdded 
             ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
-            : 'bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-size-200 bg-pos-0 hover:bg-pos-100'
+            : 'bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-size-200 bg-pos-0 hover:bg-pos-100'
           }
-          text-white shadow-lg hover:shadow-2xl
-          transform hover:scale-110 active:scale-95
+          text-white font-semibold shadow-lg hover:shadow-2xl
+          transform hover:scale-105 active:scale-95
           transition-all duration-500 ease-out
-          focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2
+          focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2
           disabled:cursor-not-allowed disabled:transform-none
           ${className}
         `}
@@ -89,26 +91,32 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         title={isAdded ? '¡Agregado!' : 'Agregar al carrito'}
       >
         {/* Brillo animado */}
-        <span className="absolute inset-0 rounded-full overflow-hidden">
+        <span className="absolute inset-0 ${showText ? 'rounded-lg' : 'rounded-full'} overflow-hidden">
           <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
         </span>
 
-        {/* Icono */}
-        <span className="relative z-10 flex items-center justify-center">
+        {/* Contenido del botón */}
+        <span className="relative z-10 flex items-center justify-center gap-2">
           {isAdded ? (
-            <Check className={`${iconSizes[size]} animate-scale-check`} strokeWidth={3} />
+            <>
+              <Check className={`${iconSizes[size]} animate-scale-check`} strokeWidth={3} />
+              {showText && <span>¡Agregado!</span>}
+            </>
           ) : (
-            <ShoppingCart className={`${iconSizes[size]} group-hover:scale-110 transition-transform duration-300`} />
+            <>
+              <ShoppingCart className={`${iconSizes[size]} group-hover:scale-110 transition-transform duration-300`} />
+              {showText && <span>Agregar al carrito</span>}
+            </>
           )}
         </span>
         
         {/* Efecto de pulso cuando se agrega */}
         {isAdded && (
-          <span className="absolute inset-0 rounded-full animate-ping bg-green-400 opacity-75"></span>
+          <span className={`absolute inset-0 ${showText ? 'rounded-lg' : 'rounded-full'} animate-ping bg-green-400 opacity-75`}></span>
         )}
 
         {/* Efecto de onda al hacer clic */}
-        <span className="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-30 transition-opacity duration-150"></span>
+        <span className={`absolute inset-0 ${showText ? 'rounded-lg' : 'rounded-full'} bg-white opacity-0 group-active:opacity-30 transition-opacity duration-150`}></span>
       </button>
 
       {/* Partículas flotantes */}

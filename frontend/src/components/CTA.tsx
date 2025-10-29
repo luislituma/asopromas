@@ -40,15 +40,21 @@ const CTA: FC<CTAProps> = ({ className = '' }) => {
           <div className="mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-56">
             <Link
               to="/products"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-amber-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-200 rounded-lg
-                hover:from-amber-500 hover:to-amber-400
-                focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-brown-900
-                transform hover:-translate-y-0.5 active:translate-y-0
-                shadow-lg hover:shadow-xl"
+              className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold text-white 
+                bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-xl
+                hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600
+                focus:outline-none focus:ring-4 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-brown-900
+                transform hover:scale-110 hover:-translate-y-1 active:scale-105 active:translate-y-0
+                shadow-2xl hover:shadow-orange-500/50
+                transition-all duration-300 ease-out
+                overflow-hidden
+                before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
+                before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700
+                animate-pulse hover:animate-none"
             >
-              <ShoppingBag className="w-5 h-5" />
-              Ver Catálogo
-              <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+              <ShoppingBag className="w-6 h-6 transition-all duration-300 group-hover:scale-125 group-hover:rotate-12" />
+              <span className="relative z-10">Ver Catálogo</span>
+              <ArrowRight className="w-6 h-6 transition-all duration-300 group-hover:translate-x-2 group-hover:scale-125" />
             </Link>
 
           </div>

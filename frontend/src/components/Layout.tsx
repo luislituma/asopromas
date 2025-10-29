@@ -26,6 +26,13 @@ const Layout: FC = () => {
       <ScreenReaderAnnouncer />
       
       <div className="min-h-screen flex flex-col bg-white">
+        {/* Elemento centinela para detectar scroll - debe estar ANTES del Header */}
+        <div 
+          id="scroll-sentinel" 
+          className="h-px w-full pointer-events-none" 
+          aria-hidden="true"
+        />
+        
         <Header />
         
         <main 

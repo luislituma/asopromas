@@ -13,7 +13,7 @@ const PureChocolateBar: FC = () => {
     currency: "USD",
     category: "Chocolate Artesanal",
     image: "/assets/images/products/chocolate-bar-100.jpg",
-    url: "/products/pure-chocolate-bar"
+    url: "/products/chocolate-bar-100"
   });
 
   // SEO Configuration
@@ -21,7 +21,7 @@ const PureChocolateBar: FC = () => {
     title: 'Barra de Chocolate 100% Puro KUJEÑITO - ASOPROMAS',
     description: 'Chocolate 100% puro KUJEÑITO elaborado con cacao de fino aroma de Zamora Chinchipe. Sabor intenso y auténtico del mejor cacao ecuatoriano. ¡Compra ahora!',
     keywords: 'chocolate 100% puro, KUJEÑITO, chocolate Ecuador, cacao fino aroma, chocolate artesanal, ASOPROMAS',
-    url: '/products/pure-chocolate-bar',
+    url: '/products/chocolate-bar-100',
     type: 'product',
     image: '/assets/images/products/chocolate-bar-100.jpg',
     schema: productSchema

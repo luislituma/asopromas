@@ -14,10 +14,38 @@ const Header: FC = () => {
     const [openSubmenuAbout, setOpenSubmenuAbout] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isScrolled, setIsScrolled] = useState(false);
     const location = useLocation();
     const { announceToScreenReader } = useA11y();
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    
+
+    // Detectar scroll usando Intersection Observer (más confiable)
+    useEffect(() => {
+        const sentinel = document.getElementById('scroll-sentinel'); if (!sentinel) { console.error(' Sentinel no encontrado'); return; }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // Cuando el sentinel NO es visible = estamos scrolleados
+                const scrolled = !entry.isIntersecting;
+                console.log('�️ Intersection Observer - isScrolled:', scrolled);
+                setIsScrolled(scrolled);
+            },
+            {
+                threshold: 0,
+                rootMargin: '-1px 0px 0px 0px'
+            }
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+            if (sentinel) {
+                observer.unobserve(sentinel);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         setIsMenuOpen(false);
@@ -84,6 +112,7 @@ const Header: FC = () => {
 
     const navLinks: NavItem[] = [
         { to: '/', text: 'Inicio' },
+        { to: '/cacao-origin', text: 'Origen del Cacao' },
         {
             to: '/about',
             text: 'Nosotros',
@@ -113,21 +142,18 @@ const Header: FC = () => {
                 {
                     title: 'Barras de Chocolate',
                     items: [
-                        { to: '/products/pure-chocolate-bar', text: 'Barra de Chocolate 100%' },
+                        { to: '/products/chocolate-bar-100', text: 'Barra de Chocolate 100%' },
                         { to: '/products/chocolate-nibs-salt', text: 'Chocolate con Nibs y Sal' },
+                        { to: '/products/chocolate-coffee', text: 'Chocolate con Café' },
                     ],
                 },
                 {
                     title: 'Productos Especiales',
                     items: [
-                        { to: '/products/cocoa-nibs', text: 'Nibs de Cacao' },
-                        { to: '/products/cocoa-powder', text: 'Polvo de Cacao' },
-                        { to: '/products/cocoa-liquor', text: 'Licor de Cacao' },
-                        { to: '/products/cacao-cocktail', text: 'Cocktail de Cacao' },
-                        { to: '/products/cacao-liqueur', text: 'Licor de Cacao Premium' },
-                        { to: '/products/chocolate-coffee', text: 'Café con Chocolate' },
-                        { to: '/products/fruit-bonbons', text: 'Bombones de Fruta' },
-                        { to: '/products/pralines', text: 'Pralinés Artesanales' },
+                        { to: '/products/fruit-bonbons', text: 'Bombones de Frutas Exóticas' },
+                        { to: '/products/cocoa-nibs', text: 'Nibs de Cacao Natural' },
+                        { to: '/products/cocoa-liqueur', text: 'Licor Dulce de Cacao (20°)' },
+                        { to: '/products/cocoa-cocktail', text: 'Cóctel de Cacao (12°)' },
                     ],
                 },
             ],
@@ -138,7 +164,11 @@ const Header: FC = () => {
     return (
         <>
             <header 
-                className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40"
+                className={`sticky top-0 z-40 transition-all duration-700 ease-in-out ${
+                    isScrolled 
+                        ? 'bg-white/95 backdrop-blur-md shadow-lg' 
+                        : 'bg-white shadow-sm'
+                } border-b ${isScrolled ? 'border-gray-300' : 'border-gray-200'}`}
                 role="banner"
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -146,19 +176,21 @@ const Header: FC = () => {
                         {/* Logo */}
                         <Link 
                             to="/" 
-                            className="flex items-center focus-visible"
+                            className="flex items-center focus-visible transition-all duration-500"
                             aria-label="ASOPROMAS - Ir a inicio"
                         >
                             <img 
                                 src={logoUrl} 
                                 alt="ASOPROMAS Logo" 
-                                className="h-10 w-auto"
+                                className={`w-auto transition-all duration-500 ${
+                                    isScrolled ? 'h-8' : 'h-10'
+                                }`}
                             />
                         </Link>
 
                         {/* Desktop Navigation */}
                         <nav 
-                            className="hidden md:flex items-center gap-8"
+                            className="hidden md:flex items-center gap-12"
                             role="navigation"
                             aria-label="Navegación principal"
                         >
@@ -170,10 +202,12 @@ const Header: FC = () => {
                                     <div key={link.to} className="relative">
                                         {hasSub ? (
                                             <button
-                                                className={`nav-item inline-flex items-center gap-1 text-base transition-colors duration-200 focus-visible ${
+                                                className={`nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
                                                     location.pathname.startsWith(link.to) && link.to !== '/'
-                                                        ? 'text-[#411900]'
-                                                        : 'text-gray-700 hover:text-[#411900]'
+                                                        ? 'text-[#411900] font-semibold'
+                                                        : isScrolled 
+                                                            ? 'text-gray-600 hover:text-[#411900]' 
+                                                            : 'text-gray-700 hover:text-[#411900]'
                                                 }`}
                                                 onClick={() => toggleSubmenu(isProducts ? 'products' : 'about')}
                                                 onKeyDown={(e) => {
@@ -187,20 +221,17 @@ const Header: FC = () => {
                                                 aria-label={`${link.text} - menú desplegable`}
                                             >
                                                 {link.text}
-                                                <ChevronDown 
-                                                    className={`w-4 h-4 transition-transform duration-200 ${
-                                                        (isProducts ? openSubmenuProducts : openSubmenuAbout) ? 'rotate-180' : 'rotate-0'
-                                                    }`} 
-                                                    aria-hidden="true"
-                                                />
                                             </button>
                                         ) : (
                                             <NavLink
                                                 to={link.to}
                                                 className={({ isActive }) =>
-                                                    `nav-item inline-flex items-center gap-1 text-base transition-colors duration-200 focus-visible ${isActive
-                                                        ? 'text-[#411900]'
-                                                        : 'text-gray-700 hover:text-[#411900]'
+                                                    `nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
+                                                        isActive
+                                                            ? 'text-[#411900] font-semibold'
+                                                            : isScrolled 
+                                                                ? 'text-gray-600 hover:text-[#411900]' 
+                                                                : 'text-gray-700 hover:text-[#411900]'
                                                     }`
                                                 }
                                             >
@@ -256,7 +287,11 @@ const Header: FC = () => {
                             {/* Search button */}
                             <button
                                 onClick={() => setSearchOpen(true)}
-                                className="p-2 rounded-md text-gray-600 hover:text-[#411900] hover:bg-gray-100 focus-visible"
+                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
+                                    isScrolled 
+                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
+                                        : 'text-gray-600 hover:text-[#411900] hover:bg-gray-100'
+                                }`}
                                 aria-label="Abrir búsqueda"
                             >
                                 <Search size={20} aria-hidden="true" />
@@ -265,10 +300,17 @@ const Header: FC = () => {
                             {/* CTA catálogo */}
                             <Link 
                                 to="/products" 
-                                className="p-2 rounded-md text-gray-600 hover:text-[#411900] hover:bg-gray-100 focus-visible"
+                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
+                                    hover:from-orange-600 hover:to-amber-600 text-white
+                                    transform hover:scale-110 active:scale-105
+                                    transition-all duration-300 ease-out
+                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
+                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
+                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
+                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
                                 aria-label="Ver catálogo de productos"
                             >
-                                <ShoppingBag className="w-5 h-5" aria-hidden="true" />
+                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
                             </Link>
                         </nav>
 
@@ -276,7 +318,11 @@ const Header: FC = () => {
                         <div className="md:hidden flex items-center gap-2">
                             <button
                                 onClick={() => setSearchOpen(true)}
-                                className="p-2 rounded-md text-gray-600 hover:text-[#411900] hover:bg-gray-100 focus-visible"
+                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
+                                    isScrolled 
+                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
+                                        : 'text-gray-600 hover:text-[#411900] hover:bg-gray-100'
+                                }`}
                                 aria-label="Abrir búsqueda"
                             >
                                 <Search size={20} aria-hidden="true" />
@@ -284,14 +330,25 @@ const Header: FC = () => {
 
                             <Link 
                                 to="/products" 
-                                className="p-2 rounded-md text-gray-600 hover:text-[#411900] hover:bg-gray-100 focus-visible"
+                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
+                                    hover:from-orange-600 hover:to-amber-600 text-white
+                                    transform hover:scale-110 active:scale-105
+                                    transition-all duration-300 ease-out
+                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
+                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
+                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
+                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
                                 aria-label="Ver catálogo de productos"
                             >
-                                <ShoppingBag className="w-5 h-5" aria-hidden="true" />
+                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
                             </Link>
 
                             <button
-                                className="p-2 rounded-md text-gray-700 hover:text-[#411900] hover:bg-gray-100 focus-visible"
+                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
+                                    isScrolled 
+                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
+                                        : 'text-gray-700 hover:text-[#411900] hover:bg-gray-100'
+                                }`}
                                 onClick={toggleMobileMenu}
                                 aria-label="Alternar menú de navegación"
                                 aria-expanded={isMenuOpen}
@@ -430,3 +487,4 @@ const Header: FC = () => {
 };
 
 export default Header;
+

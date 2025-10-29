@@ -60,46 +60,46 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- KUJEÑITO Products -->
+  <!-- KUJEÑITO Products (7 productos oficiales) -->
   <url>
-    <loc>https://asopromas.com/products/pure-chocolate-bar</loc>
-    <lastmod>2025-10-08</lastmod>
+    <loc>https://asopromas.com/products/chocolate-bar-100</loc>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://asopromas.com/products/chocolate-nibs-salt</loc>
-    <lastmod>2025-10-08</lastmod>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://asopromas.com/products/chocolate-coffee</loc>
-    <lastmod>2025-10-08</lastmod>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://asopromas.com/products/fruit-bonbons</loc>
-    <lastmod>2025-10-08</lastmod>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://asopromas.com/products/cacao-nibs</loc>
-    <lastmod>2025-10-08</lastmod>
+    <loc>https://asopromas.com/products/cocoa-nibs</loc>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://asopromas.com/products/cacao-liqueur</loc>
-    <lastmod>2025-10-08</lastmod>
+    <loc>https://asopromas.com/products/cocoa-liqueur</loc>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://asopromas.com/products/cacao-cocktail</loc>
-    <lastmod>2025-10-08</lastmod>
+    <loc>https://asopromas.com/products/cocoa-cocktail</loc>
+    <lastmod>2025-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
