@@ -18,7 +18,7 @@ const Footer: FC = () => {
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 mb-1.5">
               <img
-                src="/src/assets/icons/logo.svg"
+                src="/assets/icons/logo.svg"
                 alt="ASOPROMAS Logo"
                 className="w-6 h-6"
               />

@@ -299,7 +299,7 @@ const Landing: FC = () => {
               className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               variants={fadeInUp}
             >
-              <div className="grid md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
                     src="/assets/images/products/Calidad.jpg"
@@ -343,7 +343,7 @@ const Landing: FC = () => {
               className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               variants={fadeInUp}
             >
-              <div className="grid md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
                     src="/assets/images/products/Asopromas-socios.jpg"
@@ -387,7 +387,7 @@ const Landing: FC = () => {
               className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               variants={fadeInUp}
             >
-              <div className="grid md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
                     src="/assets/images/products/General.jpg"
@@ -431,7 +431,7 @@ const Landing: FC = () => {
               className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500"
               variants={fadeInUp}
             >
-              <div className="grid md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
                   <img
                     src="/assets/images/products/Tradicion.png"
