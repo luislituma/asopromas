@@ -268,7 +268,7 @@ const Landing: FC = () => {
             className="text-center mb-16"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={fadeInUp}
           >
             <motion.span 
@@ -503,7 +503,7 @@ const Landing: FC = () => {
             className="text-center mb-12"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
           >
             {/* Título de presentación */}
@@ -723,7 +723,7 @@ const Landing: FC = () => {
               className="relative"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={fadeInUp}
             >
               <div className="grid grid-cols-2 gap-4">
@@ -770,7 +770,7 @@ const Landing: FC = () => {
               className="space-y-6"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
             >
               <motion.div variants={fadeInUp}>
@@ -902,7 +902,7 @@ const Landing: FC = () => {
             className="text-center mb-16"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
           >
             <motion.div 
@@ -1090,7 +1090,7 @@ const Landing: FC = () => {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             className="max-w-7xl mx-auto"
           >
