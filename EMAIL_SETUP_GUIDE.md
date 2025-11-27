@@ -80,6 +80,7 @@ Confirmación de Pedido {{order_number}} - ASOPROMAS
         <div class="order-info">
             <p><strong>📋 Número de Pedido:</strong> {{order_number}}</p>
             <p><strong>📅 Fecha:</strong> {{order_date}}</p>
+            <p><strong>📱 WhatsApp:</strong> {{customer_whatsapp}}</p>
         </div>
         
         <h3>🛍️ Detalle del Pedido:</h3>
@@ -89,17 +90,23 @@ Confirmación de Pedido {{order_number}} - ASOPROMAS
         
         <div class="total">
             <p style="margin: 5px 0;">Subtotal: {{subtotal}}</p>
-            <p style="margin: 5px 0;">IVA (12%): {{iva}}</p>
-            <p style="margin: 10px 0 0 0; font-size: 22px; color: #ea580c;">TOTAL: {{total}}</p>
+            <p style="margin: 5px 0;">IVA (15%): {{iva}}</p>
+            <p style="margin: 5px 0; color: #ea580c;"><strong>Envío (Servientrega):</strong> Por confirmar</p>
+            <p style="margin: 10px 0 0 0; font-size: 22px; color: #ea580c;">TOTAL + Envío: {{total}} + costo de envío</p>
+            <p style="margin: 5px 0; font-size: 12px; color: #6b7280;">*El costo de envío se incluirá en la factura final según tu ubicación en Ecuador</p>
         </div>
         
         <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin-top: 20px;">
             <p><strong>📦 Próximos Pasos:</strong></p>
             <ul>
-                <li>Te contactaremos por WhatsApp para confirmar disponibilidad</li>
+                <li>Te contactaremos por <strong>WhatsApp ({{customer_whatsapp}})</strong> para confirmar disponibilidad</li>
+                <li>Confirmaremos el <strong>costo de envío a tu ubicación</strong> en Ecuador (vía Servientrega)</li>
                 <li>Coordinaremos el método de pago</li>
                 <li>Acordaremos fecha y método de entrega</li>
             </ul>
+            <p style="background: #fef3c7; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                ℹ️ <strong>Importante:</strong> Realizamos envíos solo a Ecuador mediante Servientrega. El costo exacto se calculará según tu ubicación y se incluirá en la factura final.
+            </p>
         </div>
         
         <div class="footer">
@@ -143,19 +150,29 @@ Confirmación de Pedido {{order_number}} - ASOPROMAS
         <p><strong>📋 Pedido:</strong> {{order_number}}</p>
         <p><strong>👤 Cliente:</strong> {{customer_name}}</p>
         <p><strong>📧 Email:</strong> {{customer_email}}</p>
-        <p><strong>📅 Fecha:</strong> {{order_date}}</p>
+        <p><strong>� WhatsApp:</strong> {{customer_whatsapp}}</p>
+        <p><strong>�📅 Fecha:</strong> {{order_date}}</p>
     </div>
     
     <h3>Productos:</h3>
     <pre style="white-space: pre-wrap; background: #f9fafb; padding: 15px; border-radius: 8px;">{{products_list}}</pre>
     
     <div style="background: #fef3c7; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold;">
-        <p>💰 TOTAL: {{total}}</p>
+        <p>💰 TOTAL PRODUCTOS: {{total}}</p>
+        <p style="font-size: 14px; font-weight: normal; margin-top: 10px; color: #92400e;">
+            ⚠️ Falta agregar costo de envío según ubicación del cliente (Servientrega)
+        </p>
     </div>
     
     <p style="margin-top: 20px; color: #6b7280;">
-        <em>Recuerda contactar al cliente por WhatsApp para confirmar el pedido.</em>
+        <em>Recuerda contactar al cliente por <strong>WhatsApp ({{customer_whatsapp}})</strong> para:</em>
     </p>
+    <ul style="color: #6b7280;">
+        <li>Confirmar disponibilidad de productos</li>
+        <li>Calcular y comunicar el costo de envío a su ubicación</li>
+        <li>Coordinar método de pago</li>
+        <li>Confirmar datos de facturación</li>
+    </ul>
 </body>
 </html>
 ```
@@ -321,7 +338,73 @@ color: #ea580c;
 
 ---
 
-## 📝 Checklist de Configuración
+## � Variables Disponibles en las Plantillas
+
+### **Variables Actualizadas (2025):**
+
+Estas son todas las variables que puedes usar en tus plantillas de EmailJS:
+
+#### **Información del Cliente:**
+- `{{to_name}}` - Nombre completo del cliente
+- `{{to_email}}` - Email del cliente
+- `{{customer_whatsapp}}` - WhatsApp del cliente en formato internacional (ej: +593987654321) ✨ **NUEVO**
+
+#### **Información del Pedido:**
+- `{{order_number}}` - Número único del pedido (ej: ASOP-12345678)
+- `{{order_date}}` - Fecha y hora del pedido (ej: 29 de octubre de 2025, 14:30)
+- `{{products_list}}` - Lista formateada de productos con cantidades y precios
+
+#### **Totales (incluye IVA 15%):**
+- `{{subtotal}}` - Subtotal sin IVA (ej: $45.22)
+- `{{iva}}` - IVA 15% (ej: $6.78)
+- `{{total}}` - Total con IVA (ej: $52.00)
+- ⚠️ **Nota:** El costo de envío NO está incluido. Debe calcularse y sumarse manualmente según la ubicación del cliente.
+
+#### **Información de Pago (Banco Pichincha):**
+- `{{bank_name}}` - Nombre del banco
+- `{{account_type}}` - Tipo de cuenta
+- `{{account_number}}` - Número de cuenta
+- `{{account_holder}}` - Titular de la cuenta
+- `{{id_number}}` - Cédula del titular
+
+#### **Información de Contacto:**
+- `{{company_email}}` - Email de ASOPROMAS
+- `{{company_phone}}` - Teléfono de ASOPROMAS
+- `{{whatsapp_link}}` - Link directo a WhatsApp con mensaje pre-cargado
+
+#### **Variables para Notificación a la Empresa:**
+- `{{customer_name}}` - Nombre del cliente
+- `{{customer_email}}` - Email del cliente
+- `{{customer_whatsapp}}` - WhatsApp del cliente ✨ **NUEVO**
+- `{{subject}}` - Asunto personalizado (ej: "Nuevo Pedido - ASOP-12345678")
+
+---
+
+## 💡 Importante: Costo de Envío
+
+**El sistema NO calcula automáticamente el costo de envío.**
+
+### **Proceso recomendado:**
+
+1. Cliente recibe email con total de productos
+2. Email indica: "Envío: Por confirmar"
+3. ASOPROMAS contacta al cliente por WhatsApp
+4. Se calcula costo de envío según ubicación (Servientrega)
+5. Se envía factura actualizada con el costo de envío incluido
+
+### **En la plantilla de EmailJS:**
+
+```html
+<p>Subtotal: {{subtotal}}</p>
+<p>IVA (15%): {{iva}}</p>
+<p style="color: #ea580c;"><strong>Envío (Servientrega):</strong> Por confirmar</p>
+<p><strong>TOTAL + Envío:</strong> {{total}} + costo de envío</p>
+<p style="font-size: 12px;">*El costo de envío se incluirá en la factura final según tu ubicación en Ecuador</p>
+```
+
+---
+
+## �📝 Checklist de Configuración
 
 - [ ] Crear cuenta en EmailJS
 - [ ] Conectar servicio de email
@@ -332,6 +415,8 @@ color: #ea580c;
 - [ ] Copiar Public Key
 - [ ] Actualizar emailService.ts con credenciales
 - [ ] Configurar email de la empresa
+- [ ] **Agregar variable {{customer_whatsapp}} en ambas plantillas** ✨ **NUEVO**
+- [ ] **Actualizar sección de totales con costo de envío** ✨ **NUEVO**
 - [ ] Probar con un pedido de prueba
 - [ ] Verificar recepción en inbox
 - [ ] ¡Listo! 🎉
