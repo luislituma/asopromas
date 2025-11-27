@@ -1,29 +1,45 @@
-import { type FC } from "react";
-import { Award, Heart, Sparkles, Star, Coffee } from "lucide-react";
+import { type FC, useState } from "react";
+import { Award, Heart, Sparkles, Star, Coffee, ChevronLeft, ChevronRight } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
 import { useSEO } from "../../hooks/useSEO";
 import { generateProductSchema } from "../../utils/schema";
 
 const ChocolateNibsSalt: FC = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const productImages = [
+    "/assets/images/products/Nibs-Sal-Marina-1.jpg",
+    "/assets/images/products/Nibs-Sal-Marina-2.jpg",
+    "/assets/images/products/Nibs-Sal-Marina-3.jpg"
+  ];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+  };
+
   // Generate Product Schema
   const productSchema = generateProductSchema({
-    name: "Chocolate con Nibs de Cacao y Sal Marina KUJEÑITO",
-    description: "Chocolate al 65% con nibs de cacao tostados y un toque de sal marina. Perfectamente equilibrado entre dulce y salado.",
-    price: "14.99",
+    name: "Barra de Chocolate con Nibs & Sal Marina ASOPROMAS",
+    description: "Barra de Chocolate Fino Artesanal al 65% con Nibs y Sal Marina. 50g de chocolate premium.",
+    price: "3.50",
     currency: "USD",
-    category: "Chocolate Gourmet",
-    image: "/assets/images/products/chocolate-nibs-salt.jpg",
+    category: "Chocolate Artesanal",
+    image: "/assets/images/products/Nibs-Sal-Marina-1.jpg",
     url: "/products/chocolate-nibs-salt"
   });
 
   // SEO Configuration
   useSEO({
-    title: 'Chocolate con Nibs y Sal Marina KUJEÑITO - ASOPROMAS',
-    description: 'Chocolate KUJEÑITO al 65% con nibs de cacao tostados y sal marina. Experiencia gourmet que equilibra dulce y salado. ¡Compra online!',
-    keywords: 'chocolate nibs sal, chocolate gourmet Ecuador, KUJEÑITO nibs, chocolate salado, cacao con sal marina',
+    title: 'Barra de Chocolate con Nibs & Sal Marina - 65% Cacao | ASOPROMAS',
+    description: 'Chocolate artesanal al 65% con nibs de cacao y sal marina. 50g / 1.76 oz por $3.50. Equilibrio perfecto entre dulce y salado.',
+    keywords: 'chocolate nibs sal marina, chocolate 65%, chocolate artesanal Ecuador, barra chocolate cacao',
     url: '/products/chocolate-nibs-salt',
     type: 'product',
-    image: '/assets/images/products/chocolate-nibs-salt.jpg',
+    image: '/assets/images/products/Nibs-Sal-Marina-1.jpg',
     schema: productSchema
   });
 
@@ -40,17 +56,17 @@ const ChocolateNibsSalt: FC = () => {
             <div className="space-y-8">
               <div className="space-y-4">
                 <div className="inline-block px-4 py-2 bg-slate-500/20 backdrop-blur-sm rounded-full border border-slate-400/40">
-                  <span className="text-slate-200 font-medium text-sm">🧂 KUJEÑITO Premium</span>
+                  <span className="text-slate-200 font-medium text-sm">🧂 Premium 65%</span>
                 </div>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                   Chocolate con
                   <span className="block bg-gradient-to-r from-slate-300 to-gray-300 bg-clip-text text-transparent">
-                    Nibs y Sal Marina
+                    Nibs & Sal Marina
                   </span>
                 </h1>
                 <p className="text-xl text-slate-100 leading-relaxed">
-                  Chocolate 65% con trocitos de cacao tostado y un toque de sal marina de 
-                  <span className="font-semibold text-slate-300"> Playas de Cuje, Zumbi</span>
+                  Barra de chocolate fino artesanal al 65% con nibs de cacao y sal marina.
+                  <span className="font-semibold text-slate-300"> 50g | $3.50</span>
                 </p>
               </div>
 
@@ -72,22 +88,80 @@ const ChocolateNibsSalt: FC = () => {
               <div className="pt-6">
                 <ButtonBuy 
                   productId="chocolate-nibs-salt"
-                  productName="Chocolate con Nibs y Sal Marina KUJEÑITO"
-                  productPrice={17.99}
-                  productImage="/assets/images/products/chocolate-nibs-salt.jpg"
+                  productName="Barra de Chocolate con Nibs & Sal Marina"
+                  productPrice={3.50}
+                  productImage="/assets/images/products/Nibs-Sal-Marina-1.jpg"
                 />
               </div>
             </div>
 
             <div className="relative">
-              <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-                <img
-                  src="/src/assets/images/products/chocolate.png"
-                  alt="Chocolate con Nibs y Sal Marina"
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-slate-500 to-gray-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
-                  65% Cacao
+              <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 overflow-hidden">
+                {/* Slider de imágenes */}
+                <div className="relative aspect-square overflow-hidden rounded-2xl group cursor-pointer">
+                  <img
+                    src={productImages[currentImageIndex]}
+                    alt={`Barra de Chocolate con Nibs & Sal Marina - Imagen ${currentImageIndex + 1}`}
+                    className="w-full h-full object-cover shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                  />
+                  
+                  {/* Botones de navegación */}
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                    aria-label="Imagen anterior"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-slate-600" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                    aria-label="Siguiente imagen"
+                  >
+                    <ChevronRight className="w-6 h-6 text-slate-600" />
+                  </button>
+
+                  {/* Indicadores */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {productImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? 'bg-white w-8' 
+                            : 'bg-white/50 hover:bg-white/75'
+                        }`}
+                        aria-label={`Ver imagen ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Miniaturas */}
+                <div className="flex gap-2 mt-4 justify-center">
+                  {productImages.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                        index === currentImageIndex
+                          ? 'border-slate-400 scale-110 shadow-lg'
+                          : 'border-white/30 hover:border-slate-300 opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Miniatura ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-slate-500 to-gray-500 text-white px-6 py-3 rounded-full font-bold shadow-lg z-10">
+                  <div className="text-2xl">$3.50</div>
+                  <div className="text-xs">50g</div>
                 </div>
               </div>
             </div>
@@ -156,6 +230,91 @@ const ChocolateNibsSalt: FC = () => {
               <div className="bg-gradient-to-br from-slate-100 to-gray-100 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold text-slate-800 mb-4">Información del Producto</h3>
                 <ul className="space-y-3 text-gray-700">
+                  <li className="flex justify-between">
+                    <span>Tipo:</span>
+                    <span className="font-semibold">Barra Artesanal</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Cacao:</span>
+                    <span className="font-semibold">65%</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Peso:</span>
+                    <span className="font-semibold">50g / 1.76 oz</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Precio:</span>
+                    <span className="font-semibold text-slate-600">$3.50</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Origen:</span>
+                    <span className="font-semibold">Zamora Chinchipe</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Ingredientes</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex justify-between items-center">
+                    <span>Pasta de Cacao</span>
+                    <span className="text-sm font-semibold bg-slate-100 px-2 py-1 rounded">50%</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Azúcar</span>
+                    <span className="text-sm font-semibold bg-slate-100 px-2 py-1 rounded">34.5%</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Nibs de Cacao</span>
+                    <span className="text-sm font-semibold bg-amber-100 px-2 py-1 rounded">5%</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Manteca de Cacao</span>
+                    <span className="text-sm font-semibold bg-slate-100 px-2 py-1 rounded">5%</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <span>Sal Marina</span>
+                    <span className="text-sm font-semibold bg-blue-100 px-2 py-1 rounded">0.5%</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-blue-50 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold text-blue-800 mb-4">Información Nutricional</h3>
+                <p className="text-xs text-gray-500 mb-3">Tamaño por porción: 10g | Porciones: 5</p>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Energía</span>
+                    <span className="font-semibold">50 kcal</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Grasa total</span>
+                    <span className="font-semibold">4g (9%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1 pl-3">
+                    <span className="text-xs">Saturadas</span>
+                    <span className="font-semibold">3g (14%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1 pl-3">
+                    <span className="text-xs">Monoinsaturadas</span>
+                    <span className="font-semibold">2g</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Carbohidratos</span>
+                    <span className="font-semibold">6g</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1 pl-3">
+                    <span className="text-xs">Azúcares</span>
+                    <span className="font-semibold">3g (2%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Proteínas</span>
+                    <span className="font-semibold">1g</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Colesterol</span>
+                    <span className="font-semibold">0mg</span>
+                  </li>
                   <li className="flex justify-between">
                     <span>Contenido de Cacao:</span>
                     <span className="font-semibold">65%</span>

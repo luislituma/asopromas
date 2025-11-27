@@ -259,10 +259,16 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">📦 Información de Entrega</h4>
-                  <p className="text-sm text-blue-800">
-                    El tiempo de entrega y costos de envío se confirmarán por WhatsApp según su ubicación.
-                  </p>
+                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                    <Package className="w-5 h-5" />
+                    Información de Envío
+                  </h4>
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <p>• <strong>Solo envíos a Ecuador</strong></p>
+                    <p>• Empresa: <strong>Servientrega</strong></p>
+                    <p>• El costo de envío se incluirá en la factura final</p>
+                    <p>• Confirmación por WhatsApp y correo electrónico</p>
+                  </div>
                 </div>
                 <div className="bg-amber-50 p-4 rounded-lg">
                   <h4 className="font-semibold text-amber-900 mb-2">💳 Métodos de Pago</h4>
@@ -276,7 +282,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-600 mb-2">
-                ¡Gracias por tu preferencia! Nos pondremos en contacto contigo pronto.
+                ¡Gracias por tu preferencia! Nos pondremos en contacto contigo por <strong>WhatsApp</strong> y <strong>correo electrónico</strong> para confirmar tu pedido.
               </p>
               <p className="text-xs text-gray-500">
                 ASOPROMAS - Asociación de Productores Orgánicos de Mandarinas, Aguacates y Sandias

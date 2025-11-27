@@ -1,10 +1,10 @@
 import { type FC, useState } from 'react';
-import { Mail, User, X, Send } from 'lucide-react';
+import { Mail, User, X, Send, Phone } from 'lucide-react';
 
 interface EmailCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (email: string, name: string) => void;
+  onSubmit: (email: string, name: string, whatsapp: string) => void;
   isLoading?: boolean;
 }
 
@@ -16,12 +16,13 @@ const EmailCaptureModal: FC<EmailCaptureModalProps> = ({
 }) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [errors, setErrors] = useState({ email: '', name: '' });
+  const [whatsapp, setWhatsapp] = useState('');
+  const [errors, setErrors] = useState({ email: '', name: '', whatsapp: '' });
 
   if (!isOpen) return null;
 
   const validateForm = (): boolean => {
-    const newErrors = { email: '', name: '' };
+    const newErrors = { email: '', name: '', whatsapp: '' };
     let isValid = true;
 
     // Validar nombre
@@ -40,6 +41,19 @@ const EmailCaptureModal: FC<EmailCaptureModalProps> = ({
       isValid = false;
     }
 
+    // Validar WhatsApp (Ecuador: +593 + 9 dígitos, ej: +593987654321 o 0987654321)
+    const whatsappClean = whatsapp.replace(/\D/g, ''); // Solo dígitos
+    if (!whatsapp.trim()) {
+      newErrors.whatsapp = 'Por favor ingresa tu número de WhatsApp';
+      isValid = false;
+    } else if (whatsappClean.length < 9 || whatsappClean.length > 13) {
+      newErrors.whatsapp = 'Número inválido. Ej: 0987654321 o +593987654321';
+      isValid = false;
+    } else if (!whatsappClean.startsWith('593') && !whatsappClean.startsWith('0')) {
+      newErrors.whatsapp = 'Número debe empezar con +593 o 09 (Ecuador)';
+      isValid = false;
+    }
+
     setErrors(newErrors);
     return isValid;
   };
@@ -48,7 +62,15 @@ const EmailCaptureModal: FC<EmailCaptureModalProps> = ({
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(email, name);
+      // Normalizar WhatsApp a formato internacional +593...
+      let normalizedWhatsapp = whatsapp.replace(/\D/g, '');
+      if (normalizedWhatsapp.startsWith('0')) {
+        normalizedWhatsapp = '593' + normalizedWhatsapp.substring(1);
+      }
+      if (!normalizedWhatsapp.startsWith('593')) {
+        normalizedWhatsapp = '593' + normalizedWhatsapp;
+      }
+      onSubmit(email, name, '+' + normalizedWhatsapp);
     }
   };
 
@@ -127,13 +149,43 @@ const EmailCaptureModal: FC<EmailCaptureModalProps> = ({
               )}
             </div>
 
+            {/* WhatsApp */}
+            <div>
+              <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-2">
+                WhatsApp (Ecuador) *
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="tel"
+                  id="whatsapp"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ${
+                    errors.whatsapp ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Ej: 0987654321 o +593987654321"
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.whatsapp && (
+                <p className="mt-1 text-sm text-red-600">{errors.whatsapp}</p>
+              )}
+            </div>
+
             {/* Info adicional */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                📧 Recibirás una copia del pedido con todos los detalles
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+              <p className="text-sm text-blue-800 font-medium">
+                � Envíos solo a Ecuador
               </p>
-              <p className="text-sm text-blue-800 mt-1">
-                💬 También serás redirigido a WhatsApp para confirmar
+              <p className="text-xs text-blue-700">
+                • Realizamos envíos a todo Ecuador vía <strong>Servientrega</strong>
+              </p>
+              <p className="text-xs text-blue-700">
+                • El costo de envío se incluirá en la factura final
+              </p>
+              <p className="text-xs text-blue-700">
+                • Te contactaremos por <strong>WhatsApp</strong> y correo para confirmar tu pedido
               </p>
             </div>
 

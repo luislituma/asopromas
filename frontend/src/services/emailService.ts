@@ -3,16 +3,34 @@ import type { CartItem } from '../context/CartContext';
 import { SITE_CONFIG } from '../config/site';
 
 // Configuración de EmailJS
-// IMPORTANTE: Reemplazar con tus credenciales de EmailJS
+// Ahora soportamos variables de entorno Vite (recomendado) con fallback a los valores actuales.
+// Puedes definir en un archivo .env en la raíz del proyecto:
+// VITE_EMAILJS_SERVICE_ID=service_xxx
+// VITE_EMAILJS_TEMPLATE_ID=template_xxx
+// VITE_EMAILJS_PUBLIC_KEY=public_xxx
+
+const SERVICE_ID = (import.meta.env.VITE_EMAILJS_SERVICE_ID as string) || 'service_u1xx4q9';
+const TEMPLATE_ID = (import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string) || 'template_3vc5pdh';
+const PUBLIC_KEY = (import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string) || 'dOXxZUCQTP-kLZr92';
+
+// ⚠️ IMPORTANTE: Usa el MISMO email que configuraste en el servicio EmailJS
+// Si tu servicio EmailJS usa Gmail (ejemplo: tuempresa@gmail.com), usa ese mismo aquí
+// NO uses un dominio externo (como @asopromas.com) si no está verificado en el servicio SMTP
+const COMPANY_NOTIFICATION_EMAIL = 'ventas@asopromas.com'; // ⚠️ CAMBIAR si aparece error 553
+
 const EMAILJS_CONFIG = {
-  SERVICE_ID: 'service_rc3f9e7', // Tu Service ID
-  TEMPLATE_ID: 'template_3vc5pdh', // Tu Template ID
-  PUBLIC_KEY: 'dOXxZUCQTP-kLZr92', // Tu Public Key
+  SERVICE_ID,
+  TEMPLATE_ID,
+  PUBLIC_KEY,
+  COMPANY_EMAIL: COMPANY_NOTIFICATION_EMAIL,
 };
 
-// Verificar si EmailJS está configurado
+// Verificar si EmailJS está configurado (asegúrate de no usar los valores por defecto de ejemplo)
 const isEmailConfigured = () => {
   return (
+    !!EMAILJS_CONFIG.SERVICE_ID &&
+    !!EMAILJS_CONFIG.TEMPLATE_ID &&
+    !!EMAILJS_CONFIG.PUBLIC_KEY &&
     EMAILJS_CONFIG.SERVICE_ID !== 'YOUR_SERVICE_ID' &&
     EMAILJS_CONFIG.TEMPLATE_ID !== 'YOUR_TEMPLATE_ID' &&
     EMAILJS_CONFIG.PUBLIC_KEY !== 'YOUR_PUBLIC_KEY'
@@ -23,6 +41,7 @@ interface OrderEmailData {
   orderNumber: string;
   customerEmail: string;
   customerName: string;
+  customerWhatsApp: string;
   items: CartItem[];
   subtotal: number;
   iva: number;
@@ -50,6 +69,7 @@ export const sendOrderEmail = async (data: OrderEmailData): Promise<boolean> => 
     const templateParams = {
       to_email: data.customerEmail,
       to_name: data.customerName,
+      customer_whatsapp: data.customerWhatsApp,
       order_number: data.orderNumber,
       order_date: data.orderDate,
       products_list: productsList,
@@ -103,12 +123,13 @@ export const sendOrderNotificationToCompany = async (
       .join('\n');
 
     const templateParams = {
-      to_email: 'luislituma22@gmail.com', // Email de la empresa
+      to_email: EMAILJS_CONFIG.COMPANY_EMAIL, // Email de la empresa (configurado arriba)
       to_name: 'Equipo ASOPROMAS',
       subject: `Nuevo Pedido - ${data.orderNumber}`,
       order_number: data.orderNumber,
       customer_name: data.customerName,
       customer_email: data.customerEmail,
+      customer_whatsapp: data.customerWhatsApp,
       order_date: data.orderDate,
       products_list: productsList,
       total: `$${data.total.toFixed(2)}`,
@@ -116,7 +137,7 @@ export const sendOrderNotificationToCompany = async (
 
     await emailjs.send(
       EMAILJS_CONFIG.SERVICE_ID,
-      'template_company_notification', // Plantilla separada para notificaciones
+      'template_spy9284', // Plantilla separada para notificaciones
       templateParams,
       EMAILJS_CONFIG.PUBLIC_KEY
     );

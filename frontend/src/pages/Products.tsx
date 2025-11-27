@@ -1,10 +1,10 @@
 // src/pages/Products.tsx
-import { type FC } from "react";
+import { type FC, memo } from "react";
 import products from "../data/products.json";
 import ProductCard from "../components/ProductCard";
 import { useSEO } from "../hooks/useSEO";
 
-const ProductsPage: FC = () => {
+const ProductsPageComponent: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Productos KUJEÑITO - Chocolate Artesanal Premium | ASOPROMAS',
@@ -26,13 +26,19 @@ const ProductsPage: FC = () => {
 
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+          {products
+            .filter((p) => p.available !== false)
+            .map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
         </div>
       </section>
     </main>
   );
 };
+
+// Memoizar para evitar re-renders innecesarios
+const ProductsPage = memo(ProductsPageComponent);
+ProductsPage.displayName = 'ProductsPage';
 
 export default ProductsPage;

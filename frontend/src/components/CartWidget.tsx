@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react';
+import { type FC, useState, memo, useEffect } from 'react';
 import { ShoppingCart, X, Minus, Plus, Trash2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -8,19 +8,24 @@ import EmailCaptureModal from './EmailCaptureModal';
 import { sendOrderEmail, sendOrderNotificationToCompany } from '../services/emailService';
 import { downloadOrderPDF } from '../utils/pdfGenerator';
 
-const CartWidget: FC = () => {
+const CartWidgetComponent: FC = () => {
   const { items, totalItems, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
 
+  // Debug: verificar si el componente se renderiza correctamente
+  useEffect(() => {
+    console.log('🛒 CartWidget render:', { isOpen, itemsCount: items.length, totalItems, totalPrice });
+  }, [isOpen, items.length, totalItems, totalPrice]);
+
   const handleCheckout = () => {
     // Mostrar modal para capturar email
     setShowEmailModal(true);
   };
 
-  const handleEmailSubmit = async (email: string, name: string) => {
+  const handleEmailSubmit = async (email: string, name: string, whatsapp: string) => {
     setIsLoadingEmail(true);
 
     try {
@@ -39,6 +44,7 @@ const CartWidget: FC = () => {
         orderNumber,
         customerName: name,
         customerEmail: email,
+        customerWhatsApp: whatsapp,
         items,
         subtotal,
         iva,
@@ -51,6 +57,7 @@ const CartWidget: FC = () => {
         orderNumber,
         customerEmail: email,
         customerName: name,
+        customerWhatsApp: whatsapp,
         items,
         subtotal,
         iva,
@@ -63,6 +70,7 @@ const CartWidget: FC = () => {
         orderNumber,
         customerEmail: email,
         customerName: name,
+        customerWhatsApp: whatsapp,
         items,
         subtotal,
         iva,
@@ -109,16 +117,15 @@ const CartWidget: FC = () => {
       </button>
 
       {/* Modal del carrito */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsOpen(false)}
-          ></div>
+      <div className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        {/* Overlay */}
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+          onClick={() => setIsOpen(false)}
+        ></div>
 
-          {/* Panel del carrito */}
-          <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform transition-transform">
+        {/* Panel del carrito */}
+        <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white p-6">
@@ -169,7 +176,7 @@ const CartWidget: FC = () => {
                               <p className="text-sm text-gray-500">{item.variant}</p>
                             )}
                             <p className="text-amber-600 font-bold mt-1">
-                              ${item.price.toFixed(2)}
+                              ${(item.price || 0).toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -211,7 +218,7 @@ const CartWidget: FC = () => {
                           <p className="text-right text-sm text-gray-600">
                             Subtotal:{' '}
                             <span className="font-bold text-gray-800">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              ${((item.price || 0) * item.quantity).toFixed(2)}
                             </span>
                           </p>
                         </div>
@@ -235,11 +242,15 @@ const CartWidget: FC = () => {
               {items.length > 0 && (
                 <div className="border-t border-gray-200 p-6 bg-gray-50 space-y-3">
                   <div className="mb-4">
-                    <div className="flex justify-between text-lg mb-2">
-                      <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Subtotal (sin IVA):</span>
+                      <span className="font-medium">${(totalPrice / 1.15).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-xl font-bold">
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>IVA (15%):</span>
+                      <span className="font-medium">${(totalPrice - (totalPrice / 1.15)).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xl font-bold border-t pt-2">
                       <span className="text-gray-800">Total:</span>
                       <span className="text-amber-600">${totalPrice.toFixed(2)}</span>
                     </div>
@@ -271,7 +282,6 @@ const CartWidget: FC = () => {
             </div>
           </div>
         </div>
-      )}
 
       {/* Modal de Resumen de Pedido */}
       {showOrderSummary && (
@@ -294,5 +304,9 @@ const CartWidget: FC = () => {
     </>
   );
 };
+
+// Memoizar el componente para evitar re-renders innecesarios causados por animaciones en otras páginas
+const CartWidget = memo(CartWidgetComponent);
+CartWidget.displayName = 'CartWidget';
 
 export default CartWidget;

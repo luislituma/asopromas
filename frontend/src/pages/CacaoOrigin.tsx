@@ -68,9 +68,18 @@ const CacaoOrigin: FC = () => {
             {/* Visual / Imagen */}
             <div className="order-1 lg:order-2">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <div className="aspect-[4/3] bg-gradient-to-br from-[#6b3e24] to-[#c9a27e] flex items-center justify-center">
-                  {/* Placeholder - Puedes reemplazar con imagen real */}
-                  <div className="text-center p-8">
+                <div className="aspect-[4/3] relative bg-gradient-to-br from-[#6b3e24] to-[#c9a27e] flex items-center justify-center">
+                  {/* Imagen de fondo con opacidad */}
+                  <div className="absolute inset-0">
+                    <img 
+                      src="/assets/images/products/zamora.png" 
+                      alt="Zamora Chinchipe - Origen del Cacao"
+                      className="w-full h-full object-cover opacity-30"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#6b3e24]/60 to-[#c9a27e]/60"></div>
+                  </div>
+                  {/* Contenido sobre la imagen */}
+                  <div className="text-center p-8 relative z-10">
                     <MapPin className="w-20 h-20 text-white/80 mx-auto mb-4" />
                     <p className="text-white text-lg font-semibold">Santa Ana de Palanda</p>
                     <p className="text-white/80 text-sm mt-2">Sitio Arqueológico</p>
@@ -100,9 +109,18 @@ const CacaoOrigin: FC = () => {
             {/* Visual / Imagen */}
             <div>
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <div className="aspect-[4/3] bg-gradient-to-br from-[#c9a27e] to-[#8b5a3c] flex items-center justify-center">
-                  {/* Placeholder - Puedes reemplazar con imagen real de productores */}
-                  <div className="text-center p-8">
+                <div className="aspect-[4/3] relative bg-gradient-to-br from-[#c9a27e] to-[#8b5a3c] flex items-center justify-center">
+                  {/* Imagen de fondo con opacidad */}
+                  <div className="absolute inset-0">
+                    <img 
+                      src="/assets/images/products/Asopromas-socios.jpg" 
+                      alt="Productores de ASOPROMAS"
+                      className="w-full h-full object-cover opacity-30"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#c9a27e]/60 to-[#8b5a3c]/60"></div>
+                  </div>
+                  {/* Contenido sobre la imagen */}
+                  <div className="text-center p-8 relative z-10">
                     <Users className="w-20 h-20 text-white/80 mx-auto mb-4" />
                     <p className="text-white text-lg font-semibold">Nuestros Productores</p>
                     <p className="text-white/80 text-sm mt-2">Guardianes del Legado</p>
@@ -125,7 +143,7 @@ const CacaoOrigin: FC = () => {
               <div className="space-y-4 text-lg text-amber-100 leading-relaxed">
                 <p>
                   Nuestros socios —productores rurales de <strong className="text-amber-300">Palanda</strong>, 
-                  <strong className="text-amber-300"> Zumbi</strong> y comunidades cercanas— son los 
+                  <strong className="text-amber-300"> Zumbi</strong>, <strong className="text-amber-300"> Morona Santiago</strong>,  y comunidades cercanas— son los 
                   <strong className="text-white"> herederos de esa historia</strong>.
                 </p>
                 
@@ -177,29 +195,45 @@ const CacaoOrigin: FC = () => {
             </p>
           </div>
 
-          {/* Mapa Visual Decorativo */}
-          <div className="relative my-12 p-12 bg-gradient-to-br from-blue-50 to-amber-50 rounded-2xl border-2 border-amber-200">
-            <Globe className="w-32 h-32 text-amber-600/20 mx-auto mb-6" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                {/* Punto de origen */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-4 h-4 bg-amber-600 rounded-full animate-ping"></div>
-                  <div className="absolute inset-0 w-4 h-4 bg-amber-600 rounded-full"></div>
+          {/* Mapa de Zamora Chinchipe */}
+          <div className="relative my-12 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative aspect-[16/10] bg-gradient-to-br from-blue-50 to-amber-50">
+              {/* Imagen de fondo del mapa con opacidad */}
+              <div className="absolute inset-0">
+                <img 
+                  src="/assets/images/products/Palanda.jpg" 
+                  alt="Mapa de Zamora Chinchipe, Ecuador"
+                  className="w-full h-full object-cover opacity-20"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 to-amber-50/80"></div>
+              </div>
+              
+              {/* Contenido sobre la imagen */}
+              <div className="relative z-10 flex flex-col items-center justify-center h-full p-8">
+                <Globe className="w-24 h-24 text-amber-600/30 mb-6" />
+                
+                <div className="relative">
+                  {/* Punto de origen animado */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-6 h-6 bg-amber-600 rounded-full animate-ping"></div>
+                    <div className="absolute inset-0 w-6 h-6 bg-amber-600 rounded-full shadow-lg"></div>
+                  </div>
+                  
+                  {/* Líneas que se expanden */}
+                  <svg className="w-64 h-64" viewBox="0 0 200 200">
+                    <line x1="100" y1="100" x2="20" y2="40" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+                    <line x1="100" y1="100" x2="180" y2="60" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+                    <line x1="100" y1="100" x2="160" y2="140" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+                    <line x1="100" y1="100" x2="40" y2="160" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
+                  </svg>
                 </div>
                 
-                {/* Líneas que se expanden */}
-                <svg className="w-64 h-64" viewBox="0 0 200 200">
-                  <line x1="100" y1="100" x2="20" y2="40" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.5"/>
-                  <line x1="100" y1="100" x2="180" y2="60" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.5"/>
-                  <line x1="100" y1="100" x2="160" y2="140" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.5"/>
-                  <line x1="100" y1="100" x2="40" y2="160" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.5"/>
-                </svg>
+                <div className="mt-8 bg-white/90 backdrop-blur-sm rounded-xl px-6 py-3 border-2 border-amber-200 shadow-lg">
+                  <p className="text-amber-800 font-bold text-lg">Zamora Chinchipe, Ecuador</p>
+                  <p className="text-amber-600 text-sm">Cuna del Cacao Ancestral</p>
+                </div>
               </div>
             </div>
-            <p className="relative z-10 text-amber-800 font-semibold mt-8">
-              Zamora Chinchipe, Ecuador
-            </p>
           </div>
 
           {/* CTA Buttons */}

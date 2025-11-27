@@ -7,7 +7,7 @@ const Producers: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Nuestros Productores - ASOPROMAS | Familias Cacaoteras de Ecuador',
-    description: 'Conoce a los productores de cacao de ASOPROMAS: 150 familias de Zamora Chinchipe dedicadas al cultivo sostenible de cacao de fino aroma ecuatoriano.',
+    description: 'Conoce a los productores de cacao de ASOPROMAS: familias de Zamora Chinchipe y Morona Santiago dedicadas al cultivo sostenible de cacao de fino aroma ecuatoriano.',
     keywords: 'productores cacao Ecuador, familias cacaoteras, Zamora Chinchipe agricultores, comercio justo cacao, agricultores ASOPROMAS',
     url: '/about/producers',
     type: 'article'
@@ -15,43 +15,43 @@ const Producers: FC = () => {
 
   const producers = [
     {
-      name: 'María Elena Vargas',
-      location: 'El Pangui',
-      experience: '25 años',
-      specialty: 'Cacao Trinitario',
-      image: '/api/placeholder/150/150',
-      story: 'Pionera en técnicas de fermentación que realzan el sabor floral del cacao.'
-    },
-    {
-      name: 'Carlos Mendoza',
-      location: 'Yantzaza',
-      experience: '18 años',
-      specialty: 'Cacao Nacional',
-      image: '/api/placeholder/150/150',
-      story: 'Líder en prácticas agroforestales que conservan la biodiversidad.'
-    },
-    {
-      name: 'Rosa Chuncho',
-      location: 'Centinela del Cóndor',
-      experience: '30 años',
+      name: 'Socio ASOPROMAS',
+      location: 'Zamora Chinchipe',
+      experience: '20+ años',
       specialty: 'Cacao Fino de Aroma',
       image: '/api/placeholder/150/150',
-      story: 'Guardiana de semillas ancestrales y técnicas tradicionales de cultivo.'
+      story: 'Pionero en técnicas de fermentación que realzan el sabor único del cacao amazónico.'
+    },
+    {
+      name: 'Socio ASOPROMAS',
+      location: 'Morona Santiago',
+      experience: '15+ años',
+      specialty: 'Cultivo Orgánico',
+      image: '/api/placeholder/150/150',
+      story: 'Líder en prácticas agroecológicas que conservan la biodiversidad de la Amazonía.'
+    },
+    {
+      name: 'Socio ASOPROMAS',
+      location: 'Zamora Chinchipe',
+      experience: '25+ años',
+      specialty: 'Cacao Nacional',
+      image: '/api/placeholder/150/150',
+      story: 'Guardián de semillas ancestrales y técnicas tradicionales de cultivo sostenible.'
     }
   ];
 
   const stats = [
     {
       icon: <Users className="w-8 h-8" />,
-      number: '520+',
+      number: '100+',
       label: 'Familias Productoras',
       description: 'Miembros activos de nuestra asociación'
     },
     {
       icon: <MapPin className="w-8 h-8" />,
-      number: '12',
-      label: 'Comunidades',
-      description: 'Distribuidas en Zamora Chinchipe'
+      number: '2',
+      label: 'Provincias',
+      description: 'Zamora Chinchipe y Morona Santiago'
     },
     {
       icon: <TrendingUp className="w-8 h-8" />,
@@ -230,23 +230,33 @@ const Producers: FC = () => {
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-bold mb-6">Testimonios</h3>
+              <h3 className="text-2xl font-bold mb-6">Nuestro Compromiso</h3>
               
-              <blockquote className="text-green-100 italic mb-4 leading-relaxed">
-                "Gracias a ASOPROMAS, mis hijos pueden estudiar y mi finca produce 
-                el mejor cacao de la región. Somos una familia próspera."
-              </blockquote>
-              <cite className="text-green-300 font-medium">
-                - María Elena Vargas, Productora desde 1998
-              </cite>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xl font-semibold mb-3 text-green-300">Bienestar Familiar</h4>
+                  <p className="text-green-100 leading-relaxed">
+                    Trabajamos para que cada familia productora tenga acceso a mejores 
+                    oportunidades de educación, salud y desarrollo económico sostenible.
+                  </p>
+                </div>
 
-              <blockquote className="text-green-100 italic mb-4 mt-6 leading-relaxed">
-                "La capacitación técnica y el acceso a mercados justos han 
-                transformado completamente nuestra comunidad."
-              </blockquote>
-              <cite className="text-green-300 font-medium">
-                - Carlos Mendoza, Líder Comunitario
-              </cite>
+                <div>
+                  <h4 className="text-xl font-semibold mb-3 text-green-300">Comercio Justo</h4>
+                  <p className="text-green-100 leading-relaxed">
+                    Garantizamos precios justos y acceso directo a mercados internacionales, 
+                    fortaleciendo la economía de nuestras comunidades.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-xl font-semibold mb-3 text-green-300">Agricultura Sostenible</h4>
+                  <p className="text-green-100 leading-relaxed">
+                    Promovemos prácticas orgánicas que preservan la Amazonía para 
+                    las futuras generaciones.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

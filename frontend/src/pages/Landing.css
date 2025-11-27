@@ -1,0 +1,213 @@
+/* Landing Page - Animaciones y Efectos Profesionales */
+
+/* Smooth scroll para toda la página */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Efecto parallax sutil en el hero */
+.parallax-bg {
+  will-change: transform;
+  transition: transform 0.3s ease-out;
+}
+
+/* Mejora de rendimiento para animaciones */
+.optimize-animation {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Efecto de brillo en hover para botones */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.shine-effect:hover::before {
+  left: 100%;
+}
+
+/* Efecto de sombra dinámica */
+.dynamic-shadow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.dynamic-shadow:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Animación de pulso suave para elementos destacados */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Animación de flotación */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Efecto de degradado animado */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Mejora de lectura con fade-in progresivo */
+.progressive-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.progressive-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Efecto de glass morphism */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Transiciones suaves globales */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mejora de rendimiento en dispositivos móviles */
+@media (max-width: 768px) {
+  .optimize-animation {
+    animation-duration: 0.5s !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Prefiere movimiento reducido para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Efecto de escala en imágenes al hacer hover */
+.image-scale-hover {
+  overflow: hidden;
+}
+
+.image-scale-hover img {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.image-scale-hover:hover img {
+  transform: scale(1.1);
+}
+
+/* Efecto de revelación desde abajo */
+.reveal-from-bottom {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-from-bottom.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Línea decorativa animada */
+.animated-line {
+  width: 0;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animated-line.visible {
+  width: 100%;
+}
+
+/* Mejora del contraste para texto sobre fondos oscuros */
+.dark-overlay {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading state sutil */
+.skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Leaf, TreePine, Award, Shield, Globe, Recycle } from 'lucide-react';
+import { ChevronRight, Leaf, TreePine, Shield, Globe, Recycle } from 'lucide-react';
 import { useSEO } from '../../hooks/useSEO';
 
 const Sustainability: FC = () => {
@@ -41,29 +41,6 @@ const Sustainability: FC = () => {
       description: 'Nuestras plantaciones capturan más CO2 del que producimos en toda la cadena.',
       impact: '120 ton CO2/año capturadas',
       color: 'from-purple-500 to-purple-600'
-    }
-  ];
-
-  const certifications = [
-    {
-      name: 'Orgánico USDA',
-      description: 'Certificación oficial para productos orgánicos en Estados Unidos',
-      year: '2010'
-    },
-    {
-      name: 'Comercio Justo',
-      description: 'Garantiza precios justos y condiciones laborales dignas',
-      year: '2012'
-    },
-    {
-      name: 'Rainforest Alliance',
-      description: 'Prácticas agrícolas que protegen la biodiversidad',
-      year: '2015'
-    },
-    {
-      name: 'IFOAM Organic',
-      description: 'Estándar internacional de agricultura orgánica',
-      year: '2018'
     }
   ];
 
@@ -163,42 +140,6 @@ const Sustainability: FC = () => {
                 </p>
                 <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-sm">
                   {initiative.impact}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section className="py-20 bg-gradient-to-r from-green-800 to-green-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Certificaciones Ambientales
-            </h2>
-            <p className="text-xl text-green-100 max-w-3xl mx-auto">
-              Reconocimientos internacionales que validan nuestro compromiso sostenible
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {certifications.map((cert) => (
-              <div
-                key={cert.name}
-                className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center hover:bg-white/15 transition-colors duration-300"
-              >
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">
-                  {cert.name}
-                </h3>
-                <p className="text-green-200 text-sm mb-3">
-                  {cert.description}
-                </p>
-                <div className="text-green-300 font-semibold">
-                  Desde {cert.year}
                 </div>
               </div>
             ))}

@@ -7,8 +7,8 @@ const Certifications: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Certificaciones - ASOPROMAS | Cacao Orgánico Certificado Ecuador',
-    description: 'ASOPROMAS cuenta con certificaciones USDA Organic, Fair Trade, Rainforest Alliance y más. Cacao orgánico certificado de la más alta calidad de Ecuador.',
-    keywords: 'certificaciones ASOPROMAS, cacao orgánico certificado, USDA Organic Ecuador, Fair Trade cacao, Rainforest Alliance',
+    description: 'ASOPROMAS cuenta con certificaciones USDA Organic y BPA (Buenas Prácticas Agrícolas). Cacao orgánico certificado de la más alta calidad de Ecuador.',
+    keywords: 'certificaciones ASOPROMAS, cacao orgánico certificado, USDA Organic Ecuador, BPA Ecuador, Buenas Prácticas Agrícolas cacao',
     url: '/about/certifications',
     type: 'article'
   });
@@ -30,49 +30,19 @@ const Certifications: FC = () => {
       color: 'from-blue-500 to-blue-600'
     },
     {
-      name: 'Fair Trade Certified',
-      organization: 'Fairtrade International',
-      description: 'Garantiza precios justos para los productores, condiciones laborales dignas y desarrollo comunitario sostenible.',
-      year: '2012',
+      name: 'BPA - Buenas Prácticas Agrícolas',
+      organization: 'Agencia de Regulación y Control Fito y Zoosanitario (AGROCALIDAD)',
+      description: 'Certificación nacional que garantiza la aplicación de prácticas agrícolas que aseguran la inocuidad, calidad y sostenibilidad en la producción de cacao.',
+      year: '2020',
       validity: '2026',
       benefits: [
-        'Precios justos garantizados',
-        'Prima para desarrollo social',
-        'Condiciones laborales dignas',
-        'Empoderamiento comunitario'
+        'Seguridad alimentaria garantizada',
+        'Uso responsable de recursos',
+        'Trazabilidad completa del producto',
+        'Protección del medio ambiente'
       ],
-      icon: '🤝',
+      icon: '🌿',
       color: 'from-green-500 to-green-600'
-    },
-    {
-      name: 'Rainforest Alliance',
-      organization: 'Rainforest Alliance Certified',
-      description: 'Certifica que nuestras fincas protegen la biodiversidad, mejoran los medios de vida y promueven derechos humanos.',
-      year: '2015',
-      validity: '2027',
-      benefits: [
-        'Protección de biodiversidad',
-        'Conservación de recursos naturales',
-        'Bienestar de trabajadores',
-        'Desarrollo rural sostenible'
-      ],
-      icon: '🌳',
-      color: 'from-emerald-500 to-emerald-600'
-    },
-    {
-      name: 'IFOAM Organic',
-      organization: 'International Federation of Organic Agriculture Movements',
-      description: 'Estándar internacional que certifica la producción orgánica según principios ecológicos, sociales y económicos.',
-      year: '2018',
-      validity: '2028',
-      benefits: [
-        'Estándares internacionales',
-        'Producción ecológica',
-        'Sostenibilidad integral',
-        'Reconocimiento mundial'
-      ],
-      icon: '🌍',
-      color: 'from-purple-500 to-purple-600'
     }
   ];
 

@@ -1,5 +1,5 @@
 // src/components/ProductCard.tsx
-import { type FC } from "react";
+import { type FC, memo } from "react";
 import { Link } from "react-router-dom";
 import ButtonBuy from "./ButtonBuy";
 
@@ -18,7 +18,7 @@ interface Props {
 
 const fallbackImage = "/assets/images/products/fallback.jpg"; // coloca un fallback en public
 
-const ProductCard: FC<Props> = ({ product, className = "" }) => {
+const ProductCardComponent: FC<Props> = ({ product, className = "" }) => {
   const thumb = product.images && product.images.length > 0 ? product.images[0] : fallbackImage;
 
   return (
@@ -80,5 +80,9 @@ const ProductCard: FC<Props> = ({ product, className = "" }) => {
     </article>
   );
 };
+
+// Memoizar para evitar re-renders innecesarios
+const ProductCard = memo(ProductCardComponent);
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

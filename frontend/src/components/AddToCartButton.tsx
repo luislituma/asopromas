@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react';
+import { type FC, useState, memo } from 'react';
 import { ShoppingCart, Check, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
@@ -13,7 +13,7 @@ interface AddToCartButtonProps {
   showText?: boolean;
 }
 
-const AddToCartButton: FC<AddToCartButtonProps> = ({
+const AddToCartButtonComponent: FC<AddToCartButtonProps> = ({
   productId,
   productName,
   productPrice,
@@ -175,5 +175,9 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
     </>
   );
 };
+
+// Memoizar para evitar re-renders innecesarios en el catálogo
+const AddToCartButton = memo(AddToCartButtonComponent);
+AddToCartButton.displayName = 'AddToCartButton';
 
 export default AddToCartButton;

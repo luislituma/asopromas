@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type FC, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, type FC, type ReactNode } from 'react';
 
 export interface CartItem {
   id: string;
@@ -84,21 +84,28 @@ export const CartProvider: FC<CartProviderProps> = ({ children }) => {
     setItems([]);
   };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalItems = useMemo(() => 
+    items.reduce((sum, item) => sum + item.quantity, 0), 
+    [items]
+  );
+  
+  const totalPrice = useMemo(() => 
+    items.reduce((sum, item) => sum + (item.price * item.quantity), 0), 
+    [items]
+  );
+
+  const contextValue = useMemo(() => ({
+    items,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    totalItems,
+    totalPrice
+  }), [items, totalItems, totalPrice]);
 
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        totalPrice
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

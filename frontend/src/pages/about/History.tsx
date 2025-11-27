@@ -6,8 +6,8 @@ import { useSEO } from '../../hooks/useSEO';
 const History: FC = () => {
   // SEO Configuration
   useSEO({
-    title: 'Historia de ASOPROMAS - 40 Años Cultivando Tradición | Ecuador',
-    description: 'Descubre la historia de ASOPROMAS desde 1985: cuatro décadas cultivando cacao de fino aroma en Zamora Chinchipe, fortaleciendo comunidades rurales del Ecuador.',
+    title: 'Historia de ASOPROMAS - 25 Años Cultivando Tradición | Ecuador',
+    description: 'Descubre la historia de ASOPROMAS desde 2000: más de dos décadas cultivando cacao de fino aroma en Zamora Chinchipe, fortaleciendo comunidades rurales del Ecuador.',
     keywords: 'historia ASOPROMAS, cacao Ecuador historia, Zamora Chinchipe agricultura, cooperativa cacao, tradición cacaotera Ecuador',
     url: '/about/history',
     type: 'article'
@@ -15,33 +15,33 @@ const History: FC = () => {
 
   const milestones = [
     {
-      year: '1985',
+      year: '2000',
       title: 'Fundación de ASOPROMAS',
       description: 'Un grupo visionario de agricultores se unió para formar la Asociación de Productores de Cacao de Zamora Chinchipe.',
       icon: <Users className="w-6 h-6" />
     },
     {
-      year: '1992',
-      title: 'Primera Certificación Orgánica',
-      description: 'Obtuvimos nuestra primera certificación orgánica, pioneros en Ecuador en agricultura sostenible.',
+      year: '2015',
+      title: 'Primer Procesamiento',
+      description: 'Inauguramos nuestra planta de procesamiento para crear productos de chocolate artesanal, marcando un hito en nuestra historia.',
       icon: <Award className="w-6 h-6" />
     },
     {
-      year: '2005',
+      year: '2024',
+      title: 'Primera Certificación Orgánica',
+      description: 'Obtuvimos nuestra primera certificación orgánica, consolidando nuestro compromiso con la agricultura sostenible.',
+      icon: <Award className="w-6 h-6" />
+    },
+    {
+      year: '2024',
       title: 'Expansión Internacional',
-      description: 'Comenzamos a exportar nuestro cacao fino de aroma a mercados europeos y norteamericanos.',
+      description: 'Comenzamos a exportar nuestro cacao fino de aroma a mercados europeos y norteamericanos, llevando el sabor de Ecuador al mundo.',
       icon: <Calendar className="w-6 h-6" />
     },
     {
-      year: '2015',
-      title: 'Procesamiento Propio',
-      description: 'Inauguramos nuestra planta de procesamiento para crear productos de chocolate artesanal.',
-      icon: <Award className="w-6 h-6" />
-    },
-    {
-      year: '2025',
+      year: 'Actualidad',
       title: 'Presente y Futuro',
-      description: 'Hoy somos líderes en la producción de cacao premium, trabajando con más de 500 familias productoras.',
+      description: 'Hoy somos líderes en la producción de cacao premium, trabajando con más de 100 familias productoras y mirando hacia el futuro con optimismo.',
       icon: <Users className="w-6 h-6" />
     }
   ];
@@ -56,7 +56,7 @@ const History: FC = () => {
             Nuestra Historia
           </h1>
           <p className="text-xl sm:text-2xl text-amber-100 max-w-3xl mx-auto">
-            Cuatro décadas cultivando tradición, calidad y sostenibilidad en el corazón de Ecuador
+            Más de dos décadas cultivando tradición, calidad y sostenibilidad en el corazón de Ecuador
           </p>
         </div>
       </section>
@@ -128,7 +128,7 @@ const History: FC = () => {
             Nuestro Legado
           </h2>
           <p className="text-xl text-amber-100 max-w-4xl mx-auto leading-relaxed mb-8">
-            Durante más de 35 años, hemos trabajado incansablemente para preservar las tradiciones 
+            Desde el año 2000, hemos trabajado incansablemente para preservar las tradiciones 
             del cultivo de cacao mientras innovamos en técnicas sostenibles. Cada grano que 
             producimos cuenta la historia de nuestra tierra, nuestras familias y nuestro compromiso 
             con la excelencia.

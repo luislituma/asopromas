@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, memo } from "react";
 import AddToCartButton from "./AddToCartButton";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-const ButtonBuy: FC<Props> = ({ 
+const ButtonBuyComponent: FC<Props> = ({ 
   productId, 
   productName,
   productPrice,
@@ -29,5 +29,9 @@ const ButtonBuy: FC<Props> = ({
     />
   );
 };
+
+// Memoizar para evitar re-renders innecesarios
+const ButtonBuy = memo(ButtonBuyComponent);
+ButtonBuy.displayName = 'ButtonBuy';
 
 export default ButtonBuy;

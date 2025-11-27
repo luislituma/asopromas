@@ -1,24 +1,24 @@
 import { useEffect, useState, type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
-import chocolate1 from '../assets/images/products/chocolate.png';
-
 
 interface CTAProps {
   className?: string;
 }
 
-
-
 const CTA: FC<CTAProps> = ({ className = '' }) => {
-  const images = [chocolate1];
+  const images = [
+    '/assets/images/products/Chocolates.jpg',
+    '/assets/images/products/Cafe-1.jpg',
+    '/assets/images/products/Bombones-fondo.png'
+  ];
   const [current, setCurrent] = useState(0);
 
-  // Cambiar imagen cada 4 segundos
+  // Cambiar imagen cada 5 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [images.length]);
   return (
@@ -60,18 +60,43 @@ const CTA: FC<CTAProps> = ({ className = '' }) => {
           </div>
         </div>
 
-        {/* Columna Derecha: Imagen */}
-       <div className="relative w-full h-72 flex justify-center items-center">
-          {images.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt={`Chocolate ${index + 1}`}
-              className={`absolute w-100 h-auto object-contain transition-opacity duration-1000 ${
-                index === current ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          ))}
+        {/* Columna Derecha: Slider de Imágenes */}
+        <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] flex justify-center items-center group">
+          <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                  index === current 
+                    ? "opacity-100 scale-100" 
+                    : "opacity-0 scale-95"
+                }`}
+              >
+                <img
+                  src={img}
+                  alt={`Producto ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
+            ))}
+
+            {/* Indicadores de puntos */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrent(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === current
+                      ? 'bg-amber-400 w-10 h-3'
+                      : 'bg-white/50 hover:bg-white/75 w-3 h-3'
+                  }`}
+                  aria-label={`Ver imagen ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

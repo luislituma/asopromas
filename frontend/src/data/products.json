@@ -1,53 +1,192 @@
 [
   {
     "id": "chocolate-bar-100",
-    "name": "Barra de Chocolate 100%",
-    "description": "Chocolate puro, elaborado directamente del cacao de fino aroma. Sabor intenso y auténtico, perfecto para los amantes del cacao en su forma más natural.",
-    "images": ["/assets/images/products/chocolate-bar-100.jpg"]
+    "name": "Pasta de Cacao",
+    "description": "Pasta de Cacao para Taza al 100%. Cacao puro sin azúcar, elaborado con granos de cacao de fino aroma.",
+    "price": 3.00,
+    "priceVariant": 5.00,
+    "weight": "100g",
+    "weightVariant": "200g",
+    "images": [
+      "/assets/images/products/Barra-Pura-1.jpg",
+      "/assets/images/products/Barra-Pura-2.jpg"
+    ],
+    "variants": [
+      { "size": "100g", "price": 3.00 },
+      { "size": "200g", "price": 5.00 }
+    ],
+    "ingredients": [
+      { "name": "Granos de Cacao", "percentage": "100%" }
+    ],
+    "nutritionalInfo": {
+      "servingSize": "Por porción",
+      "totalFat": "8%",
+      "saturatedFat": "15%",
+      "transFat": "0g",
+      "cholesterol": "0%",
+      "sodium": "0%",
+      "totalCarbohydrates": "1%",
+      "fiber": "0%",
+      "sugars": "0%",
+      "protein": "1g"
+    }
   },
   {
     "id": "chocolate-nibs-salt",
-    "name": "Barra de Chocolate con Nibs de Cacao y Sal Marina",
-    "description": "Chocolate al 65% con nibs de cacao tostados y un toque de sal marina. Crujiente y perfectamente equilibrado entre dulce y salado.",
+    "name": "Barra de Chocolate con Nibs & Sal Marina",
+    "description": "Barra de Chocolate Fino Artesanal al 65% con Nibs y Sal Marina. Crujiente y perfectamente equilibrado entre dulce y salado.",
+    "price": 3.50,
+    "weight": "50g",
+    "weightOz": "1.76 oz",
     "images": [
-      "/assets/images/products/chocolate-bar-100.jpg",
-      "/assets/images/products/chocolate-nibs-salt-alt.jpg"
-    ]
+      "/assets/images/products/Nibs-Sal-Marina-1.jpg",
+      "/assets/images/products/Nibs-Sal-Marina-2.jpg",
+      "/assets/images/products/Nibs-Sal-Marina-3.jpg"
+    ],
+    "ingredients": [
+      { "name": "Pasta de Cacao", "percentage": "50%" },
+      { "name": "Azúcar", "percentage": "34.5%" },
+      { "name": "Manteca de Cacao", "percentage": "5%" },
+      { "name": "Nibs de Cacao", "percentage": "5%" },
+      { "name": "Sal Marina", "percentage": "0.5%" }
+    ],
+    "nutritionalInfo": {
+      "servingSize": "10g",
+      "servingsPerContainer": "5",
+      "calories": "50 kcal",
+      "caloriesFromFat": "45 kcal",
+      "totalFat": "4g",
+      "totalFatPercent": "9%",
+      "saturatedFat": "3g",
+      "saturatedFatPercent": "14%",
+      "transFat": "0g",
+      "monounsaturatedFat": "2g",
+      "polyunsaturatedFat": "0g",
+      "cholesterol": "0mg",
+      "sodium": "0mg",
+      "totalCarbohydrates": "6g",
+      "fiber": "0g",
+      "sugars": "3g",
+      "sugarsPercent": "2%",
+      "protein": "1g"
+    }
   },
   {
     "id": "chocolate-coffee",
     "name": "Barra de Chocolate con Café",
-    "description": "Chocolate al 65% con café, elaborado con granos de café de altura de Palanda. Perfecto para empezar el día con energía y rico aroma.",
-    "images": ["/assets/images/products/chocolate-coffee.jpg"]
+    "description": "Barra de Chocolate Fino Artesanal al 65% con Café. La combinación perfecta entre chocolate premium y café tostado.",
+    "price": 3.50,
+    "weight": "50g",
+    "weightOz": "1.76 oz",
+    "images": [
+      "/assets/images/products/Cafe-1.jpg",
+      "/assets/images/products/Cafe-2.jpg"
+    ],
+    "ingredients": [
+      { "name": "Pasta de Cacao", "percentage": "57%" },
+      { "name": "Azúcar", "percentage": "32%" },
+      { "name": "Manteca de Cacao", "percentage": "8%" },
+      { "name": "Café Tostado", "percentage": "3%" }
+    ],
+    "nutritionalInfo": {
+      "servingSize": "10g",
+      "servingsPerContainer": "5",
+      "calories": "50 kcal",
+      "caloriesFromFat": "45 kcal",
+      "totalFat": "4g",
+      "totalFatPercent": "9%",
+      "saturatedFat": "3g",
+      "saturatedFatPercent": "14%",
+      "transFat": "0g",
+      "monounsaturatedFat": "2g",
+      "polyunsaturatedFat": "0g",
+      "cholesterol": "0mg",
+      "sodium": "0mg",
+      "totalCarbohydrates": "6g",
+      "fiber": "0g",
+      "sugars": "3g",
+      "sugarsPercent": "2%",
+      "protein": "1g"
+    }
   },
   {
     "id": "fruit-bonbons",
-    "name": "Bombones con Relleno de Frutas Exóticas",
-    "description": "Bombones rellenos con frutas locales y exóticas. Una combinación dulce y afrutada que resalta la riqueza de la Amazonía.",
+    "name": "Bombones de Chocolate",
+    "description": "Bombones de Chocolate Artesanales con relleno de frutas tropicales amazónicas. Disponibles con rellenos de guayaba, piña, maracuyá, mora, frutilla y jalea de cacao.",
+    "price": 5.00,
+    "weight": "80g",
     "images": [
-      "/assets/images/products/fruit-bonbons.jpg",
-      "/assets/images/products/fruit-bonbons-alt.jpg"
-    ]
+      "/assets/images/products/Bombones-1.jpg",
+      "/assets/images/products/Bombones-2.jpg",
+      "/assets/images/products/Bombones-3.jpg"
+    ],
+    "variants": [
+      "Guayaba",
+      "Piña",
+      "Maracuyá",
+      "Mora",
+      "Frutilla",
+      "Jalea de Cacao"
+    ],
+    "nutritionalInfo": {
+      "servingSize": "80g",
+      "calories": "320 kJ",
+      "totalFat": "6g",
+      "saturatedFat": "1.5g",
+      "transFat": "0g",
+      "monounsaturatedFat": "4g",
+      "polyunsaturatedFat": "0.5g",
+      "cholesterol": "0mg",
+      "sodium": "0mg",
+      "totalCarbohydrates": "7g",
+      "fiber": "0g",
+      "sugars": "4g",
+      "protein": "1g"
+    }
   },
   {
     "id": "cocoa-nibs",
     "name": "Nibs de Cacao Natural",
     "description": "Nibs de cacao tostados, puros y naturales. Perfectos como snack saludable, para repostería o para realzar postres.",
-    "images": ["/assets/images/products/cocoa-nibs.jpg"]
+    "images": ["/assets/images/products/cocoa-nibs.jpg"],
+    "available": false
   },
   {
     "id": "cocoa-liqueur",
-    "name": "Licor Dulce de Cacao (20°)",
-    "description": "Licor artesanal, suave y dulce. Ideal para disfrutar y compartir.",
-    "images": ["/assets/images/products/cocoa-liqueur.jpg"]
+    "name": "Licor de Cacao",
+    "description": "Licor dulce de cacao al 20%. Artesanal, suave y dulce. Ideal para disfrutar y compartir.",
+    "price": 4.00,
+    "priceVariant": 10.00,
+    "volume": "375ml",
+    "volumeVariant": "750ml",
+    "alcoholContent": "20°",
+    "images": [
+      "/assets/images/products/Licor-Pequenio-1.jpg",
+      "/assets/images/products/Licor-Grande-1.jpg",
+      "/assets/images/products/Licor-Grande-2.jpg",
+      "/assets/images/products/Licores-1.jpg"
+    ],
+    "variants": [
+      { "size": "375ml", "price": 4.00 },
+      { "size": "750ml", "price": 10.00 }
+    ],
+    "ingredients": [
+      { "name": "Agua desmineralizada", "percentage": "48.93%" },
+      { "name": "Aguardiente de caña de Alc 46%", "percentage": "46%" },
+      { "name": "Macerado de cacao", "percentage": "18.81%" },
+      { "name": "Nibs de cacao", "percentage": "50%" },
+      { "name": "Azúcar", "percentage": "10%" },
+      { "name": "Esencia sabor a cacao", "percentage": "0.13%" }
+    ],
+    "warnings": "Consérvese en un ambiente fresco y seco. Una vez abierto mantener en refrigeración. Venta prohibida a menores de 18 años."
   },
   {
     "id": "cocoa-cocktail",
     "name": "Cóctel de Cacao (12°)",
     "description": "Bebida suave, dulce y refrescante. Se disfruta mejor fría, perfecta para reuniones especiales.",
     "images": [
-      "/assets/images/products/cocoa-cocktail.jpg",
-      "/assets/images/products/cocoa-cocktail-alt.jpg"
+      "/assets/images/products/Coctel-1.jpg",
+      "/assets/images/products/Coctel-Pequenio-1.jpg"
     ]
   }
 ]

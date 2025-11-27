@@ -7,7 +7,7 @@ import SkipLinks from './SkipLinks';
 import ScreenReaderAnnouncer from './ScreenReaderAnnouncer';
 import { useA11y } from '../hooks/useA11y';
 
-const Layout: FC = () => {
+const LayoutComponent: FC = () => {
   const location = useLocation();
   const { announcePageChange, focusMainContent } = useA11y();
 
@@ -51,6 +51,10 @@ const Layout: FC = () => {
     </>
   );
 };
+
+// NO memoizamos Layout porque Outlet necesita actualizarse con cada cambio de ruta
+// Pero los componentes hijo (Header, CartWidget) sí están memoizados
+const Layout = LayoutComponent;
         
 
 export default Layout;

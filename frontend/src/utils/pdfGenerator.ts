@@ -5,6 +5,7 @@ interface OrderPDFData {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerWhatsApp: string;
   items: CartItem[];
   subtotal: number;
   iva: number;
@@ -82,6 +83,12 @@ export const generateOrderPDF = (data: OrderPDFData): string => {
   pdf.text('Email:', 25, y);
   pdf.setFont('helvetica', 'normal');
   pdf.text(data.customerEmail, 70, y);
+
+  y += 7;
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('WhatsApp:', 25, y);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(data.customerWhatsApp, 70, y);
 
   y += 15;
 

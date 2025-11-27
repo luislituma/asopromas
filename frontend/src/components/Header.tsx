@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect, useRef } from 'react';
+import { type FC, useState, useEffect, useRef, memo } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Search, X, ChevronDown, ShoppingBag, Menu } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
@@ -8,7 +8,7 @@ type SubmenuItem = { to: string; text: string };
 type SubmenuSection = { title: string; items: SubmenuItem[] };
 type NavItem = { to: string; text: string; submenu?: SubmenuSection[] };
 
-const Header: FC = () => {
+const HeaderComponent: FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openSubmenuProducts, setOpenSubmenuProducts] = useState(false);
     const [openSubmenuAbout, setOpenSubmenuAbout] = useState(false);
@@ -485,6 +485,10 @@ const Header: FC = () => {
         </>
     );
 };
+
+// Memoizar el Header para evitar re-renders innecesarios
+const Header = memo(HeaderComponent);
+Header.displayName = 'Header';
 
 export default Header;
 

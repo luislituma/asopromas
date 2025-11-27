@@ -1,29 +1,45 @@
-import { type FC } from "react";
-import { Award, Heart, Sparkles, Star, Cherry } from "lucide-react";
+import { type FC, useState } from "react";
+import { Award, Heart, Sparkles, Star, Cherry, ChevronLeft, ChevronRight } from "lucide-react";
 import ButtonBuy from "../../components/ButtonBuy";
 import { useSEO } from "../../hooks/useSEO";
 import { generateProductSchema } from "../../utils/schema";
 
 const FruitBonbons: FC = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const productImages = [
+    "/assets/images/products/Bombones-1.jpg",
+    "/assets/images/products/Bombones-2.jpg",
+    "/assets/images/products/Bombones-3.jpg"
+  ];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+  };
+
   // Generate Product Schema
   const productSchema = generateProductSchema({
-    name: "Bombones con Relleno de Frutas Exóticas KUJEÑITO",
-    description: "Bombones rellenos con frutas locales y exóticas. Una combinación dulce y afrutada que resalta la riqueza de la Amazonía.",
-    price: "18.99",
+    name: "Bombones de Chocolate ASOPROMAS",
+    description: "Bombones de Chocolate Artesanales con relleno de frutas tropicales amazónicas. Disponibles con rellenos de guayaba, piña, maracuyá, mora, frutilla y jalea de cacao.",
+    price: "5.00",
     currency: "USD",
     category: "Bombones Artesanales",
-    image: "/assets/images/products/fruit-bonbons.jpg",
+    image: "/assets/images/products/Bombones-1.jpg",
     url: "/products/fruit-bonbons"
   });
 
   // SEO Configuration
   useSEO({
-    title: 'Bombones con Frutas Exóticas KUJEÑITO - Sabores Amazónicos | ASOPROMAS',
-    description: 'Bombones KUJEÑITO rellenos con frutas exóticas de la Amazonía ecuatoriana. Combinación perfecta de chocolate premium y sabores tropicales únicos.',
-    keywords: 'bombones frutas exóticas, KUJEÑITO bombones, chocolate frutas amazónicas, bombones artesanales Ecuador',
+    title: 'Bombones de Chocolate - Rellenos de Frutas Tropicales | ASOPROMAS',
+    description: 'Bombones artesanales con rellenos de frutas amazónicas: guayaba, piña, maracuyá, mora, frutilla y jalea de cacao. 80g por $5.00',
+    keywords: 'bombones chocolate, bombones frutas tropicales, bombones artesanales Ecuador, chocolate amazónico',
     url: '/products/fruit-bonbons',
     type: 'product',
-    image: '/assets/images/products/fruit-bonbons.jpg',
+    image: '/assets/images/products/Bombones-1.jpg',
     schema: productSchema
   });
 
@@ -43,14 +59,14 @@ const FruitBonbons: FC = () => {
                   <span className="text-pink-200 font-medium text-sm">🍓 KUJEÑITO Premium</span>
                 </div>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                  Bombones con
+                  Bombones de
                   <span className="block bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent">
-                    Frutas Exóticas
+                    Chocolate
                   </span>
                 </h1>
                 <p className="text-xl text-pink-100 leading-relaxed">
-                  Deliciosos bombones rellenos de frutas locales y exóticas de la zona amazónica de 
-                  <span className="font-semibold text-pink-300"> Playas de Cuje, Zumbi</span>
+                  Bombones artesanales con relleno de frutas tropicales amazónicas.
+                  <span className="font-semibold text-pink-300"> 80g de puro sabor | $5.00</span>
                 </p>
               </div>
 
@@ -71,23 +87,85 @@ const FruitBonbons: FC = () => {
 
               <div className="pt-6">
                 <ButtonBuy 
-                  productId="fruit-bonbons-exotic"
-                  productName="Bombones con Frutas Exóticas KUJEÑITO"
-                  productPrice={22.99}
-                  productImage="/assets/images/products/fruit-bonbons.jpg"
+                  productId="fruit-bonbons"
+                  productName="Bombones de Chocolate"
+                  productPrice={5.00}
+                  productImage="/assets/images/products/Bombones-1.jpg"
                 />
               </div>
             </div>
 
             <div className="relative">
-              <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-                <img
-                  src="/src/assets/images/products/chocolate.png"
-                  alt="Bombones con Frutas Exóticas"
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
-                  Frutas Exóticas
+              <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 overflow-hidden">
+                {/* Slider de imágenes */}
+                <div className="relative aspect-square overflow-hidden rounded-2xl group cursor-pointer">
+                  <img
+                    src={productImages[currentImageIndex]}
+                    alt={`Bombones de Chocolate - Imagen ${currentImageIndex + 1}`}
+                    className="w-full h-full object-cover shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {/* Overlay con efecto de brillo dinámico */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/0 to-white/0 group-hover:from-white/20 transition-all duration-300 pointer-events-none"></div>
+                  {/* Sombra interna para profundidad */}
+                  <div className="absolute inset-0 shadow-inner pointer-events-none"></div>
+                  
+                  {/* Botones de navegación */}
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                    aria-label="Imagen anterior"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-pink-600" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                    aria-label="Siguiente imagen"
+                  >
+                    <ChevronRight className="w-6 h-6 text-pink-600" />
+                  </button>
+
+                  {/* Indicadores */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {productImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? 'bg-white w-8' 
+                            : 'bg-white/50 hover:bg-white/75'
+                        }`}
+                        aria-label={`Ver imagen ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Miniaturas */}
+                <div className="flex gap-2 mt-4 justify-center">
+                  {productImages.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                        index === currentImageIndex
+                          ? 'border-pink-400 scale-110 shadow-lg'
+                          : 'border-white/30 hover:border-pink-300 opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Miniatura ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-full font-bold shadow-lg z-10">
+                  <div className="text-2xl">$5.00</div>
+                  <div className="text-xs">80g</div>
                 </div>
               </div>
             </div>
@@ -158,19 +236,19 @@ const FruitBonbons: FC = () => {
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex justify-between">
                     <span>Tipo:</span>
-                    <span className="font-semibold">Bombones Premium</span>
+                    <span className="font-semibold">Bombones Artesanales</span>
                   </li>
                   <li className="flex justify-between">
-                    <span>Relleno:</span>
-                    <span className="font-semibold">Frutas Exóticas</span>
+                    <span>Peso:</span>
+                    <span className="font-semibold">80g</span>
                   </li>
                   <li className="flex justify-between">
-                    <span>Variedad:</span>
-                    <span className="font-semibold">Frutas Locales</span>
+                    <span>Precio:</span>
+                    <span className="font-semibold text-pink-600">$5.00</span>
                   </li>
                   <li className="flex justify-between">
-                    <span>Proceso:</span>
-                    <span className="font-semibold">Artesanal</span>
+                    <span>Rellenos:</span>
+                    <span className="font-semibold">6 Variedades</span>
                   </li>
                   <li className="flex justify-between">
                     <span>Origen:</span>
@@ -180,14 +258,65 @@ const FruitBonbons: FC = () => {
               </div>
 
               <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Frutas Utilizadas</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Sabores Disponibles</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Maracuyá amazónico</li>
-                  <li>• Uvilla (golden berry)</li>
-                  <li>• Guayusa</li>
-                  <li>• Cacao de origen</li>
-                  <li>• Frutas de temporada</li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-pink-500 rounded-full"></span>
+                    Guayaba
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                    Piña
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                    Maracuyá
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                    Mora
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                    Frutilla
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-amber-700 rounded-full"></span>
+                    Jalea de Cacao
+                  </li>
                 </ul>
+              </div>
+
+              <div className="bg-blue-50 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold text-blue-800 mb-4">Información Nutricional</h3>
+                <p className="text-xs text-gray-500 mb-3">Por porción de 80g</p>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Grasa total</span>
+                    <span className="font-semibold">6g (9%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1 pl-3">
+                    <span className="text-xs">Saturadas</span>
+                    <span className="font-semibold">1.5g (8%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Carbohidratos</span>
+                    <span className="font-semibold">7g (2%)</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1 pl-3">
+                    <span className="text-xs">Azúcares</span>
+                    <span className="font-semibold">4g</span>
+                  </li>
+                  <li className="flex justify-between border-b pb-1">
+                    <span>Proteínas</span>
+                    <span className="font-semibold">1g (2%)</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Colesterol</span>
+                    <span className="font-semibold">0mg</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-gray-500 mt-3">*Basado en dieta de 2.000 Kcal</p>
               </div>
             </div>
           </div>
