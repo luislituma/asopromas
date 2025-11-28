@@ -6,7 +6,7 @@ import { generateProductSchema } from "../../utils/schema";
 
 const CacaoCocktail: FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState({ size: "375ml", price: 5.00 });
+  const [selectedVariant, setSelectedVariant] = useState({ size: "375ml", price: 7.00 });
 
   const productImages = [
     "/assets/images/products/Coctel-1.jpg",
@@ -16,8 +16,8 @@ const CacaoCocktail: FC = () => {
   ];
 
   const variants = [
-    { size: "375ml", price: 5.00 },
-    { size: "750ml", price: 12.00 }
+    { size: "375ml", price: 7.00 },
+    { size: "750ml", price: 14.00 }
   ];
 
   const nextImage = () => {

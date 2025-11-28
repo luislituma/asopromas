@@ -3,7 +3,7 @@
     "id": "chocolate-bar-100",
     "name": "Pasta de Cacao",
     "description": "Pasta de Cacao para Taza al 100%. Cacao puro sin azúcar, elaborado con granos de cacao de fino aroma.",
-    "price": 3.00,
+    "price": 2.50,
     "priceVariant": 5.00,
     "weight": "100g",
     "weightVariant": "200g",
@@ -12,7 +12,7 @@
       "/assets/images/products/Barra-Pura-2.jpg"
     ],
     "variants": [
-      { "size": "100g", "price": 3.00 },
+      { "size": "100g", "price": 2.50 },
       { "size": "200g", "price": 5.00 }
     ],
     "ingredients": [
@@ -155,7 +155,7 @@
     "id": "cocoa-liqueur",
     "name": "Licor de Cacao",
     "description": "Licor dulce de cacao al 20%. Artesanal, suave y dulce. Ideal para disfrutar y compartir.",
-    "price": 4.00,
+    "price": 7.00,
     "priceVariant": 10.00,
     "volume": "375ml",
     "volumeVariant": "750ml",
@@ -167,7 +167,7 @@
       "/assets/images/products/Licores-1.jpg"
     ],
     "variants": [
-      { "size": "375ml", "price": 4.00 },
+      { "size": "375ml", "price": 7.00 },
       { "size": "750ml", "price": 10.00 }
     ],
     "ingredients": [
@@ -184,9 +184,19 @@
     "id": "cocoa-cocktail",
     "name": "Cóctel de Cacao (12°)",
     "description": "Bebida suave, dulce y refrescante. Se disfruta mejor fría, perfecta para reuniones especiales.",
+    "price": 7.00,
+    "priceVariant": 14.00,
+    "volume": "375ml",
+    "volumeVariant": "750ml",
+    "alcoholContent": "12°",
     "images": [
       "/assets/images/products/Coctel-1.jpg",
       "/assets/images/products/Coctel-Pequenio-1.jpg"
-    ]
+    ],
+    "variants": [
+      { "size": "375ml", "price": 7.00 },
+      { "size": "750ml", "price": 14.00 }
+    ],
+    "warnings": "Consérvese en un ambiente fresco y seco. Una vez abierto mantener en refrigeración. Venta prohibida a menores de 18 años."
   }
 ]

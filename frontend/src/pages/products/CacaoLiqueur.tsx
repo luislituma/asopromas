@@ -8,7 +8,7 @@ const CacaoLiqueur: FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<{ size: string; price: number }>({
     size: "375ml",
-    price: 4.00
+    price: 7.00
   });
   
   const productImages = [
@@ -19,7 +19,7 @@ const CacaoLiqueur: FC = () => {
   ];
 
   const variants = [
-    { size: "375ml", price: 4.00 },
+    { size: "375ml", price: 7.00 },
     { size: "750ml", price: 10.00 }
   ];
 
@@ -45,7 +45,7 @@ const CacaoLiqueur: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Licor de Cacao 20° - Dulce y Suave | ASOPROMAS',
-    description: 'Licor dulce de cacao al 20°. Artesanal, suave y dulce. 375ml ($4.00) y 750ml ($10.00). ¡Ideal para disfrutar!',
+    description: 'Licor dulce de cacao al 20°. Artesanal, suave y dulce. 375ml ($7.00) y 750ml ($10.00). ¡Ideal para disfrutar!',
     keywords: 'licor cacao Ecuador, licor dulce 20 grados, licor artesanal, bebida alcohólica cacao',
     url: '/products/cacao-liqueur',
     type: 'product',
@@ -76,7 +76,7 @@ const CacaoLiqueur: FC = () => {
                 </h1>
                 <p className="text-xl text-red-100 leading-relaxed">
                   Licor dulce de cacao al 20°. Artesanal, suave y dulce.
-                  <span className="font-semibold text-red-300"> 375ml - $4.00 | 750ml - $10.00</span>
+                  <span className="font-semibold text-red-300"> 375ml - $7.00 | 750ml - $10.00</span>
                 </p>
               </div>
 

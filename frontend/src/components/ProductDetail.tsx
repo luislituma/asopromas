@@ -4,12 +4,23 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import productsData from "../data/products.json"; // tu JSON importable
 import ButtonBuy from "../components/ButtonBuy";
 
+type ProductVariant = {
+  size: string;
+  price: number;
+};
+
 type ProductJson = {
   id: string;
   name: string;
   description: string;
   images?: string[];
   price?: number;
+  priceVariant?: number;
+  variants?: ProductVariant[];
+  weight?: string;
+  weightVariant?: string;
+  volume?: string;
+  volumeVariant?: string;
 };
 
 const ProductDetail: FC = () => {
@@ -20,6 +31,25 @@ const ProductDetail: FC = () => {
   // Carousel state
   const [current, setCurrent] = useState(0);
   const images = product?.images ?? ["/assets/images/products/fallback.jpg"];
+  
+  // Variant selection state
+  const [selectedVariant, setSelectedVariant] = useState<number>(0);
+  
+  // Get current price based on selected variant
+  const getCurrentPrice = (): number => {
+    if (product?.variants && product.variants.length > 0) {
+      return product.variants[selectedVariant]?.price || product.price || 0;
+    }
+    return product?.price || 0;
+  };
+  
+  // Get current size/variant name
+  const getCurrentVariantName = (): string => {
+    if (product?.variants && product.variants.length > 0) {
+      return product.variants[selectedVariant]?.size || '';
+    }
+    return '';
+  };
 
   useEffect(() => {
     setCurrent(0);
@@ -94,12 +124,56 @@ const ProductDetail: FC = () => {
 
           <p className="text-gray-700 mb-8 text-lg leading-relaxed">{product.description}</p>
 
+          {/* Variant Selector */}
+          {product.variants && product.variants.length > 1 && (
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                Selecciona la presentación:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {product.variants.map((variant, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedVariant(index)}
+                    className={`p-4 border-2 rounded-lg transition-all duration-200 ${
+                      selectedVariant === index
+                        ? 'border-amber-500 bg-amber-50 shadow-md'
+                        : 'border-gray-200 hover:border-amber-300 bg-white'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-bold text-gray-900">{variant.size}</div>
+                      <div className="text-lg font-bold text-amber-600 mt-1">
+                        ${variant.price.toFixed(2)}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Price Display */}
+          <div className="mb-6">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-amber-600">
+                ${getCurrentPrice().toFixed(2)}
+              </span>
+              {getCurrentVariantName() && (
+                <span className="text-sm text-gray-500">
+                  ({getCurrentVariantName()})
+                </span>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             <ButtonBuy 
               productId={product.id} 
               productName={product.name}
-              productPrice={product.price || 19.99}
+              productPrice={getCurrentPrice()}
               productImage={images[0]}
+              variant={getCurrentVariantName()}
             />
             <div className="text-sm text-gray-500">
               💬 Respuesta inmediata por WhatsApp

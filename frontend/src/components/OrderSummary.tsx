@@ -285,7 +285,7 @@ const OrderSummary: FC<OrderSummaryProps> = ({
                 ¡Gracias por tu preferencia! Nos pondremos en contacto contigo por <strong>WhatsApp</strong> y <strong>correo electrónico</strong> para confirmar tu pedido.
               </p>
               <p className="text-xs text-gray-500">
-                ASOPROMAS - Asociación de Productores Orgánicos de Mandarinas, Aguacates y Sandias
+                ASOPROMAS - Asociación de Producción de Cacao y Derivados Aromas del Sur
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Chocolate Artesanal KUJEÑITO | Zamora Chinchipe, Ecuador

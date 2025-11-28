@@ -8,7 +8,7 @@ const PureChocolateBar: FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<{ size: string; price: number }>({
     size: "100g",
-    price: 3.00
+    price: 2.50
   });
   
   const productImages = [
@@ -17,7 +17,7 @@ const PureChocolateBar: FC = () => {
   ];
 
   const variants = [
-    { size: "100g", price: 3.00 },
+    { size: "100g", price: 2.50 },
     { size: "200g", price: 5.00 }
   ];
 
@@ -43,7 +43,7 @@ const PureChocolateBar: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Pasta de Cacao 100% - Para Taza | ASOPROMAS',
-    description: 'Pasta de cacao pura al 100% para taza. Disponible en 100g ($3.00) y 200g ($5.00). Cacao de fino aroma sin azúcar.',
+    description: 'Pasta de cacao pura al 100% para taza. Disponible en 100g ($2.50) y 200g ($5.00). Cacao de fino aroma sin azúcar.',
     keywords: 'pasta cacao 100%, cacao para taza, chocolate puro Ecuador, cacao sin azúcar, cacao artesanal',
     url: '/products/chocolate-bar-100',
     type: 'product',
@@ -74,7 +74,7 @@ const PureChocolateBar: FC = () => {
                 </h1>
                 <p className="text-xl text-amber-100 leading-relaxed">
                   Pasta de cacao para taza al 100%. Cacao puro sin azúcar.
-                  <span className="font-semibold text-amber-300"> 100g - $3.00 | 200g - $5.00</span>
+                  <span className="font-semibold text-amber-300"> 100g - $2.50 | 200g - $5.00</span>
                 </p>
               </div>
 
