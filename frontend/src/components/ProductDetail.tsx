@@ -16,11 +16,12 @@ type ProductJson = {
   images?: string[];
   price?: number;
   priceVariant?: number;
-  variants?: ProductVariant[];
+  variants?: ProductVariant[] | string[];
   weight?: string;
   weightVariant?: string;
   volume?: string;
   volumeVariant?: string;
+  available?: boolean;
 };
 
 const ProductDetail: FC = () => {
@@ -35,18 +36,24 @@ const ProductDetail: FC = () => {
   // Variant selection state
   const [selectedVariant, setSelectedVariant] = useState<number>(0);
   
+  // Check if variants are price variants (ProductVariant[]) or flavor variants (string[])
+  const hasPriceVariants = product?.variants && 
+    product.variants.length > 0 && 
+    typeof product.variants[0] === 'object' && 
+    'size' in product.variants[0];
+  
   // Get current price based on selected variant
   const getCurrentPrice = (): number => {
-    if (product?.variants && product.variants.length > 0) {
-      return product.variants[selectedVariant]?.price || product.price || 0;
+    if (hasPriceVariants && product?.variants) {
+      return (product.variants[selectedVariant] as ProductVariant)?.price || product.price || 0;
     }
     return product?.price || 0;
   };
   
   // Get current size/variant name
   const getCurrentVariantName = (): string => {
-    if (product?.variants && product.variants.length > 0) {
-      return product.variants[selectedVariant]?.size || '';
+    if (hasPriceVariants && product?.variants) {
+      return (product.variants[selectedVariant] as ProductVariant)?.size || '';
     }
     return '';
   };
@@ -124,14 +131,14 @@ const ProductDetail: FC = () => {
 
           <p className="text-gray-700 mb-8 text-lg leading-relaxed">{product.description}</p>
 
-          {/* Variant Selector */}
-          {product.variants && product.variants.length > 1 && (
+          {/* Variant Selector - Only for price variants */}
+          {hasPriceVariants && product.variants && product.variants.length > 1 && (
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Selecciona la presentación:
               </label>
               <div className="grid grid-cols-2 gap-3">
-                {product.variants.map((variant, index) => (
+                {(product.variants as ProductVariant[]).map((variant, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedVariant(index)}
@@ -168,16 +175,24 @@ const ProductDetail: FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-            <ButtonBuy 
-              productId={product.id} 
-              productName={product.name}
-              productPrice={getCurrentPrice()}
-              productImage={images[0]}
-              variant={getCurrentVariantName()}
-            />
-            <div className="text-sm text-gray-500">
-              💬 Respuesta inmediata por WhatsApp
-            </div>
+            {product.available === false ? (
+              <div className="px-6 py-3 bg-gray-200 text-gray-600 rounded-lg font-semibold">
+                Producto No Disponible
+              </div>
+            ) : (
+              <>
+                <ButtonBuy 
+                  productId={product.id} 
+                  productName={product.name}
+                  productPrice={getCurrentPrice()}
+                  productImage={images[0]}
+                  variant={getCurrentVariantName()}
+                />
+                <div className="text-sm text-gray-500">
+                  💬 Respuesta inmediata por WhatsApp
+                </div>
+              </>
+            )}
           </div>
 
           <div className="border-t pt-6">

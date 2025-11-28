@@ -159,7 +159,7 @@ const CartWidgetComponent: FC = () => {
                   <div className="space-y-4">
                     {items.map((item) => (
                       <div
-                        key={item.id}
+                        key={`${item.id}-${item.variant || 'default'}`}
                         className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-amber-300 transition-colors"
                       >
                         <div className="flex gap-4">
@@ -185,7 +185,7 @@ const CartWidgetComponent: FC = () => {
                           {/* Controles de cantidad */}
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
                               className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition-colors"
                               aria-label="Disminuir cantidad"
                             >
@@ -195,7 +195,7 @@ const CartWidgetComponent: FC = () => {
                               {item.quantity}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.id, item.variant, item.quantity + 1)}
                               className="bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition-colors"
                               aria-label="Aumentar cantidad"
                             >
@@ -205,7 +205,7 @@ const CartWidgetComponent: FC = () => {
 
                           {/* Botón eliminar */}
                           <button
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => removeItem(item.id, item.variant)}
                             className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
                             aria-label="Eliminar del carrito"
                           >

@@ -155,7 +155,7 @@
     "id": "cocoa-liqueur",
     "name": "Licor de Cacao",
     "description": "Licor dulce de cacao al 20%. Artesanal, suave y dulce. Ideal para disfrutar y compartir.",
-    "price": 7.00,
+    "price": 4.00,
     "priceVariant": 10.00,
     "volume": "375ml",
     "volumeVariant": "750ml",
@@ -167,7 +167,7 @@
       "/assets/images/products/Licores-1.jpg"
     ],
     "variants": [
-      { "size": "375ml", "price": 7.00 },
+      { "size": "375ml", "price": 4.00 },
       { "size": "750ml", "price": 10.00 }
     ],
     "ingredients": [

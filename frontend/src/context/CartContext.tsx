@@ -12,8 +12,8 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (id: string, variant?: string) => void;
+  updateQuantity: (id: string, variant: string | undefined, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -47,35 +47,42 @@ export const CartProvider: FC<CartProviderProps> = ({ children }) => {
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems(currentItems => {
-      const existingItem = currentItems.find(item => item.id === newItem.id);
+      // Buscar item existente considerando tanto id como variant
+      const existingItem = currentItems.find(item => 
+        item.id === newItem.id && item.variant === newItem.variant
+      );
       
       if (existingItem) {
-        // Si el item ya existe, incrementar cantidad
+        // Si el item ya existe (mismo producto y variante), incrementar cantidad
         return currentItems.map(item =>
-          item.id === newItem.id
+          item.id === newItem.id && item.variant === newItem.variant
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
       
-      // Si es nuevo, agregarlo con cantidad 1
+      // Si es nuevo (diferente producto o variante), agregarlo con cantidad 1
       return [...currentItems, { ...newItem, quantity: 1 }];
     });
   };
 
-  const removeItem = (id: string) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== id));
+  const removeItem = (id: string, variant?: string) => {
+    setItems(currentItems => 
+      currentItems.filter(item => 
+        !(item.id === id && item.variant === variant)
+      )
+    );
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (id: string, variant: string | undefined, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id);
+      removeItem(id, variant);
       return;
     }
     
     setItems(currentItems =>
       currentItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id && item.variant === variant ? { ...item, quantity } : item
       )
     );
   };

@@ -1,7 +1,12 @@
 // src/components/ProductCard.tsx
-import { type FC, memo } from "react";
+import { type FC, memo, useState } from "react";
 import { Link } from "react-router-dom";
 import ButtonBuy from "./ButtonBuy";
+
+export type ProductVariant = {
+  size: string;
+  price: number;
+};
 
 export type Product = {
   id: string;
@@ -9,6 +14,8 @@ export type Product = {
   description: string;
   images?: string[];
   price?: number;
+  variants?: ProductVariant[] | string[];
+  available?: boolean;
 };
 
 interface Props {
@@ -20,6 +27,20 @@ const fallbackImage = "/assets/images/products/fallback.jpg"; // coloca un fallb
 
 const ProductCardComponent: FC<Props> = ({ product, className = "" }) => {
   const thumb = product.images && product.images.length > 0 ? product.images[0] : fallbackImage;
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  
+  // Obtener precio y variante actual
+  const hasVariants = product.variants && 
+    product.variants.length > 0 && 
+    typeof product.variants[0] === 'object' && 
+    'size' in product.variants[0];
+  
+  const currentPrice = hasVariants && product.variants
+    ? (product.variants[selectedVariantIndex] as ProductVariant).price 
+    : (product.price || 0);
+  const currentVariant = hasVariants && product.variants
+    ? (product.variants[selectedVariantIndex] as ProductVariant).size 
+    : undefined;
 
   return (
     <article
@@ -60,6 +81,32 @@ const ProductCardComponent: FC<Props> = ({ product, className = "" }) => {
         </div>
       </Link>
 
+      {/* Selector de variantes si existen */}
+      {hasVariants && (
+        <div className="px-4 pb-3">
+          <label className="block text-xs font-medium text-gray-700 mb-2">
+            Presentación:
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {(product.variants as ProductVariant[]).map((variant, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setSelectedVariantIndex(index)}
+                className={`px-2 py-1.5 rounded-lg border-2 transition-all text-xs font-medium ${
+                  selectedVariantIndex === index
+                    ? "border-amber-600 bg-amber-50 text-amber-900"
+                    : "border-gray-300 bg-white text-gray-700 hover:border-amber-400"
+                }`}
+              >
+                <div>{variant.size}</div>
+                <div className="text-xs font-bold">${variant.price.toFixed(2)}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="px-4 pb-4 flex items-center justify-between">
         <Link
           to={`/products/${product.id}`}
@@ -69,13 +116,20 @@ const ProductCardComponent: FC<Props> = ({ product, className = "" }) => {
           Ver detalles →
         </Link>
 
-        {/* Botón para comprar / WhatsApp */}
-        <ButtonBuy 
-          productId={product.id} 
-          productName={product.name}
-          productPrice={product.price || 19.99}
-          productImage={thumb}
-        />
+        {/* Botón para comprar o badge de no disponible */}
+        {product.available === false ? (
+          <span className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium">
+            No Disponible
+          </span>
+        ) : (
+          <ButtonBuy 
+            productId={product.id} 
+            productName={product.name}
+            productPrice={currentPrice}
+            productImage={thumb}
+            variant={currentVariant}
+          />
+        )}
       </div>
     </article>
   );

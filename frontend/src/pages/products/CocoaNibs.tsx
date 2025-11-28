@@ -1,8 +1,6 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Sparkles, Coffee, Zap, Heart } from 'lucide-react';
-import ButtonBuy from '../../components/ButtonBuy';
-
 const CocoaNibs: FC = () => {
   const products = [
     {
@@ -85,12 +83,9 @@ const CocoaNibs: FC = () => {
                 El superalimento ancestral en su forma más pura: fragmentos crujientes de cacao llenos de nutrientes y sabor auténtico
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <ButtonBuy 
-                  productId="cocoa-nibs-premium"
-                  productName="Nibs de Cacao Premium"
-                  productPrice={14.99}
-                  productImage="/assets/images/products/cocoa-nibs.jpg"
-                />
+                <div className="bg-gray-200 text-gray-600 px-8 py-3 rounded-lg font-semibold inline-flex items-center justify-center">
+                  Producto No Disponible
+                </div>
                 <Link
                   to="/products"
                   className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-800 transition-colors inline-flex items-center justify-center"
@@ -164,12 +159,9 @@ const CocoaNibs: FC = () => {
                     <span className="text-3xl font-bold text-purple-600">
                       {product.price}
                     </span>
-                    <ButtonBuy 
-                      productId={`cocoa-nibs-${product.name.toLowerCase().replace(/\s+/g, '-')}`}
-                      productName={product.name}
-                      productPrice={parseFloat(product.price.replace('$', ''))}
-                      productImage="/assets/images/products/cocoa-nibs.jpg"
-                    />
+                    <span className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium">
+                      No Disponible
+                    </span>
                   </div>
                 </div>
               </div>
@@ -365,12 +357,9 @@ const CocoaNibs: FC = () => {
             del cacao. ¡Añade este superalimento a tu rutina diaria!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <ButtonBuy 
-              productId="cocoa-nibs-collection"
-              productName="Colección Completa Nibs de Cacao ASOPROMAS"
-              productPrice={59.99}
-              productImage="/assets/images/products/cocoa-nibs-collection.jpg"
-            />
+            <div className="bg-gray-200 text-gray-600 px-8 py-3 rounded-lg font-semibold inline-flex items-center justify-center">
+              Producto No Disponible
+            </div>
             <Link
               to="/contact"
               className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition-colors inline-flex items-center justify-center"
