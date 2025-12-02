@@ -481,7 +481,7 @@ const Landing: FC = () => {
           >
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Heart className="h-5 w-5" />
-              <span>Más de 15 años transformando vidas con cacao de calidad</span>
+              <span>Más de 12 años transformando vidas con cacao de calidad</span>
             </div>
           </motion.div>
         </div>
@@ -760,8 +760,8 @@ const Landing: FC = () => {
 
               {/* Badge flotante */}
               <div className="absolute -top-4 -right-4 bg-gradient-to-br from-amber-500 to-orange-600 text-white px-6 py-3 rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                <p className="text-sm font-semibold">Desde 2008</p>
-                <p className="text-2xl font-bold">15+ Años</p>
+                <p className="text-sm font-semibold">Desde 2013</p>
+                <p className="text-2xl font-bold">12+ Años</p>
               </div>
             </motion.div>
 
@@ -813,7 +813,7 @@ const Landing: FC = () => {
                   <div className="text-sm text-gray-600">Familias</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-600 mb-1">15+</div>
+                  <div className="text-3xl font-bold text-amber-600 mb-1">12+</div>
                   <div className="text-sm text-gray-600">Años</div>
                 </div>
                 <div className="text-center">
@@ -927,7 +927,7 @@ const Landing: FC = () => {
               className="text-xl text-amber-100 max-w-3xl mx-auto leading-relaxed"
               variants={fadeInUp}
             >
-              Hace más de 5,000 años, en las tierras sagradas de Zamora Chinchipe, 
+              Hace alrededor de 5,500 años, en las tierras sagradas de Zamora Chinchipe, 
               nació la historia del cacao que hoy compartimos con el mundo.
             </motion.p>
           </motion.div>
@@ -944,7 +944,7 @@ const Landing: FC = () => {
               {/* Línea conectora en desktop */}
               <div className="hidden md:block absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transform -translate-y-1/2"></div>
 
-              {/* Card 1 - 3000 AC */}
+              {/* Card 1 - 3500 AC */}
               <motion.div 
                 className="relative"
                 variants={fadeInUp}
@@ -956,11 +956,11 @@ const Landing: FC = () => {
                   </div>
                   
                   <div className="text-center">
-                    <h3 className="text-5xl font-bold text-amber-300 mb-3">3000 AC</h3>
+                    <h3 className="text-5xl font-bold text-amber-300 mb-3">3500 AC</h3>
                     <h4 className="text-xl font-semibold text-white mb-4">Los Primeros Vestigios</h4>
                     <p className="text-amber-100 text-sm leading-relaxed">
-                      Los primeros indicios del cultivo de cacao en Santa Ana-La Florida, 
-                      marcando el inicio de una civilización construida alrededor del cacao.
+                      Los primeros indicios del cultivo de cacao en Palanda (hace 5500 años), 
+                      marcando el inicio de una civilización construida alrededor del cacao más antiguo del mundo.
                     </p>
                   </div>
 
@@ -1045,7 +1045,7 @@ const Landing: FC = () => {
               variants={fadeInUp}
             >
               <div className="text-center">
-                <div className="text-4xl font-bold text-amber-300 mb-1">5,000+</div>
+                <div className="text-4xl font-bold text-amber-300 mb-1">5,500</div>
                 <div className="text-sm text-amber-100">Años de Historia</div>
               </div>
               <div className="text-center">
@@ -1054,7 +1054,7 @@ const Landing: FC = () => {
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-amber-300 mb-1">🏆</div>
-                <div className="text-sm text-amber-100">Premio Mundial</div>
+                <div className="text-sm text-amber-100">Premio</div>
               </div>
             </motion.div>
 
@@ -1275,7 +1275,7 @@ const Landing: FC = () => {
                   {/* Trust Badge */}
                   <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
                     <span className="text-2xl">🏆</span>
-                    <span className="text-sm text-amber-200 font-semibold">Premio Internacional de Calidad</span>
+                    <span className="text-sm text-amber-200 font-semibold">Premio de Calidad</span>
                   </div>
                 </div>
               </div>
@@ -1291,7 +1291,7 @@ const Landing: FC = () => {
                 <div className="text-sm text-amber-100">Familias Productoras</div>
               </div>
               <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <div className="text-3xl md:text-4xl font-bold text-amber-300 mb-2">15+</div>
+                <div className="text-3xl md:text-4xl font-bold text-amber-300 mb-2">12+</div>
                 <div className="text-sm text-amber-100">Años de Experiencia</div>
               </div>
               <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">

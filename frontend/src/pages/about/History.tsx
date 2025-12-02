@@ -29,7 +29,7 @@ const History: FC = () => {
     {
       year: '2016-2019',
       title: 'Infraestructura',
-      description: 'Construcción del centro de acopio y planta de procesamiento con apoyo de IAF, Municipio y Prefectura. Implementación de marquesinas y 15 cajones de fermentación.',
+      description: 'Construcción del centro de acopio y planta de procesamiento con apoyo de ONG´s, Instituciones Locales Implementación de marquesinas y 15 cajones de fermentación.',
       icon: <Calendar className="w-6 h-6" />
     },
     {
@@ -163,7 +163,7 @@ const History: FC = () => {
             Nuestro Legado
           </h2>
           <p className="text-xl text-amber-100 max-w-4xl mx-auto leading-relaxed mb-8">
-            Desde 2013, ASOPROMAS ha crecido de 13 a 181 socios (94 mujeres y 87 hombres) de nacionalidad 
+            Desde 2013, ASOPROMAS ha crecido de 13 a 188 socios (96 mujeres y 92 hombres) de nacionalidad 
             Shuar y mestiza. Hemos preservado las tradiciones del cultivo de cacao mientras innovamos en 
             técnicas sostenibles, rescatando el cacao ancestral y logrando certificaciones orgánicas 
             internacionales. Cada grano cuenta la historia de nuestras comunidades, nuestra tierra y nuestro 

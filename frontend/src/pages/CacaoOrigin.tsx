@@ -49,7 +49,7 @@ const CacaoOrigin: FC = () => {
                   En el corazón de <strong className="text-[#3b1d0e]">Zamora Chinchipe</strong>, 
                   en los valles fértiles de <strong className="text-[#3b1d0e]">Palanda</strong>, 
                   se descubrieron los vestigios del cacao más antiguo del mundo, con más de 
-                  <strong className="text-amber-700"> 5.000 años de historia</strong>.
+                  <strong className="text-amber-700"> 5.500 años de historia</strong>.
                 </p>
                 
                 <p>
@@ -281,11 +281,11 @@ const CacaoOrigin: FC = () => {
             
             {/* Hitos */}
             <div className="space-y-12">
-              {/* 3000 AC */}
+              {/* 3500 AC */}
               <div className="relative flex items-center">
                 <div className="flex-1 text-right pr-8">
-                  <h3 className="text-2xl font-bold text-amber-700">3000 AC</h3>
-                  <p className="text-gray-600 mt-2">Primeros vestigios de cacao en Palanda</p>
+                  <h3 className="text-2xl font-bold text-amber-700">3500 AC</h3>
+                  <p className="text-gray-600 mt-2">Primeros vestigios de cacao en Palanda (hace 5500 años)</p>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 bg-amber-600 rounded-full border-4 border-white shadow-lg z-10"></div>
                 <div className="flex-1 pl-8"></div>
