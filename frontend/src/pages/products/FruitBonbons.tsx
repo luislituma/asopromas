@@ -401,10 +401,10 @@ const FruitBonbons: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productId="fruit-bonbons-exotic"
-              productName="Bombones con Frutas Exóticas KUJEÑITO"
-              productPrice={22.99}
-              productImage="/assets/images/products/fruit-bonbons.jpg"
+              productId="fruit-bonbons"
+              productName="Bombones de Chocolate"
+              productPrice={5.00}
+              productImage="/assets/images/products/Bombones-1.jpg"
             />
           </div>
         </div>

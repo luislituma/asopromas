@@ -389,10 +389,10 @@ const ChocolateCoffee: FC = () => {
           </p>
           <div className="flex justify-center">
             <ButtonBuy 
-              productId="chocolate-coffee-palanda"
-              productName="Chocolate con Café de Palanda KUJEÑITO"
-              productPrice={18.99}
-              productImage="/assets/images/products/chocolate-coffee.jpg"
+              productId="chocolate-coffee"
+              productName="Barra de Chocolate con Café"
+              productPrice={3.50}
+              productImage="/assets/images/products/Cafe-1.jpg"
             />
           </div>
         </div>

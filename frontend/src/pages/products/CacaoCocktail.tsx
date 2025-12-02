@@ -125,6 +125,7 @@ const CacaoCocktail: FC = () => {
                   productName={`Cóctel de Cacao ${selectedVariant.size}`}
                   productPrice={selectedVariant.price}
                   productImage="/assets/images/products/Coctel-1.jpg"
+                  variant={selectedVariant.size}
                 />
               </div>
             </div>
@@ -397,6 +398,7 @@ const CacaoCocktail: FC = () => {
               productName={`Cóctel de Cacao ${selectedVariant.size}`}
               productPrice={selectedVariant.price}
               productImage="/assets/images/products/Coctel-1.jpg"
+              variant={selectedVariant.size}
             />
           </div>
         </div>

@@ -402,9 +402,9 @@ const ChocolateNibsSalt: FC = () => {
           <div className="flex justify-center">
             <ButtonBuy 
               productId="chocolate-nibs-salt"
-              productName="Chocolate con Nibs y Sal Marina KUJEÑITO"
-              productPrice={17.99}
-              productImage="/assets/images/products/chocolate-nibs-salt.jpg"
+              productName="Barra de Chocolate con Nibs & Sal Marina"
+              productPrice={3.50}
+              productImage="/assets/images/products/Nibs-Sal-Marina-1.jpg"
             />
           </div>
         </div>

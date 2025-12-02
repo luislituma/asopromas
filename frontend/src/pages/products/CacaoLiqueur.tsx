@@ -128,6 +128,7 @@ const CacaoLiqueur: FC = () => {
                   productName={`Licor de Cacao ${selectedVariant.size}`}
                   productPrice={selectedVariant.price}
                   productImage="/assets/images/products/Licor-Pequenio-1.jpg"
+                  variant={selectedVariant.size}
                 />
               </div>
             </div>
@@ -393,6 +394,7 @@ const CacaoLiqueur: FC = () => {
               productName={`Licor de Cacao ${selectedVariant.size}`}
               productPrice={selectedVariant.price}
               productImage="/assets/images/products/Licor-Grande-1.jpg"
+              variant={selectedVariant.size}
             />
           </div>
         </div>
