@@ -6,57 +6,92 @@ import { useSEO } from '../../hooks/useSEO';
 const History: FC = () => {
   // SEO Configuration
   useSEO({
-    title: 'Historia de ASOPROMAS - 25 Años Cultivando Tradición | Ecuador',
-    description: 'Descubre la historia de ASOPROMAS desde 2000: más de dos décadas cultivando cacao de fino aroma en Zamora Chinchipe, fortaleciendo comunidades rurales del Ecuador.',
-    keywords: 'historia ASOPROMAS, cacao Ecuador historia, Zamora Chinchipe agricultura, cooperativa cacao, tradición cacaotera Ecuador',
+    title: 'Historia de ASOPROMAS - Desde 2013 Cultivando Tradición | Ecuador',
+    description: 'Descubre la historia de ASOPROMAS desde 2013: más de una década cultivando cacao de fino aroma y ancestral en Zamora Chinchipe y Morona Santiago, con 181 socios y certificación orgánica.',
+    keywords: 'historia ASOPROMAS, cacao Ecuador historia, Zamora Chinchipe agricultura, cacao ancestral, cooperativa cacao, tradición cacaotera Ecuador, cacao orgánico',
     url: '/about/history',
     type: 'article'
   });
 
   const milestones = [
     {
-      year: '2000',
+      year: '2013',
       title: 'Fundación de ASOPROMAS',
-      description: 'Un grupo visionario de agricultores se unió para formar la Asociación de Productores de Cacao de Zamora Chinchipe.',
+      description: 'Creada con 13 socios impulsada por el FEPP. Producción inicial de 15-18 quintales anuales con venta local de chocolates artesanales.',
       icon: <Users className="w-6 h-6" />
     },
     {
       year: '2015',
-      title: 'Primer Procesamiento',
-      description: 'Inauguramos nuestra planta de procesamiento para crear productos de chocolate artesanal, marcando un hito en nuestra historia.',
+      title: 'Terreno Propio',
+      description: 'Adquisición de terreno propio con título de propiedad en Playas de Cuje, Zumbi.',
       icon: <Award className="w-6 h-6" />
     },
     {
-      year: '2024',
-      title: 'Primera Certificación Orgánica',
-      description: 'Obtuvimos nuestra primera certificación orgánica, consolidando nuestro compromiso con la agricultura sostenible.',
-      icon: <Award className="w-6 h-6" />
-    },
-    {
-      year: '2024',
-      title: 'Expansión Internacional',
-      description: 'Comenzamos a exportar nuestro cacao fino de aroma a mercados europeos y norteamericanos, llevando el sabor de Ecuador al mundo.',
+      year: '2016-2019',
+      title: 'Infraestructura',
+      description: 'Construcción del centro de acopio y planta de procesamiento con apoyo de IAF, Municipio y Prefectura. Implementación de marquesinas y 15 cajones de fermentación.',
       icon: <Calendar className="w-6 h-6" />
     },
     {
-      year: 'Actualidad',
-      title: 'Presente y Futuro',
-      description: 'Hoy somos líderes en la producción de cacao premium, trabajando con más de 100 familias productoras y mirando hacia el futuro con optimismo.',
+      year: '2019',
+      title: 'Alianzas Estratégicas',
+      description: 'Apoyo de PRO AMAZONIA (PPR red++) para implementar el CAS y bioinsumos. Inicio del proceso de certificación Libre de Deforestación.',
+      icon: <Award className="w-6 h-6" />
+    },
+    {
+      year: '2020',
+      title: 'Yachak y Cacao Ancestral',
+      description: 'Nace "Yachak Premium Chocolate". Se identifican 70 árboles de cacao ancestral en Centinela del Cóndor, iniciando su investigación.',
       icon: <Users className="w-6 h-6" />
+    },
+    {
+      year: '2022-2024',
+      title: 'Expansión y Capacitación',
+      description: 'Ejecución de 7 escuelas de campo (IAF). Entrega de kits a 84 socios. Apoyo de Farmer to Farmer en género, certificación orgánica y chocolate. Incremento a 181 socios en 13 comunidades.',
+      icon: <Calendar className="w-6 h-6" />
+    },
+    {
+      year: '2023',
+      title: 'Marca Kujeñito',
+      description: 'Registro sanitario y de marca "Kujeñito". Diseño de empaques, instalación de refinadora de 25kg y nueva marquesina. Acopio alcanza 150 quintales.',
+      icon: <Award className="w-6 h-6" />
+    },
+    {
+      year: '2024',
+      title: 'Alianza Yachak',
+      description: 'Exclusividad entre Yachak y ASOPROMAS. Proyecto conjunto con INIAP/FIASA para rescate de cacao ancestral en microlotes.',
+      icon: <Users className="w-6 h-6" />
+    },
+    {
+      year: '2025',
+      title: 'Certificaciones y Exportación',
+      description: 'Certificación Orgánica (UE y Norteamérica) y BPA. Primera exportación de nibs de cacao nacional y ancestral a POWATHAN, Virginia, EE.UU.',
+      icon: <Award className="w-6 h-6" />
+    },
+    {
+      year: '2025+',
+      title: 'Consolidación y Futuro',
+      description: 'Meta de 350 quintales de cacao orgánico y 22 de ancestral. 22 viveros con 45,000 plantas. Apertura de "Ruta del Cacao Ancestral" y proyectos con COSPE, FAO y FUNDACIÓN HUMANA.',
+      icon: <Calendar className="w-6 h-6" />
     }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-amber-50">
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 text-white overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url("/assets/images/products/Asopromas-socios.jpg")' }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 via-amber-800/75 to-amber-700/80"></div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             Nuestra Historia
           </h1>
           <p className="text-xl sm:text-2xl text-amber-100 max-w-3xl mx-auto">
-            Más de dos décadas cultivando tradición, calidad y sostenibilidad en el corazón de Ecuador
+            Desde 2013 cultivando tradición, calidad y sostenibilidad en Zamora Chinchipe y Morona Santiago con 181 socios comprometidos
           </p>
         </div>
       </section>
@@ -128,10 +163,11 @@ const History: FC = () => {
             Nuestro Legado
           </h2>
           <p className="text-xl text-amber-100 max-w-4xl mx-auto leading-relaxed mb-8">
-            Desde el año 2000, hemos trabajado incansablemente para preservar las tradiciones 
-            del cultivo de cacao mientras innovamos en técnicas sostenibles. Cada grano que 
-            producimos cuenta la historia de nuestra tierra, nuestras familias y nuestro compromiso 
-            con la excelencia.
+            Desde 2013, ASOPROMAS ha crecido de 13 a 181 socios (94 mujeres y 87 hombres) de nacionalidad 
+            Shuar y mestiza. Hemos preservado las tradiciones del cultivo de cacao mientras innovamos en 
+            técnicas sostenibles, rescatando el cacao ancestral y logrando certificaciones orgánicas 
+            internacionales. Cada grano cuenta la historia de nuestras comunidades, nuestra tierra y nuestro 
+            compromiso con la excelencia y la sostenibilidad.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

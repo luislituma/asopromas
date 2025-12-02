@@ -199,29 +199,44 @@ const HeaderComponent: FC = () => {
                                 const hasSub = link.submenu && link.submenu.length > 0;
 
                                 return (
-                                    <div key={link.to} className="relative">
+                                    <div 
+                                        key={link.to} 
+                                        className="relative"
+                                        onMouseEnter={() => {
+                                            if (hasSub) {
+                                                if (isProducts) {
+                                                    setOpenSubmenuProducts(true);
+                                                    setOpenSubmenuAbout(false);
+                                                } else {
+                                                    setOpenSubmenuAbout(true);
+                                                    setOpenSubmenuProducts(false);
+                                                }
+                                            }
+                                        }}
+                                        onMouseLeave={() => {
+                                            if (hasSub) {
+                                                setOpenSubmenuProducts(false);
+                                                setOpenSubmenuAbout(false);
+                                            }
+                                        }}
+                                    >
                                         {hasSub ? (
-                                            <button
-                                                className={`nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
-                                                    location.pathname.startsWith(link.to) && link.to !== '/'
-                                                        ? 'text-[#411900] font-semibold'
-                                                        : isScrolled 
-                                                            ? 'text-gray-600 hover:text-[#411900]' 
-                                                            : 'text-gray-700 hover:text-[#411900]'
-                                                }`}
-                                                onClick={() => toggleSubmenu(isProducts ? 'products' : 'about')}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ') {
-                                                        e.preventDefault();
-                                                        toggleSubmenu(isProducts ? 'products' : 'about');
-                                                    }
-                                                }}
+                                            <NavLink
+                                                to={link.to}
+                                                className={({ isActive }) =>
+                                                    `nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
+                                                        isActive || location.pathname.startsWith(link.to)
+                                                            ? 'text-[#411900] font-semibold'
+                                                            : isScrolled 
+                                                                ? 'text-gray-600 hover:text-[#411900]' 
+                                                                : 'text-gray-700 hover:text-[#411900]'
+                                                    }`
+                                                }
                                                 aria-expanded={isProducts ? openSubmenuProducts : openSubmenuAbout}
                                                 aria-haspopup="true"
-                                                aria-label={`${link.text} - menú desplegable`}
                                             >
                                                 {link.text}
-                                            </button>
+                                            </NavLink>
                                         ) : (
                                             <NavLink
                                                 to={link.to}

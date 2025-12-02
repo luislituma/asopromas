@@ -7,7 +7,7 @@ const About: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Nosotros - ASOPROMAS | Asociación de Productores de Cacao Ecuador',
-    description: 'Conoce ASOPROMAS, asociación de productores de cacao de Zamora Chinchipe. Fortaleciendo comunidades rurales a través del cacao de fino aroma desde 1985.',
+    description: 'Conoce ASOPROMAS, asociación de productores de cacao de Zamora Chinchipe. Fortaleciendo comunidades rurales a través del cacao de fino aroma desde 2000.',
     keywords: 'ASOPROMAS, productores cacao Ecuador, Zamora Chinchipe, cacao fino aroma, cooperativa agrícola, desarrollo rural',
     url: '/about',
     type: 'article',
@@ -18,17 +18,20 @@ const About: FC = () => {
     {
       icon: <Leaf className="h-8 w-8 text-brown-600" />,
       title: "Calidad y Sostenibilidad",
-      description: "Nos comprometemos con prácticas agrícolas responsables que protegen la tierra y la biodiversidad."
+      description: "Nos comprometemos con prácticas agrícolas responsables que protegen la tierra y la biodiversidad.",
+      link: "/about/sustainability"
     },
     {
       icon: <Users className="h-8 w-8 text-brown-600" />,
       title: "Comunidad y Equidad",
-      description: "Promovemos la participación activa de todos los socios, dando especial importancia al rol de las mujeres rurales."
+      description: "Promovemos la participación activa de todos los socios, dando especial importancia al rol de las mujeres rurales.",
+      link: "/about/producers"
     },
     {
       icon: <Handshake className="h-8 w-8 text-brown-600" />,
       title: "Transparencia y Cooperación",
-      description: "Cada decisión se toma colectivamente, asegurando un impacto positivo en la región."
+      description: "Cada decisión se toma colectivamente, asegurando un impacto positivo en la región.",
+      link: "/about/certifications"
     }
   ];
 
@@ -38,16 +41,16 @@ const About: FC = () => {
       <section className="relative h-[600px] flex items-center justify-center">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("/assets/images/hero-cacao.jpg")' }}
+          style={{ backgroundImage: 'url("/assets/images/products/General.jpg")' }}
         >
           <div className="absolute inset-0 bg-black/50"></div>
         </div>
         <div className="relative text-center text-white px-4 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Asopromas: Fortaleciendo comunidades a través del cacao en Zamora Chinchipe
+            Asopromas: Fortaleciendo comunidades a través del cacao en Zamora Chinchipe y Morona Santiago
           </h1>
           <p className="text-lg md:text-xl opacity-90">
-            Más de 200 socios comprometidos con la producción sostenible, donde el 45% son mujeres rurales que lideran el cambio en sus comunidades.
+            <strong className="text-amber-300">188 socios</strong> comprometidos con la producción sostenible, donde <strong className="text-amber-300">el 51% son mujeres y 49% hombres</strong>, personas rurales que lideran el cambio en sus comunidades.
           </p>
         </div>
       </section>
@@ -63,10 +66,16 @@ const About: FC = () => {
               <p className="text-lg text-gray-600">
                 Asopromas es una asociación que une a productores locales de cacao, fomentando el desarrollo económico, social y cultural de la región. Nuestra comunidad está formada por hombres y mujeres que trabajan unidos, promoviendo prácticas sostenibles y valores de cooperación y responsabilidad.
               </p>
+              <Link
+                to="/about/producers"
+                className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors mt-4"
+              >
+                Conoce a Nuestros Productores →
+              </Link>
             </div>
             <div className="rounded-2xl overflow-hidden shadow-xl">
               <img
-                src="/assets/images/community.jpg"
+                src="/assets/images/products/Asopromas-socios.jpg"
                 alt="Comunidad Asopromas"
                 className="w-full h-[400px] object-cover"
               />
@@ -78,21 +87,30 @@ const About: FC = () => {
       {/* Valores y Filosofía Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Valores y Filosofía
           </h2>
+          <p className="text-center text-gray-600 mb-8">
+            <Link to="/about/values" className="text-amber-600 hover:text-amber-700 font-medium">
+              Explora nuestros valores en detalle →
+            </Link>
+          </p>
           <div className="grid md:grid-cols-3 gap-8">
             {values.map((value, index) => (
-              <div
+              <Link
                 key={index}
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                to={value.link}
+                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 block group"
               >
-                <div className="bg-brown-50 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <div className="bg-brown-50 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:bg-amber-100 transition-colors">
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-4">{value.title}</h3>
+                <h3 className="text-xl font-semibold mb-4 group-hover:text-amber-600 transition-colors">{value.title}</h3>
                 <p className="text-gray-600">{value.description}</p>
-              </div>
+                <span className="text-amber-600 font-medium mt-4 inline-block group-hover:translate-x-1 transition-transform">
+                  Ver más →
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -104,7 +122,7 @@ const About: FC = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1">
               <img
-                src="/assets/images/history.jpg"
+                src="/assets/images/products/Palanda.jpg"
                 alt="Historia de Asopromas"
                 className="rounded-2xl shadow-xl w-full h-[400px] object-cover"
               />
@@ -116,6 +134,12 @@ const About: FC = () => {
               <p className="text-lg text-gray-600">
                 Desde su fundación, Asopromas ha trabajado para fortalecer la economía local mediante la producción de cacao fino de aroma, promoviendo la cultura y el desarrollo de las comunidades rurales de Zamora Chinchipe.
               </p>
+              <Link
+                to="/about/history"
+                className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors mt-4"
+              >
+                Descubre Nuestra Historia Completa →
+              </Link>
             </div>
           </div>
         </div>
@@ -125,7 +149,7 @@ const About: FC = () => {
       <section className="relative py-24">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("/assets/images/aerial-cacao.jpg")' }}
+          style={{ backgroundImage: 'url("/assets/images/products/Chocolates.jpg")' }}
         >
           <div className="absolute inset-0 bg-black/60"></div>
         </div>

@@ -56,8 +56,8 @@ const Contact: FC = () => {
         {
             icon: <Phone className="h-6 w-6 text-brown-600" />,
             title: "Teléfono",
-            details: "+593 (07) 2605-120",
-            link: "tel:+59372605120"
+            details: "+593 96 170 6421",
+            link: "tel:+593961706421"
         },
         {
             icon: <MapPin className="h-6 w-6 text-brown-600" />,
