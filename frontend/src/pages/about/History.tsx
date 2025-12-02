@@ -7,7 +7,7 @@ const History: FC = () => {
   // SEO Configuration
   useSEO({
     title: 'Historia de ASOPROMAS - Desde 2013 Cultivando Tradición | Ecuador',
-    description: 'Descubre la historia de ASOPROMAS desde 2013: más de una década cultivando cacao de fino aroma y ancestral en Zamora Chinchipe y Morona Santiago, con 181 socios y certificación orgánica.',
+    description: 'Descubre la historia de ASOPROMAS desde 2013: más de una década cultivando cacao de fino aroma y ancestral en Zamora Chinchipe y Morona Santiago, con 188 socios y certificación orgánica.',
     keywords: 'historia ASOPROMAS, cacao Ecuador historia, Zamora Chinchipe agricultura, cacao ancestral, cooperativa cacao, tradición cacaotera Ecuador, cacao orgánico',
     url: '/about/history',
     type: 'article'
@@ -17,7 +17,7 @@ const History: FC = () => {
     {
       year: '2013',
       title: 'Fundación de ASOPROMAS',
-      description: 'Creada con 13 socios impulsada por el FEPP. Producción inicial de 15-18 quintales anuales con venta local de chocolates artesanales.',
+      description: 'Creada con 13 socios impulsada por ONG´s. Producción inicial de 15-18 quintales anuales con venta local de chocolates artesanales.',
       icon: <Users className="w-6 h-6" />
     },
     {
@@ -35,7 +35,7 @@ const History: FC = () => {
     {
       year: '2019',
       title: 'Alianzas Estratégicas',
-      description: 'Apoyo de PRO AMAZONIA (PPR red++) para implementar el CAS y bioinsumos. Inicio del proceso de certificación Libre de Deforestación.',
+      description: 'Apoyo de PROAMAZONIA para implementar el CAS y bioinsumos. Inicio del proceso de certificación Libre de Deforestación.',
       icon: <Award className="w-6 h-6" />
     },
     {
@@ -47,7 +47,7 @@ const History: FC = () => {
     {
       year: '2022-2024',
       title: 'Expansión y Capacitación',
-      description: 'Ejecución de 7 escuelas de campo (IAF). Entrega de kits a 84 socios. Apoyo de Farmer to Farmer en género, certificación orgánica y chocolate. Incremento a 181 socios en 13 comunidades.',
+      description: 'Ejecución de 7 escuelas de campo. Entrega de kits a 84 socios. Apoyo en Equidas de Género, certificación orgánica de cacao y chocolate. Incremento a 188 socios en 13 comunidades.',
       icon: <Calendar className="w-6 h-6" />
     },
     {
@@ -59,7 +59,7 @@ const History: FC = () => {
     {
       year: '2024',
       title: 'Alianza Yachak',
-      description: 'Exclusividad entre Yachak y ASOPROMAS. Proyecto conjunto con INIAP/FIASA para rescate de cacao ancestral en microlotes.',
+      description: 'Exclusividad entre Yachak y ASOPROMAS. Proyecto conjunto con para rescate de cacao ancestral en microlotes.',
       icon: <Users className="w-6 h-6" />
     },
     {
@@ -71,7 +71,7 @@ const History: FC = () => {
     {
       year: '2025+',
       title: 'Consolidación y Futuro',
-      description: 'Meta de 350 quintales de cacao orgánico y 22 de ancestral. 22 viveros con 45,000 plantas. Apertura de "Ruta del Cacao Ancestral" y proyectos con COSPE, FAO y FUNDACIÓN HUMANA.',
+      description: 'Meta de 350 quintales de cacao orgánico y 22 de ancestral. 22 viveros con 45,000 plantas. Apertura de "Ruta del Cacao Ancestral" y proyectos con ONG´s internacionales.',
       icon: <Calendar className="w-6 h-6" />
     }
   ];
@@ -91,7 +91,7 @@ const History: FC = () => {
             Nuestra Historia
           </h1>
           <p className="text-xl sm:text-2xl text-amber-100 max-w-3xl mx-auto">
-            Desde 2013 cultivando tradición, calidad y sostenibilidad en Zamora Chinchipe y Morona Santiago con 181 socios comprometidos
+            Desde 2013 cultivando tradición, calidad y sostenibilidad en Zamora Chinchipe y Morona Santiago con 188 socios comprometidos
           </p>
         </div>
       </section>

@@ -209,7 +209,7 @@ const Landing: FC = () => {
                 variants={fadeInUp}
               >
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-amber-400">15+</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-amber-400">12+</div>
                   <div className="text-sm text-gray-400">Años de Experiencia</div>
                 </div>
                 <div className="text-center">
@@ -613,7 +613,7 @@ const Landing: FC = () => {
                 <div className="text-xs text-gray-400">Calidad Premium</div>
               </div>
               <div className="text-center p-3 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                <div className="text-2xl font-bold text-amber-400 mb-1">15+</div>
+                <div className="text-2xl font-bold text-amber-400 mb-1">12+</div>
                 <div className="text-xs text-gray-400">Años de Tradición</div>
               </div>
             </motion.div>

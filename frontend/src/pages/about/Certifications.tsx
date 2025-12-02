@@ -18,7 +18,7 @@ const Certifications: FC = () => {
       name: 'USDA Organic',
       organization: 'United States Department of Agriculture',
       description: 'Certificación que garantiza que nuestros productos están libres de pesticidas sintéticos, herbicidas y fertilizantes artificiales.',
-      year: '2010',
+      year: '2024',
       validity: '2025',
       benefits: [
         'Productos 100% naturales',
@@ -33,7 +33,7 @@ const Certifications: FC = () => {
       name: 'BPA - Buenas Prácticas Agrícolas',
       organization: 'Agencia de Regulación y Control Fito y Zoosanitario (AGROCALIDAD)',
       description: 'Certificación nacional que garantiza la aplicación de prácticas agrícolas que aseguran la inocuidad, calidad y sostenibilidad en la producción de cacao.',
-      year: '2020',
+      year: '2024',
       validity: '2026',
       benefits: [
         'Seguridad alimentaria garantizada',

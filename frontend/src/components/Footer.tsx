@@ -28,8 +28,10 @@ const Footer: FC = () => {
             {/* Contact Info */}
             <div className="space-y-0 text-[10px]">
               <a 
-                href="tel:+593961706421" 
+                href="https://wa.me/593961706421" 
                 className="flex items-center justify-center md:justify-start gap-1 text-gray-300 hover:text-amber-300 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Phone className="w-3 h-3" />
                 <span>+593 96 170 6421</span>
@@ -88,33 +90,44 @@ const Footer: FC = () => {
           {/* Columna 3: Social Media */}
           <div className="text-center md:text-right">
             <h3 className="text-sm font-bold text-amber-300 mb-1.5">Síguenos</h3>
-            <div className="flex justify-center md:justify-end gap-1.5 mb-0.5">
+            <div className="flex justify-center md:justify-end gap-3 mb-1">
               <a
                 href="https://www.facebook.com/asopromas"
-                className="bg-white/10 hover:bg-amber-500 p-1.5 rounded transition-all duration-300"
-                aria-label="Facebook"
+                className="bg-[#1877F2] hover:bg-[#0e62d0] p-2.5 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center border border-[#1877F2]"
+                aria-label="Síguenos en Facebook"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Facebook className="w-3.5 h-3.5" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a
                 href="https://www.instagram.com/asopromas"
-                className="bg-white/10 hover:bg-amber-500 p-1.5 rounded transition-all duration-300"
-                aria-label="Instagram"
+                className="bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F56040] hover:opacity-90 p-2.5 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center border border-[#E1306C]"
+                aria-label="Síguenos en Instagram"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Instagram className="w-3.5 h-3.5" />
+                <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="https://www.youtube.com/asopromas"
-                className="bg-white/10 hover:bg-amber-500 p-1.5 rounded transition-all duration-300"
-                aria-label="YouTube"
+                href="https://www.youtube.com/@asopromas"
+                className="bg-[#FF0000] hover:bg-[#cc0000] p-2.5 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center border border-[#FF0000]"
+                aria-label="Síguenos en YouTube"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Youtube className="w-3.5 h-3.5" />
+                <Youtube className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@asopromas"
+                className="bg-black hover:bg-gray-800 p-2.5 rounded-lg transition-all duration-300 hover:scale-110 flex items-center justify-center border border-gray-700"
+                aria-label="Síguenos en TikTok"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
               </a>
             </div>
             <p className="text-gray-400 text-xs">
@@ -125,11 +138,22 @@ const Footer: FC = () => {
 
         {/* Divider */}
         <div className="border-t border-white/10 pt-2">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-0.5 text-[10px] text-gray-400">
-            <p className="text-center md:text-left">
-              © {new Date().getFullYear()} ASOPROMAS. Todos los derechos reservados.
-            </p>
-            <p className="flex items-center gap-1 text-center md:text-right">
+          <div className="flex flex-col items-center gap-2 text-[10px] text-gray-400">
+            <div className="text-center">
+              <p>
+                © {new Date().getFullYear()} ASOPROMAS. Todos los derechos reservados.
+              </p>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <Link to="/privacy" className="hover:text-amber-300 transition-colors">
+                  Política de Privacidad
+                </Link>
+                <span>•</span>
+                <Link to="/terms" className="hover:text-amber-300 transition-colors">
+                  Términos y Condiciones
+                </Link>
+              </div>
+            </div>
+            <p className="flex items-center gap-1 text-center">
               Hecho en Ecuador con <span className="text-amber-500">❤️</span>
             </p>
           </div>

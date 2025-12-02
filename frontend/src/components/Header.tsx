@@ -1,8 +1,9 @@
 import { type FC, useState, useEffect, useRef, memo } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ShoppingBag, Menu } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
 import { useA11y } from '../hooks/useA11y';
+import productsData from '../data/products.json';
 
 type SubmenuItem = { to: string; text: string };
 type SubmenuSection = { title: string; items: SubmenuItem[] };
@@ -14,8 +15,10 @@ const HeaderComponent: FC = () => {
     const [openSubmenuAbout, setOpenSubmenuAbout] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState<typeof productsData>([]);
     const [isScrolled, setIsScrolled] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const { announceToScreenReader } = useA11y();
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -100,14 +103,36 @@ const HeaderComponent: FC = () => {
         }
     };
 
+    // Search functionality with real-time suggestions
+    useEffect(() => {
+        if (searchTerm.trim().length >= 2) {
+            const filtered = productsData.filter(product => 
+                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setSearchResults(filtered);
+        } else {
+            setSearchResults([]);
+        }
+    }, [searchTerm]);
+
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
             announceToScreenReader(`Buscando: ${searchTerm}`);
-            // Here you would implement actual search functionality
+            navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
             setSearchOpen(false);
             setSearchTerm('');
+            setSearchResults([]);
         }
+    };
+
+    const handleProductClick = (productId: string) => {
+        navigate(`/products/${productId}`);
+        setSearchOpen(false);
+        setSearchTerm('');
+        setSearchResults([]);
+        announceToScreenReader('Navegando al producto seleccionado');
     };
 
     const navLinks: NavItem[] = [
@@ -455,15 +480,27 @@ const HeaderComponent: FC = () => {
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="search-title"
+                    onClick={() => {
+                        setSearchOpen(false);
+                        setSearchTerm('');
+                        setSearchResults([]);
+                    }}
                 >
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
-                        <div className="p-6">
+                    <div 
+                        className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 id="search-title" className="text-lg font-semibold text-gray-900">
                                     Buscar productos
                                 </h2>
                                 <button
-                                    onClick={() => setSearchOpen(false)}
+                                    onClick={() => {
+                                        setSearchOpen(false);
+                                        setSearchTerm('');
+                                        setSearchResults([]);
+                                    }}
                                     className="p-2 rounded-md text-gray-400 hover:text-gray-600 focus-visible"
                                     aria-label="Cerrar búsqueda"
                                 >
@@ -481,19 +518,77 @@ const HeaderComponent: FC = () => {
                                         type="text"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        placeholder="¿Qué estás buscando?"
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#411900] focus:border-transparent"
+                                        placeholder="Buscar chocolate, licor, pasta..."
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                         aria-label="Campo de búsqueda"
                                     />
                                 </div>
-                                <button
-                                    type="submit"
-                                    className="mt-4 w-full bg-[#411900] text-white py-3 px-4 rounded-lg hover:bg-[#2a0f00] transition-colors duration-200 focus-visible"
-                                >
-                                    Buscar
-                                </button>
                             </form>
                         </div>
+
+                        {/* Search Results */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {searchTerm.trim().length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                    <p>Empieza a escribir para buscar productos</p>
+                                    <p className="text-sm mt-2">Chocolate, licor, pasta de cacao...</p>
+                                </div>
+                            ) : searchTerm.trim().length < 2 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p>Escribe al menos 2 caracteres</p>
+                                </div>
+                            ) : searchResults.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p>No se encontraron productos para "{searchTerm}"</p>
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="mt-4 text-amber-600 hover:text-amber-700 underline"
+                                    >
+                                        Limpiar búsqueda
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        {searchResults.length} {searchResults.length === 1 ? 'resultado' : 'resultados'} encontrados
+                                    </p>
+                                    {searchResults.map((product) => (
+                                        <button
+                                            key={product.id}
+                                            onClick={() => handleProductClick(product.id)}
+                                            className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors text-left group"
+                                        >
+                                            <img
+                                                src={product.images[0]}
+                                                alt={product.name}
+                                                className="w-16 h-16 object-cover rounded-md"
+                                            />
+                                            <div className="flex-1">
+                                                <h3 className="font-medium text-gray-900 group-hover:text-amber-600 transition-colors">
+                                                    {product.name}
+                                                </h3>
+                                                <p className="text-sm text-gray-600 line-clamp-1">
+                                                    {product.description}
+                                                </p>
+                                                <p className="text-sm font-semibold text-amber-600 mt-1">
+                                                    ${(product.price || 0).toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer with shortcut hint */}
+                        {searchResults.length > 0 && (
+                            <div className="p-4 border-t border-gray-200 bg-gray-50">
+                                <p className="text-xs text-gray-500 text-center">
+                                    Presiona <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">ESC</kbd> para cerrar
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

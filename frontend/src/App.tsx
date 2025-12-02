@@ -26,6 +26,10 @@ import Producers from './pages/about/Producers';
 import Sustainability from './pages/about/Sustainability';
 import Certifications from './pages/about/Certifications';
 
+// Legal Pages
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+
 // Product Pages
 import ChocolateBar100 from './pages/products/PureChocolateBar';
 import ChocolateNibsSalt from './pages/products/ChocolateNibsSalt';
@@ -66,6 +70,8 @@ const App: FC = () => {
         <Route path="products/cocoa-nibs" element={<CocoaNibs />} />
         <Route path="products/cocoa-liqueur" element={<CocoaLiqueur />} />
         <Route path="products/cocoa-cocktail" element={<CocoaCocktail />} />
+        <Route path="privacy" element={<Privacy />} />
+        <Route path="terms" element={<Terms />} />
       </Route>
     </Routes>
   );

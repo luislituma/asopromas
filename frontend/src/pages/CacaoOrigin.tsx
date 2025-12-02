@@ -14,7 +14,7 @@ const CacaoOrigin: FC = () => {
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 backdrop-blur-sm rounded-full border border-amber-400/30 mb-6">
             <Mountain className="w-5 h-5 text-amber-300" />
-            <span className="text-amber-100 font-semibold">5,000+ años de historia</span>
+            <span className="text-amber-100 font-semibold">5,500+ años de historia</span>
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
@@ -158,7 +158,7 @@ const CacaoOrigin: FC = () => {
               {/* Stats */}
               <div className="grid grid-cols-2 gap-4 mt-8">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <p className="text-3xl font-bold text-amber-300">5000+</p>
+                  <p className="text-3xl font-bold text-amber-300">5500+</p>
                   <p className="text-sm text-white/80 mt-1">Años de Historia</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">

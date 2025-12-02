@@ -61,9 +61,9 @@ const Producers: FC = () => {
     },
     {
       icon: <Home className="w-8 h-8" />,
-      number: '2,500',
+      number: '84',
       label: 'Hectáreas',
-      description: 'Bajo manejo sostenible'
+      description: 'Orgánicas y Bajo manejo sostenible'
     }
   ];
 
