@@ -1,6 +1,6 @@
 import { type FC, useState, useEffect, useRef, memo } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ShoppingBag, Menu } from 'lucide-react';
+import { Search, X, ChevronDown, Menu } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
 import { useA11y } from '../hooks/useA11y';
 import productsData from '../data/products.json';
@@ -337,21 +337,6 @@ const HeaderComponent: FC = () => {
                                 <Search size={20} aria-hidden="true" />
                             </button>
 
-                            {/* CTA catálogo */}
-                            <Link 
-                                to="/products" 
-                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
-                                    hover:from-orange-600 hover:to-amber-600 text-white
-                                    transform hover:scale-110 active:scale-105
-                                    transition-all duration-300 ease-out
-                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
-                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
-                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
-                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
-                                aria-label="Ver catálogo de productos"
-                            >
-                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
-                            </Link>
                         </nav>
 
                         {/* Mobile action buttons */}
@@ -367,21 +352,6 @@ const HeaderComponent: FC = () => {
                             >
                                 <Search size={20} aria-hidden="true" />
                             </button>
-
-                            <Link 
-                                to="/products" 
-                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
-                                    hover:from-orange-600 hover:to-amber-600 text-white
-                                    transform hover:scale-110 active:scale-105
-                                    transition-all duration-300 ease-out
-                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
-                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
-                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
-                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
-                                aria-label="Ver catálogo de productos"
-                            >
-                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
-                            </Link>
 
                             <button
                                 className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
