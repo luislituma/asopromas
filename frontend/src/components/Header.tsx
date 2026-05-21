@@ -1,114 +1,68 @@
 import { type FC, useState, useEffect, useRef, memo } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Search, X, ChevronDown, ShoppingBag, Menu } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X, Menu, ArrowRight } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
-import { useA11y } from '../hooks/useA11y';
+
 import productsData from '../data/products.json';
 
-type SubmenuItem = { to: string; text: string };
+type SubmenuItem = { to: string; text: string; desc?: string };
 type SubmenuSection = { title: string; items: SubmenuItem[] };
 type NavItem = { to: string; text: string; submenu?: SubmenuSection[] };
 
 const HeaderComponent: FC = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [openSubmenuProducts, setOpenSubmenuProducts] = useState(false);
-    const [openSubmenuAbout, setOpenSubmenuAbout] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [activeMegaMenu, setActiveMegaMenu] = useState<'products' | 'about' | null>(null);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<typeof productsData>([]);
     const [isScrolled, setIsScrolled] = useState(false);
+    
     const location = useLocation();
     const navigate = useNavigate();
-    const { announceToScreenReader } = useA11y();
-    const mobileMenuRef = useRef<HTMLDivElement>(null);
+
     const searchInputRef = useRef<HTMLInputElement>(null);
-    
 
-    // Detectar scroll usando Intersection Observer (más confiable)
+    // Scroll Detection
     useEffect(() => {
-        const sentinel = document.getElementById('scroll-sentinel'); if (!sentinel) { console.error(' Sentinel no encontrado'); return; }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                // Cuando el sentinel NO es visible = estamos scrolleados
-                const scrolled = !entry.isIntersecting;
-                console.log('�️ Intersection Observer - isScrolled:', scrolled);
-                setIsScrolled(scrolled);
-            },
-            {
-                threshold: 0,
-                rootMargin: '-1px 0px 0px 0px'
-            }
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            if (sentinel) {
-                observer.unobserve(sentinel);
-            }
-        };
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Close menus on route change
     useEffect(() => {
-        setIsMenuOpen(false);
-        setOpenSubmenuProducts(false);
-        setOpenSubmenuAbout(false);
+        setIsMobileMenuOpen(false);
+        setActiveMegaMenu(null);
     }, [location.pathname]);
 
-    // Handle ESC key to close menus
+    // Handle ESC key
     useEffect(() => {
-        const handleEscKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                if (searchOpen) {
-                    setSearchOpen(false);
-                } else if (isMenuOpen) {
-                    setIsMenuOpen(false);
-                } else if (openSubmenuProducts || openSubmenuAbout) {
-                    setOpenSubmenuProducts(false);
-                    setOpenSubmenuAbout(false);
-                }
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setSearchOpen(false);
+                setIsMobileMenuOpen(false);
+                setActiveMegaMenu(null);
             }
         };
+        document.addEventListener('keydown', handleEsc);
+        return () => document.removeEventListener('keydown', handleEsc);
+    }, []);
 
-        document.addEventListener('keydown', handleEscKey);
-        return () => document.removeEventListener('keydown', handleEscKey);
-    }, [searchOpen, isMenuOpen, openSubmenuProducts, openSubmenuAbout]);
-
-    // Focus search input when opened
+    // Search Focus
     useEffect(() => {
         if (searchOpen && searchInputRef.current) {
-            searchInputRef.current.focus();
+            setTimeout(() => searchInputRef.current?.focus(), 100);
         }
     }, [searchOpen]);
 
-    // Announce menu state changes
-    const toggleMobileMenu = () => {
-        const newState = !isMenuOpen;
-        setIsMenuOpen(newState);
-        announceToScreenReader(newState ? 'Menú abierto' : 'Menú cerrado');
-    };
-
-    const toggleSubmenu = (menu: 'products' | 'about') => {
-        if (menu === 'products') {
-            const newState = !openSubmenuProducts;
-            setOpenSubmenuProducts(newState);
-            setOpenSubmenuAbout(false);
-            announceToScreenReader(newState ? 'Submenú de productos abierto' : 'Submenú de productos cerrado');
-        } else {
-            const newState = !openSubmenuAbout;
-            setOpenSubmenuAbout(newState);
-            setOpenSubmenuProducts(false);
-            announceToScreenReader(newState ? 'Submenú de nosotros abierto' : 'Submenú de nosotros cerrado');
-        }
-    };
-
-    // Search functionality with real-time suggestions
+    // Search Logic
     useEffect(() => {
         if (searchTerm.trim().length >= 2) {
-            const filtered = productsData.filter(product => 
-                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                product.description.toLowerCase().includes(searchTerm.toLowerCase())
+            const filtered = productsData.filter(p => 
+                p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.description.toLowerCase().includes(searchTerm.toLowerCase())
             );
             setSearchResults(filtered);
         } else {
@@ -119,25 +73,16 @@ const HeaderComponent: FC = () => {
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            announceToScreenReader(`Buscando: ${searchTerm}`);
             navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
             setSearchOpen(false);
             setSearchTerm('');
-            setSearchResults([]);
         }
-    };
-
-    const handleProductClick = (productId: string) => {
-        navigate(`/products/${productId}`);
-        setSearchOpen(false);
-        setSearchTerm('');
-        setSearchResults([]);
-        announceToScreenReader('Navegando al producto seleccionado');
     };
 
     const navLinks: NavItem[] = [
         { to: '/', text: 'Inicio' },
         { to: '/cacao-origin', text: 'Origen del Cacao' },
+        { to: '/ruta-cacao-ancestral', text: 'Ruta del Cacao' },
         {
             to: '/about',
             text: 'Nosotros',
@@ -145,17 +90,17 @@ const HeaderComponent: FC = () => {
                 {
                     title: 'Nuestra Historia',
                     items: [
-                        { to: '/about/history', text: 'Historia de ASOPROMAS' },
-                        { to: '/about/mission', text: 'Misión y Visión' },
-                        { to: '/about/values', text: 'Valores' },
+                        { to: '/about/history', text: 'Historia de ASOPROMAS', desc: 'El comienzo de nuestro sueño' },
+                        { to: '/about/mission', text: 'Misión y Visión', desc: 'Nuestro norte como organización' },
+                        { to: '/about/values', text: 'Valores', desc: 'Lo que nos hace únicos' },
                     ],
                 },
                 {
                     title: 'Comunidad',
                     items: [
-                        { to: '/about/producers', text: 'Nuestros Productores' },
-                        { to: '/about/sustainability', text: 'Sostenibilidad' },
-                        { to: '/about/certifications', text: 'Certificaciones' },
+                        { to: '/about/producers', text: 'Nuestros Productores', desc: 'Las familias detrás del cacao' },
+                        { to: '/about/sustainability', text: 'Sostenibilidad', desc: 'Cuidado de nuestra Amazonía' },
+                        { to: '/about/certifications', text: 'Certificaciones', desc: 'Avales de nuestra calidad' },
                     ],
                 },
             ],
@@ -165,440 +110,360 @@ const HeaderComponent: FC = () => {
             text: 'Productos',
             submenu: [
                 {
-                    title: 'Barras de Chocolate',
+                    title: 'Colección Principal',
                     items: [
-                        { to: '/products/chocolate-bar-100', text: 'Barra de Chocolate 100%' },
-                        { to: '/products/chocolate-nibs-salt', text: 'Chocolate con Nibs y Sal' },
-                        { to: '/products/chocolate-coffee', text: 'Chocolate con Café' },
+                        { to: '/products/chocolate-bar-100', text: 'Barra de Chocolate 100%', desc: 'Puro e intenso, sin azúcar' },
+                        { to: '/products/chocolate-nibs-salt', text: 'Chocolate con Nibs y Sal', desc: 'Equilibrio perfecto de sabores' },
+                        { to: '/products/chocolate-coffee', text: 'Chocolate con Café', desc: 'Fusión de granos selectos' },
                     ],
                 },
                 {
-                    title: 'Productos Especiales',
+                    title: 'Especialidades',
                     items: [
-                        { to: '/products/fruit-bonbons', text: 'Bombones de Frutas Exóticas' },
-                        { to: '/products/cocoa-nibs', text: 'Nibs de Cacao Natural' },
-                        { to: '/products/cocoa-liqueur', text: 'Licor Dulce de Cacao (20°)' },
-                        { to: '/products/cocoa-cocktail', text: 'Cóctel de Cacao (12°)' },
+                        { to: '/products/fruit-bonbons', text: 'Bombones Frutales', desc: 'Rellenos de sabores exóticos' },
+                        { to: '/products/cocoa-nibs', text: 'Nibs Naturales', desc: 'Crujientes y saludables' },
+                        { to: '/products/cocoa-liqueur', text: 'Licor Dulce (20°)', desc: 'Para ocasiones especiales' },
+                        { to: '/products/cocoa-cocktail', text: 'Cóctel de Cacao (12°)', desc: 'Suave y muy refrescante' },
                     ],
                 },
             ],
         },
-        { to: '/contact', text: 'Contacto' },
     ];
 
     return (
         <>
-            <header 
-                className={`sticky top-0 z-40 transition-all duration-700 ease-in-out ${
+            <motion.header 
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                className={`fixed w-full top-0 z-40 transition-all duration-500 border-b ${
                     isScrolled 
-                        ? 'bg-white/95 backdrop-blur-md shadow-lg' 
-                        : 'bg-white shadow-sm'
-                } border-b ${isScrolled ? 'border-gray-300' : 'border-gray-200'}`}
-                role="banner"
+                        ? 'bg-white/90 backdrop-blur-xl border-stone-200 shadow-sm py-3' 
+                        : 'bg-white/50 backdrop-blur-sm border-transparent py-5'
+                }`}
+                onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="flex justify-between items-center">
                         {/* Logo */}
-                        <Link 
-                            to="/" 
-                            className="flex items-center focus-visible transition-all duration-500"
-                            aria-label="ASOPROMAS - Ir a inicio"
-                        >
+                        <Link to="/" className="relative z-50 flex-shrink-0 flex items-center gap-3 group">
                             <img 
                                 src={logoUrl} 
                                 alt="ASOPROMAS Logo" 
-                                className={`w-auto transition-all duration-500 ${
-                                    isScrolled ? 'h-8' : 'h-10'
-                                }`}
+                                className={`w-auto transition-all duration-500 ease-out ${isScrolled ? 'h-8' : 'h-10'}`}
                             />
+                            <span className={`font-medium tracking-wide text-chocolate-900 transition-all duration-500 ease-out hidden sm:block group-hover:text-chocolate-700 ${isScrolled ? 'text-lg' : 'text-xl'}`}>
+                                ASOPROMAS
+                            </span>
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <nav 
-                            className="hidden md:flex items-center gap-12"
-                            role="navigation"
-                            aria-label="Navegación principal"
-                        >
+                        <nav className="hidden lg:flex items-center space-x-10">
                             {navLinks.map((link) => {
+
                                 const isProducts = link.text === 'Productos';
-                                const hasSub = link.submenu && link.submenu.length > 0;
+                                const isAbout = link.text === 'Nosotros';
 
                                 return (
                                     <div 
                                         key={link.to} 
-                                        className="relative"
+                                        className="relative group h-full flex items-center"
                                         onMouseEnter={() => {
-                                            if (hasSub) {
-                                                if (isProducts) {
-                                                    setOpenSubmenuProducts(true);
-                                                    setOpenSubmenuAbout(false);
-                                                } else {
-                                                    setOpenSubmenuAbout(true);
-                                                    setOpenSubmenuProducts(false);
-                                                }
-                                            }
-                                        }}
-                                        onMouseLeave={() => {
-                                            if (hasSub) {
-                                                setOpenSubmenuProducts(false);
-                                                setOpenSubmenuAbout(false);
-                                            }
+                                            if (isProducts) setActiveMegaMenu('products');
+                                            else if (isAbout) setActiveMegaMenu('about');
+                                            else setActiveMegaMenu(null);
                                         }}
                                     >
-                                        {hasSub ? (
-                                            <NavLink
-                                                to={link.to}
-                                                className={({ isActive }) =>
-                                                    `nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
-                                                        isActive || location.pathname.startsWith(link.to)
-                                                            ? 'text-[#411900] font-semibold'
-                                                            : isScrolled 
-                                                                ? 'text-gray-600 hover:text-[#411900]' 
-                                                                : 'text-gray-700 hover:text-[#411900]'
-                                                    }`
-                                                }
-                                                aria-expanded={isProducts ? openSubmenuProducts : openSubmenuAbout}
-                                                aria-haspopup="true"
-                                            >
-                                                {link.text}
-                                            </NavLink>
-                                        ) : (
-                                            <NavLink
-                                                to={link.to}
-                                                className={({ isActive }) =>
-                                                    `nav-item inline-flex items-center gap-1 text-sm transition-colors duration-200 focus-visible ${
-                                                        isActive
-                                                            ? 'text-[#411900] font-semibold'
-                                                            : isScrolled 
-                                                                ? 'text-gray-600 hover:text-[#411900]' 
-                                                                : 'text-gray-700 hover:text-[#411900]'
-                                                    }`
-                                                }
-                                            >
-                                                {link.text}
-                                            </NavLink>
-                                        )}
-
-                                        {/* Desktop Mega menu */}
-                                        {hasSub && (
-                                            <div
-                                                className={`mega-menu absolute top-full left-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-200 z-50 ${
-                                                    (isProducts ? openSubmenuProducts : openSubmenuAbout)
-                                                        ? 'opacity-100 visible translate-y-0'
-                                                        : 'opacity-0 invisible -translate-y-2'
-                                                }`}
-                                                role="menu"
-                                                aria-labelledby={`${link.text.toLowerCase()}-menu-button`}
-                                            >
-                                                <div className="p-6">
-                                                    <div className="grid grid-cols-1 gap-6">
-                                                        {link.submenu?.map((section) => (
-                                                            <div key={section.title}>
-                                                                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                                                                    {section.title}
-                                                                </h3>
-                                                                <ul className="space-y-2" role="none">
-                                                                    {section.items.map((item) => (
-                                                                        <li key={item.to} role="none">
-                                                                            <Link
-                                                                                to={item.to}
-                                                                                className="block text-sm text-gray-600 hover:text-[#411900] transition-colors duration-200 focus-visible"
-                                                                                role="menuitem"
-                                                                                onClick={() => {
-                                                                                    setOpenSubmenuProducts(false);
-                                                                                    setOpenSubmenuAbout(false);
-                                                                                }}
-                                                                            >
-                                                                                {item.text}
-                                                                            </Link>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-
-                            {/* Search button */}
-                            <button
-                                onClick={() => setSearchOpen(true)}
-                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
-                                    isScrolled 
-                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
-                                        : 'text-gray-600 hover:text-[#411900] hover:bg-gray-100'
-                                }`}
-                                aria-label="Abrir búsqueda"
-                            >
-                                <Search size={20} aria-hidden="true" />
-                            </button>
-
-                            {/* CTA catálogo */}
-                            <Link 
-                                to="/products" 
-                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
-                                    hover:from-orange-600 hover:to-amber-600 text-white
-                                    transform hover:scale-110 active:scale-105
-                                    transition-all duration-300 ease-out
-                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
-                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
-                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
-                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
-                                aria-label="Ver catálogo de productos"
-                            >
-                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
-                            </Link>
-                        </nav>
-
-                        {/* Mobile action buttons */}
-                        <div className="md:hidden flex items-center gap-2">
-                            <button
-                                onClick={() => setSearchOpen(true)}
-                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
-                                    isScrolled 
-                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
-                                        : 'text-gray-600 hover:text-[#411900] hover:bg-gray-100'
-                                }`}
-                                aria-label="Abrir búsqueda"
-                            >
-                                <Search size={20} aria-hidden="true" />
-                            </button>
-
-                            <Link 
-                                to="/products" 
-                                className="group relative p-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 
-                                    hover:from-orange-600 hover:to-amber-600 text-white
-                                    transform hover:scale-110 active:scale-105
-                                    transition-all duration-300 ease-out
-                                    shadow-md hover:shadow-lg hover:shadow-orange-500/50
-                                    focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
-                                    before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent
-                                    before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-500"
-                                aria-label="Ver catálogo de productos"
-                            >
-                                <ShoppingBag className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
-                            </Link>
-
-                            <button
-                                className={`p-2 rounded-md transition-colors duration-200 focus-visible ${
-                                    isScrolled 
-                                        ? 'text-gray-600 hover:text-[#411900] hover:bg-gray-100' 
-                                        : 'text-gray-700 hover:text-[#411900] hover:bg-gray-100'
-                                }`}
-                                onClick={toggleMobileMenu}
-                                aria-label="Alternar menú de navegación"
-                                aria-expanded={isMenuOpen}
-                                aria-controls="mobile-menu"
-                            >
-                                <Menu size={24} aria-hidden="true" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile Menu */}
-                {isMenuOpen && (
-                    <div 
-                        id="mobile-menu"
-                        ref={mobileMenuRef}
-                        className="md:hidden bg-white border-t border-gray-200"
-                        role="navigation"
-                        aria-label="Navegación móvil"
-                    >
-                        <div className="px-4 py-6 space-y-4">
-                            {navLinks.map((link) => (
-                                <div key={link.to}>
-                                    {link.submenu ? (
-                                        <div>
-                                            <button
-                                                className="w-full flex items-center justify-between text-base font-medium text-gray-900 focus-visible"
-                                                onClick={() => toggleSubmenu(link.text === 'Productos' ? 'products' : 'about')}
-                                                aria-expanded={link.text === 'Productos' ? openSubmenuProducts : openSubmenuAbout}
-                                            >
-                                                {link.text}
-                                                <ChevronDown 
-                                                    className={`w-5 h-5 transition-transform duration-200 ${
-                                                        (link.text === 'Productos' ? openSubmenuProducts : openSubmenuAbout) ? 'rotate-180' : 'rotate-0'
-                                                    }`} 
-                                                    aria-hidden="true"
-                                                />
-                                            </button>
-                                            {(link.text === 'Productos' ? openSubmenuProducts : openSubmenuAbout) && (
-                                                <div className="mt-4 pl-4 space-y-4">
-                                                    {link.submenu.map((section) => (
-                                                        <div key={section.title}>
-                                                            <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                                                                {section.title}
-                                                            </h3>
-                                                            <ul className="space-y-2">
-                                                                {section.items.map((item) => (
-                                                                    <li key={item.to}>
-                                                                        <Link
-                                                                            to={item.to}
-                                                                            className="block text-sm text-gray-600 hover:text-[#411900] focus-visible"
-                                                                            onClick={() => setIsMenuOpen(false)}
-                                                                        >
-                                                                            {item.text}
-                                                                        </Link>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
                                         <NavLink
                                             to={link.to}
                                             className={({ isActive }) =>
-                                                `block text-base font-medium transition-colors duration-200 focus-visible ${isActive
-                                                    ? 'text-[#411900]'
-                                                    : 'text-gray-900 hover:text-[#411900]'
+                                                `flex items-center gap-1 text-[15px] font-medium transition-colors ${
+                                                    isActive || location.pathname.startsWith(link.to)
+                                                        ? 'text-chocolate-800'
+                                                        : 'text-stone-600 hover:text-chocolate-900'
                                                 }`
                                             }
-                                            onClick={() => setIsMenuOpen(false)}
                                         >
                                             {link.text}
                                         </NavLink>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </header>
+                                    </div>
+                                );
+                            })}
+                        </nav>
 
-            {/* Search Modal */}
-            {searchOpen && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="search-title"
-                    onClick={() => {
-                        setSearchOpen(false);
-                        setSearchTerm('');
-                        setSearchResults([]);
-                    }}
-                >
-                    <div 
-                        className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="p-6 border-b border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 id="search-title" className="text-lg font-semibold text-gray-900">
-                                    Buscar productos
-                                </h2>
-                                <button
-                                    onClick={() => {
-                                        setSearchOpen(false);
-                                        setSearchTerm('');
-                                        setSearchResults([]);
-                                    }}
-                                    className="p-2 rounded-md text-gray-400 hover:text-gray-600 focus-visible"
-                                    aria-label="Cerrar búsqueda"
-                                >
-                                    <X size={20} aria-hidden="true" />
-                                </button>
-                            </div>
-                            <form onSubmit={handleSearchSubmit}>
-                                <div className="relative">
-                                    <Search 
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" 
-                                        aria-hidden="true"
-                                    />
-                                    <input
-                                        ref={searchInputRef}
-                                        type="text"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        placeholder="Buscar chocolate, licor, pasta..."
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                        aria-label="Campo de búsqueda"
-                                    />
-                                </div>
-                            </form>
-                        </div>
+                        {/* Actions */}
+                        <div className="flex items-center gap-6 relative z-50">
+                            <button
+                                onClick={() => setSearchOpen(true)}
+                                className="text-stone-500 hover:text-chocolate-800 transition-colors p-2"
+                                aria-label="Buscar"
+                            >
+                                <Search className="w-[22px] h-[22px]" />
+                            </button>
 
-                        {/* Search Results */}
-                        <div className="flex-1 overflow-y-auto p-6">
-                            {searchTerm.trim().length === 0 ? (
-                                <div className="text-center py-8 text-gray-500">
-                                    <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                                    <p>Empieza a escribir para buscar productos</p>
-                                    <p className="text-sm mt-2">Chocolate, licor, pasta de cacao...</p>
-                                </div>
-                            ) : searchTerm.trim().length < 2 ? (
-                                <div className="text-center py-8 text-gray-500">
-                                    <p>Escribe al menos 2 caracteres</p>
-                                </div>
-                            ) : searchResults.length === 0 ? (
-                                <div className="text-center py-8 text-gray-500">
-                                    <p>No se encontraron productos para "{searchTerm}"</p>
-                                    <button
-                                        onClick={() => setSearchTerm('')}
-                                        className="mt-4 text-amber-600 hover:text-amber-700 underline"
-                                    >
-                                        Limpiar búsqueda
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <p className="text-sm text-gray-600 mb-4">
-                                        {searchResults.length} {searchResults.length === 1 ? 'resultado' : 'resultados'} encontrados
-                                    </p>
-                                    {searchResults.map((product) => (
-                                        <button
-                                            key={product.id}
-                                            onClick={() => handleProductClick(product.id)}
-                                            className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors text-left group"
-                                        >
-                                            <img
-                                                src={product.images[0]}
-                                                alt={product.name}
-                                                className="w-16 h-16 object-cover rounded-md"
-                                            />
-                                            <div className="flex-1">
-                                                <h3 className="font-medium text-gray-900 group-hover:text-amber-600 transition-colors">
-                                                    {product.name}
-                                                </h3>
-                                                <p className="text-sm text-gray-600 line-clamp-1">
-                                                    {product.description}
-                                                </p>
-                                                <p className="text-sm font-semibold text-amber-600 mt-1">
-                                                    ${(product.price || 0).toFixed(2)}
-                                                </p>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                            <Link 
+                                to="/ruta-cacao-ancestral" 
+                                className="hidden md:inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-chocolate-900 text-white text-sm font-medium hover:bg-chocolate-950 transition-colors shadow-md hover:shadow-lg"
+                            >
+                                Reservar Ruta
+                            </Link>
 
-                        {/* Footer with shortcut hint */}
-                        {searchResults.length > 0 && (
-                            <div className="p-4 border-t border-gray-200 bg-gray-50">
-                                <p className="text-xs text-gray-500 text-center">
-                                    Presiona <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">ESC</kbd> para cerrar
-                                </p>
-                            </div>
-                        )}
+                            <button
+                                className="lg:hidden p-2 text-stone-600"
+                                onClick={() => setIsMobileMenuOpen(true)}
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            )}
+
+                {/* Mega Menu Dropdown */}
+                <AnimatePresence>
+                    {activeMegaMenu && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="absolute top-full left-0 w-full bg-white border-b border-stone-200 shadow-xl overflow-hidden"
+                        >
+                            <div className="max-w-7xl mx-auto px-6 py-12">
+                                <div className="grid grid-cols-12 gap-12">
+                                    {/* Links Section */}
+                                    <div className="col-span-8 grid grid-cols-2 gap-12">
+                                        {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
+                                            <div key={section.title}>
+                                                <h3 className="text-sm font-semibold text-chocolate-900 tracking-wider uppercase mb-6">
+                                                    {section.title}
+                                                </h3>
+                                                <ul className="space-y-5">
+                                                    {section.items.map((item) => (
+                                                        <li key={item.to}>
+                                                            <Link
+                                                                to={item.to}
+                                                                className="group block"
+                                                                onClick={() => setActiveMegaMenu(null)}
+                                                            >
+                                                                <span className="block text-base font-medium text-stone-800 group-hover:text-chocolate-700 transition-colors">
+                                                                    {item.text}
+                                                                </span>
+                                                                {item.desc && (
+                                                                    <span className="block text-sm text-stone-500 mt-1">
+                                                                        {item.desc}
+                                                                    </span>
+                                                                )}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Featured Section */}
+                                    <div className="col-span-4 border-l border-stone-100 pl-12">
+                                        <div className="relative h-full w-full rounded-2xl overflow-hidden group cursor-pointer" onClick={() => navigate(activeMegaMenu === 'products' ? '/products' : '/about')}>
+                                            <img 
+                                                src={activeMegaMenu === 'products' ? "/assets/images/products/Barra-Pura-1.jpg" : "/assets/images/products/Asopromas-socios.jpg"} 
+                                                alt="Destacado"
+                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                            <div className="absolute bottom-6 left-6 right-6">
+                                                <h4 className="text-white text-xl font-medium mb-2">
+                                                    {activeMegaMenu === 'products' ? 'Explorar Colección' : 'Nuestra Historia'}
+                                                </h4>
+                                                <div className="flex items-center text-stone-300 text-sm group-hover:text-white transition-colors">
+                                                    <span>Descubrir más</span>
+                                                    <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.header>
+
+            {/* Mobile Drawer Menu */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 h-full w-[85vw] max-w-sm bg-white z-50 shadow-2xl flex flex-col"
+                        >
+                            <div className="p-6 border-b border-stone-100 flex justify-between items-center">
+                                <span className="font-semibold text-chocolate-900 tracking-wider">MENÚ</span>
+                                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-stone-500 hover:text-chocolate-800 rounded-full hover:bg-stone-50">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto py-6 px-6 space-y-8">
+                                {navLinks.map((link) => (
+                                    <div key={link.to}>
+                                        {link.submenu ? (
+                                            <div className="space-y-4">
+                                                <span className="text-sm font-semibold text-stone-400 uppercase tracking-widest">{link.text}</span>
+                                                <div className="space-y-4 pl-4 border-l border-stone-100">
+                                                    {link.submenu.map((sec) => (
+                                                        <div key={sec.title} className="space-y-3">
+                                                            {sec.items.map((item) => (
+                                                                <Link 
+                                                                    key={item.to} 
+                                                                    to={item.to}
+                                                                    className="block text-stone-600 hover:text-chocolate-800 font-medium"
+                                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                                >
+                                                                    {item.text}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                to={link.to}
+                                                className="block text-lg font-medium text-stone-800 hover:text-chocolate-800"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                            >
+                                                {link.text}
+                                            </Link>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="p-6 bg-stone-50 border-t border-stone-100">
+                                <Link 
+                                    to="/ruta-cacao-ancestral" 
+                                    className="flex w-full items-center justify-center px-6 py-3 rounded-full bg-chocolate-900 text-white font-medium hover:bg-chocolate-950 transition-colors"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    Reservar Ruta
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Elegant Search Modal */}
+            <AnimatePresence>
+                {searchOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex flex-col items-center pt-24 px-4 sm:px-6"
+                    >
+                        {/* Blur Backdrop */}
+                        <div 
+                            className="absolute inset-0 bg-white/90 backdrop-blur-xl"
+                            onClick={() => setSearchOpen(false)}
+                        />
+
+                        <motion.div 
+                            initial={{ y: -20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                            className="relative w-full max-w-3xl z-10"
+                        >
+                            <button
+                                onClick={() => setSearchOpen(false)}
+                                className="absolute -right-4 -top-16 p-2 text-stone-400 hover:text-chocolate-900 transition-colors"
+                            >
+                                <X className="w-8 h-8" />
+                                <span className="sr-only">Cerrar</span>
+                            </button>
+
+                            <form onSubmit={handleSearchSubmit} className="relative group">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-stone-300 group-focus-within:text-chocolate-600 transition-colors" />
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Buscar productos..."
+                                    className="w-full bg-white py-6 pl-20 pr-8 text-2xl font-light text-stone-800 placeholder-stone-300 rounded-2xl border-2 border-stone-100 shadow-2xl focus:outline-none focus:border-chocolate-300 focus:ring-0 transition-all"
+                                />
+                            </form>
+
+                            {/* Search Results Dropdown-style */}
+                            <AnimatePresence>
+                                {searchTerm.trim().length >= 2 && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="mt-6 bg-white rounded-2xl shadow-xl border border-stone-100 overflow-hidden max-h-[50vh] overflow-y-auto"
+                                    >
+                                        {searchResults.length === 0 ? (
+                                            <div className="p-12 text-center text-stone-500 font-light">
+                                                No se encontraron resultados para "{searchTerm}"
+                                            </div>
+                                        ) : (
+                                            <div className="p-4">
+                                                <p className="px-4 py-2 text-xs font-semibold text-stone-400 uppercase tracking-widest">
+                                                    Resultados
+                                                </p>
+                                                {searchResults.map((product) => (
+                                                    <button
+                                                        key={product.id}
+                                                        onClick={() => {
+                                                            navigate(`/products/${product.id}`);
+                                                            setSearchOpen(false);
+                                                        }}
+                                                        className="w-full flex items-center gap-6 p-4 rounded-xl hover:bg-stone-50 transition-colors text-left group"
+                                                    >
+                                                        <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-stone-100">
+                                                            <img
+                                                                src={product.images[0]}
+                                                                alt={product.name}
+                                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-lg font-medium text-stone-800 group-hover:text-chocolate-800 transition-colors">
+                                                                {product.name}
+                                                            </h3>
+                                                            <p className="text-sm text-stone-500 line-clamp-1 mt-1">
+                                                                {product.description}
+                                                            </p>
+                                                        </div>
+                                                        <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <ArrowRight className="w-5 h-5 text-chocolate-500" />
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
 
-// Memoizar el Header para evitar re-renders innecesarios
 const Header = memo(HeaderComponent);
 Header.displayName = 'Header';
 
 export default Header;
-

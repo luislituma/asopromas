@@ -2,7 +2,7 @@
 import { type FC, useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import productsData from "../data/products.json"; // tu JSON importable
-import ButtonBuy from "../components/ButtonBuy";
+import { SITE_CONFIG } from '../config/site';
 
 type ProductVariant = {
   size: string;
@@ -181,13 +181,14 @@ const ProductDetail: FC = () => {
               </div>
             ) : (
               <>
-                <ButtonBuy 
-                  productId={product.id} 
-                  productName={product.name}
-                  productPrice={getCurrentPrice()}
-                  productImage={images[0]}
-                  variant={getCurrentVariantName()}
-                />
+                <a 
+                  href={`https://wa.me/${SITE_CONFIG.CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, me interesa el producto: ${product.name}${getCurrentVariantName() ? ` (${getCurrentVariantName()})` : ''}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Comprar por WhatsApp
+                </a>
                 <div className="text-sm text-gray-500">
                   💬 Respuesta inmediata por WhatsApp
                 </div>

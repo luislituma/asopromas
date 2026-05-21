@@ -2,7 +2,6 @@ import { type FC, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import CartWidget from './CartWidget';
 import SkipLinks from './SkipLinks';
 import ScreenReaderAnnouncer from './ScreenReaderAnnouncer';
 import { useA11y } from '../hooks/useA11y';
@@ -46,14 +45,13 @@ const LayoutComponent: FC = () => {
         </main>
         
         <Footer />
-        <CartWidget />
       </div>
     </>
   );
 };
 
 // NO memoizamos Layout porque Outlet necesita actualizarse con cada cambio de ruta
-// Pero los componentes hijo (Header, CartWidget) sí están memoizados
+// Pero los componentes hijo (Header) sí están memoizados
 const Layout = LayoutComponent;
         
 

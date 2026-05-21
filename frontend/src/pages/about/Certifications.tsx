@@ -1,312 +1,54 @@
 import { type FC } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, Award, Shield, Globe, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Award, Shield, CheckCircle2 } from 'lucide-react';
 import { useSEO } from '../../hooks/useSEO';
 
 const Certifications: FC = () => {
-  // SEO Configuration
   useSEO({
-    title: 'Certificaciones - ASOPROMAS | Cacao Orgánico Certificado Ecuador',
-    description: 'ASOPROMAS cuenta con certificaciones USDA Organic y BPA (Buenas Prácticas Agrícolas). Cacao orgánico certificado de la más alta calidad de Ecuador.',
-    keywords: 'certificaciones ASOPROMAS, cacao orgánico certificado, USDA Organic Ecuador, BPA Ecuador, Buenas Prácticas Agrícolas cacao',
+    title: 'Certificaciones | ASOPROMAS',
+    description: 'Conoce nuestros avales internacionales: USDA Organic y BPA, que garantizan la inocuidad y calidad orgánica.',
+    keywords: 'certificaciones cacao, cacao orgánico, USDA Organic, BPA Ecuador',
     url: '/about/certifications',
-    type: 'article'
   });
 
-  const certifications = [
-    {
-      name: 'USDA Organic',
-      organization: 'United States Department of Agriculture',
-      description: 'Certificación que garantiza que nuestros productos están libres de pesticidas sintéticos, herbicidas y fertilizantes artificiales.',
-      year: '2024',
-      validity: '2025',
-      benefits: [
-        'Productos 100% naturales',
-        'Sin químicos sintéticos',
-        'Métodos de cultivo sostenibles',
-        'Acceso a mercados premium'
-      ],
-      icon: '🇺🇸',
-      color: 'from-blue-500 to-blue-600'
-    },
-    {
-      name: 'BPA - Buenas Prácticas Agrícolas',
-      organization: 'Agencia de Regulación y Control Fito y Zoosanitario (AGROCALIDAD)',
-      description: 'Certificación nacional que garantiza la aplicación de prácticas agrícolas que aseguran la inocuidad, calidad y sostenibilidad en la producción de cacao.',
-      year: '2024',
-      validity: '2026',
-      benefits: [
-        'Seguridad alimentaria garantizada',
-        'Uso responsable de recursos',
-        'Trazabilidad completa del producto',
-        'Protección del medio ambiente'
-      ],
-      icon: '🌿',
-      color: 'from-green-500 to-green-600'
-    }
-  ];
-
-  const processSteps = [
-    {
-      step: '1',
-      title: 'Evaluación Inicial',
-      description: 'Inspección completa de fincas, procesos y documentación.'
-    },
-    {
-      step: '2',
-      title: 'Implementación',
-      description: 'Adopción de prácticas y estándares requeridos por cada certificación.'
-    },
-    {
-      step: '3',
-      title: 'Auditoría Externa',
-      description: 'Verificación independiente por organismos certificadores autorizados.'
-    },
-    {
-      step: '4',
-      title: 'Certificación',
-      description: 'Obtención del certificado y derecho a usar los sellos correspondientes.'
-    },
-    {
-      step: '5',
-      title: 'Monitoreo Continuo',
-      description: 'Inspecciones periódicas para mantener la validez de las certificaciones.'
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-            Certificaciones Internacionales
-          </h1>
-          <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto">
-            Respaldos que garantizan la calidad, sostenibilidad y responsabilidad social de nuestros productos
-          </p>
-        </div>
+    <div className="min-h-screen bg-white font-sans text-stone-800">
+      <section className="relative pt-40 pb-20 px-6 bg-chocolate-950 text-center">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-5xl sm:text-7xl font-light text-white mb-6">Nuestros <span className="font-medium font-serif tracking-wide text-amber-200">Avales</span></h1>
+          <p className="text-xl text-stone-300 font-light max-w-2xl mx-auto">La excelencia y pureza de nuestro cacao respaldada por rigurosos estándares internacionales.</p>
+        </motion.div>
       </section>
 
-      {/* Certifications Grid */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Nuestras Certificaciones Activas
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Cada certificación representa años de trabajo y compromiso con los más altos estándares internacionales
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {certifications.map((cert) => (
-              <div
-                key={cert.name}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100"
-              >
-                <div className={`h-2 bg-gradient-to-r ${cert.color}`}></div>
-                
-                <div className="p-8">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="text-4xl">{cert.icon}</div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-900">
-                        {cert.name}
-                      </h3>
-                      <p className="text-gray-600 font-medium">
-                        {cert.organization}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-700 leading-relaxed mb-6">
-                    {cert.description}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="text-sm text-gray-500">Certificado desde</div>
-                      <div className="text-lg font-bold text-gray-900">{cert.year}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="text-sm text-gray-500">Válido hasta</div>
-                      <div className="text-lg font-bold text-gray-900">{cert.validity}</div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Beneficios:</h4>
-                    <div className="space-y-2">
-                      {cert.benefits.map((benefit) => (
-                        <div key={benefit} className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                          <span className="text-gray-700 text-sm">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Certification Process */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Proceso de Certificación
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              El camino riguroso que seguimos para obtener y mantener nuestras certificaciones
-            </p>
-          </div>
-
-          <div className="relative">
-            {/* Línea conectora */}
-            <div className="hidden lg:block absolute top-16 left-0 w-full h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200"></div>
-
-            <div className="grid lg:grid-cols-5 gap-8">
-              {processSteps.map((process) => (
-                <div key={process.step} className="relative">
-                  {/* Punto en la línea */}
-                  <div className="hidden lg:flex absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-blue-500 rounded-full items-center justify-center text-white font-bold text-sm z-10">
-                    {process.step}
-                  </div>
-
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 mt-8 lg:mt-12 border border-blue-200 hover:shadow-lg transition-shadow duration-300">
-                    <div className="lg:hidden w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm mb-4">
-                      {process.step}
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">
-                      {process.title}
-                    </h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">
-                      {process.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+      <section className="py-32 px-6 bg-stone-50">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] border border-stone-200 shadow-sm relative overflow-hidden group">
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-cacao-green-50 rounded-full blur-3xl group-hover:bg-cacao-green-100 transition-colors"></div>
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-cacao-green-50 text-cacao-green-700 rounded-2xl flex items-center justify-center mb-8"><Award className="w-8 h-8"/></div>
+              <h2 className="text-3xl font-medium text-chocolate-900 mb-2">USDA Organic</h2>
+              <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">Válido hasta 2025</span>
+              <p className="text-stone-500 font-light leading-relaxed mb-8">Garantiza que nuestros productos están libres de pesticidas, herbicidas y fertilizantes sintéticos. Un sello de pureza para el mercado norteamericano y mundial.</p>
+              <ul className="space-y-3">
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0"/><span className="text-stone-600 font-light">100% natural</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0"/><span className="text-stone-600 font-light">Acceso a mercados premium</span></li>
+              </ul>
             </div>
-          </div>
-        </div>
-      </section>
+          </motion.div>
 
-      {/* Impact Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-800 to-blue-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-                Impacto de Nuestras Certificaciones
-              </h2>
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-                Las certificaciones no son solo sellos en nuestros productos, son compromisos 
-                tangibles que transforman vidas y protegen el medio ambiente.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Globe className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Acceso a Mercados Globales</h4>
-                    <p className="text-blue-200">
-                      Nuestras certificaciones nos abren las puertas de los mercados más exigentes del mundo.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Garantía de Calidad</h4>
-                    <p className="text-blue-200">
-                      Los consumidores confían en la consistencia y calidad de nuestros productos.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-semibold mb-2">Mejores Precios</h4>
-                    <p className="text-blue-200">
-                      Las certificaciones nos permiten obtener precios premium por nuestros productos.
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] border border-stone-200 shadow-sm relative overflow-hidden group">
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-amber-50 rounded-full blur-3xl group-hover:bg-amber-100 transition-colors"></div>
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center mb-8"><Shield className="w-8 h-8"/></div>
+              <h2 className="text-3xl font-medium text-chocolate-900 mb-2">Buenas Prácticas (BPA)</h2>
+              <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">Agrocalidad 2026</span>
+              <p className="text-stone-500 font-light leading-relaxed mb-8">Certificación nacional que asegura la inocuidad, higiene y sostenibilidad de toda nuestra cadena de producción de cacao y chocolate.</p>
+              <ul className="space-y-3">
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0"/><span className="text-stone-600 font-light">Seguridad alimentaria</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0"/><span className="text-stone-600 font-light">Trazabilidad completa</span></li>
+              </ul>
             </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-bold mb-6">Resultados Medibles</h3>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-white/20">
-                  <span className="text-blue-100">Incremento en ingresos:</span>
-                  <span className="font-bold text-2xl">+35%</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/20">
-                  <span className="text-blue-100">Mercados internacionales:</span>
-                  <span className="font-bold text-2xl">15</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/20">
-                  <span className="text-blue-100">Auditorías exitosas:</span>
-                  <span className="font-bold text-2xl">100%</span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-blue-100">Renovaciones consecutivas:</span>
-                  <span className="font-bold text-2xl">5</span>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-blue-500/20 rounded-lg">
-                <p className="text-blue-100 text-sm">
-                  📊 Datos actualizados a diciembre 2024
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8">
-            Confía en la Calidad Certificada
-          </h2>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-            Cuando eliges ASOPROMAS, eliges productos respaldados por los estándares 
-            internacionales más rigurosos de calidad y sostenibilidad.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/products"
-              className="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center"
-            >
-              Ver Productos Certificados
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Link>
-            <Link
-              to="/about/sustainability"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-700 transition-colors inline-flex items-center justify-center"
-            >
-              Conocer Sostenibilidad
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

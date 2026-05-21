@@ -17,6 +17,7 @@ import Contact from './pages/Contact';
 import Products from './pages/Products';
 import About from './pages/About';
 import CacaoOrigin from './pages/CacaoOrigin';
+import RutaCacaoAncestral from './pages/RutaCacaoAncestral';
 
 // About Pages
 import Mission from './pages/about/Mission';
@@ -54,6 +55,7 @@ const App: FC = () => {
       <Route path="/" element={<Layout />}>
         <Route index element={<Landing />} />
         <Route path="cacao-origin" element={<CacaoOrigin />} />
+        <Route path="ruta-cacao-ancestral" element={<RutaCacaoAncestral />} />
         <Route path="about" element={<About/>} />
         <Route path="about/history" element={<History />} />
         <Route path="about/mission" element={<Mission />} />

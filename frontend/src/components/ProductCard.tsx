@@ -1,11 +1,11 @@
-// src/components/ProductCard.tsx
-import { type FC, memo, useState } from "react";
+import { type FC, memo, useRef } from "react";
 import { Link } from "react-router-dom";
-import ButtonBuy from "./ButtonBuy";
+import { ArrowRight } from "lucide-react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export type ProductVariant = {
   size: string;
-  price: number;
+  price?: number;
 };
 
 export type Product = {
@@ -23,119 +23,101 @@ interface Props {
   className?: string;
 }
 
-const fallbackImage = "/assets/images/products/fallback.jpg"; // coloca un fallback en public
+const fallbackImage = "/assets/images/products/fallback.jpg";
 
 const ProductCardComponent: FC<Props> = ({ product, className = "" }) => {
   const thumb = product.images && product.images.length > 0 ? product.images[0] : fallbackImage;
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const ref = useRef<HTMLAnchorElement>(null);
   
-  // Obtener precio y variante actual
-  const hasVariants = product.variants && 
-    product.variants.length > 0 && 
-    typeof product.variants[0] === 'object' && 
-    'size' in product.variants[0];
-  
-  const currentPrice = hasVariants && product.variants
-    ? (product.variants[selectedVariantIndex] as ProductVariant).price 
-    : (product.price || 0);
-  const currentVariant = hasVariants && product.variants
-    ? (product.variants[selectedVariantIndex] as ProductVariant).size 
-    : undefined;
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <article
-      className={`group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition transform hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[#411900] focus-within:ring-offset-2 ${className}`}
+      className={`group w-full h-full ${className}`}
       aria-labelledby={`product-${product.id}-title`}
       aria-describedby={`product-${product.id}-description`}
+      style={{ perspective: 1200 }}
     >
       <Link 
         to={`/products/${product.id}`} 
-        className="block focus-visible"
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="block focus-visible outline-none h-full"
         aria-label={`Ver producto ${product.name}`}
       >
-        <div className="relative h-56 bg-gray-100 overflow-hidden">
-          <img
-            src={thumb}
-            alt={`Imagen de ${product.name}`}
-            loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={(e) => {
-              // Fallback image if main image fails to load
-              const target = e.target as HTMLImageElement;
-              target.src = fallbackImage;
-            }}
-          />
-        </div>
-
-        <div className="p-4">
-          <h3 id={`product-${product.id}-title`} className="text-lg font-semibold text-gray-900 mb-1">
-            {product.name}
-          </h3>
-
-          <p 
-            id={`product-${product.id}-description`}
-            className="text-sm text-gray-600 mb-4 line-clamp-3"
-          >
-            {product.description}
-          </p>
-        </div>
-      </Link>
-
-      {/* Selector de variantes si existen */}
-      {hasVariants && (
-        <div className="px-4 pb-3">
-          <label className="block text-xs font-medium text-gray-700 mb-2">
-            Presentación:
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {(product.variants as ProductVariant[]).map((variant, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => setSelectedVariantIndex(index)}
-                className={`px-2 py-1.5 rounded-lg border-2 transition-all text-xs font-medium ${
-                  selectedVariantIndex === index
-                    ? "border-amber-600 bg-amber-50 text-amber-900"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-amber-400"
-                }`}
-              >
-                <div>{variant.size}</div>
-                <div className="text-xs font-bold">${variant.price.toFixed(2)}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="px-4 pb-4 flex items-center justify-between">
-        <Link
-          to={`/products/${product.id}`}
-          className="text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200 hover:underline focus-visible"
-          aria-label={`Ver detalles completos de ${product.name}`}
+        <motion.div 
+          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+          className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-500 border border-stone-100 h-full flex flex-col will-change-transform"
         >
-          Ver detalles →
-        </Link>
+          <div className="relative h-72 bg-stone-50 overflow-hidden" style={{ transform: "translateZ(20px)" }}>
+            <img
+              src={thumb}
+              alt={`Imagen de ${product.name}`}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = fallbackImage;
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {product.available === false && (
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-stone-500 px-4 py-1.5 rounded-full text-xs font-medium">
+                No Disponible
+              </div>
+            )}
+          </div>
 
-        {/* Botón para comprar o badge de no disponible */}
-        {product.available === false ? (
-          <span className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium">
-            No Disponible
-          </span>
-        ) : (
-          <ButtonBuy 
-            productId={product.id} 
-            productName={product.name}
-            productPrice={currentPrice}
-            productImage={thumb}
-            variant={currentVariant}
-          />
-        )}
-      </div>
+          <div className="p-8 flex-1 flex flex-col bg-white" style={{ transform: "translateZ(40px)" }}>
+            <h3 id={`product-${product.id}-title`} className="text-2xl font-medium text-chocolate-900 mb-3 group-hover:text-amber-600 transition-colors">
+              {product.name}
+            </h3>
+
+            <p 
+              id={`product-${product.id}-description`}
+              className="text-stone-500 font-light leading-relaxed mb-6 line-clamp-3 flex-1"
+            >
+              {product.description}
+            </p>
+            
+            <div className="flex items-center text-chocolate-700 font-medium group-hover:text-amber-600 transition-colors mt-auto">
+              <span className="text-sm uppercase tracking-wider">Descubrir</span>
+              <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-2 transition-transform" />
+            </div>
+          </div>
+        </motion.div>
+      </Link>
     </article>
   );
 };
 
-// Memoizar para evitar re-renders innecesarios
 const ProductCard = memo(ProductCardComponent);
 ProductCard.displayName = 'ProductCard';
 

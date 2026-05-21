@@ -1,187 +1,74 @@
 import { type FC } from 'react';
+import { motion } from 'framer-motion';
+import { Target, Eye, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Target, Eye, Heart, Award } from 'lucide-react';
 import { useSEO } from '../../hooks/useSEO';
 
+import type { Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.1 } }
+};
+
 const Mission: FC = () => {
-  // SEO Configuration
   useSEO({
-    title: 'Misión y Visión - ASOPROMAS | Cacao Premium Ecuador',
-    description: 'Conoce la misión y visión de ASOPROMAS: producir cacao de fino aroma de la más alta calidad, promoviendo el desarrollo sostenible de las comunidades rurales de Zamora Chinchipe.',
-    keywords: 'misión ASOPROMAS, visión ASOPROMAS, cacao sostenible, desarrollo rural Ecuador, Zamora Chinchipe',
+    title: 'Misión y Visión | ASOPROMAS',
+    description: 'Conoce nuestro propósito y visión a largo plazo para el desarrollo sostenible del cacao ecuatoriano.',
+    keywords: 'misión ASOPROMAS, visión, futuro sostenible, cacao Ecuador',
     url: '/about/mission',
-    type: 'article'
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50">
-      {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-            Misión y Visión
-          </h1>
-          <p className="text-xl sm:text-2xl text-emerald-100 max-w-3xl mx-auto">
-            Nuestro propósito y dirección hacia un futuro sostenible
-          </p>
-        </div>
+    <div className="min-h-screen bg-stone-50 font-sans text-stone-800">
+      <section className="relative pt-40 pb-20 px-6 bg-chocolate-950 overflow-hidden text-center">
+        <div className="absolute inset-0 bg-[url('/assets/images/products/General.jpg')] opacity-10 mix-blend-overlay object-cover"></div>
+        <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="relative z-10 max-w-4xl mx-auto">
+          <motion.h1 variants={fadeInUp} className="text-5xl sm:text-7xl font-light text-white mb-6">Nuestro <span className="font-medium font-serif tracking-wide text-amber-200">Propósito</span></motion.h1>
+          <motion.p variants={fadeInUp} className="text-xl text-stone-300 font-light leading-relaxed">El norte que guía nuestras acciones y el futuro que construimos cada día.</motion.p>
+        </motion.div>
       </section>
 
-      {/* Mission & Vision Cards */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Misión */}
-            <div className="group">
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-emerald-100 hover:shadow-2xl transition-all duration-300 h-full">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl text-white">
-                    <Target className="w-8 h-8" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-gray-900">Nuestra Misión</h2>
-                </div>
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                  Producir y comercializar cacao de fino aroma y productos derivados de la más alta 
-                  calidad, promoviendo el desarrollo sostenible de nuestras comunidades rurales, 
-                  preservando el medio ambiente y generando valor agregado que beneficie a todos 
-                  los miembros de nuestra asociación.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Heart className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Desarrollo comunitario integral</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Heart className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Agricultura sostenible y orgánica</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Heart className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Comercio justo y equitativo</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <section className="py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] shadow-sm border border-stone-100 hover:shadow-xl transition-shadow duration-500">
+              <div className="w-16 h-16 bg-cacao-green-50 text-cacao-green-700 rounded-2xl flex items-center justify-center mb-8"><Target className="w-8 h-8" /></div>
+              <h2 className="text-3xl font-medium text-chocolate-900 mb-6">Misión</h2>
+              <p className="text-lg text-stone-500 font-light leading-relaxed mb-8">Producir y comercializar cacao de fino aroma de la más alta calidad, promoviendo el desarrollo sostenible de nuestras comunidades rurales y preservando el medio ambiente.</p>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0" /><span className="text-stone-600 font-light">Desarrollo comunitario integral</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0" /><span className="text-stone-600 font-light">Agricultura orgánica y regenerativa</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0" /><span className="text-stone-600 font-light">Comercio justo y equitativo</span></li>
+              </ul>
+            </motion.div>
 
-            {/* Visión */}
-            <div className="group">
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-amber-100 hover:shadow-2xl transition-all duration-300 h-full">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl text-white">
-                    <Eye className="w-8 h-8" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-gray-900">Nuestra Visión</h2>
-                </div>
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                  Ser reconocidos como la asociación líder en la producción de cacao fino de aroma 
-                  en Ecuador, siendo referente mundial en calidad, sostenibilidad e innovación, 
-                  contribuyendo al bienestar de nuestras familias productoras y al desarrollo 
-                  de la región amazónica.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Award className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Liderazgo en calidad internacional</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Award className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Innovación en procesos productivos</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Award className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Desarrollo regional sostenible</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] shadow-sm border border-stone-100 hover:shadow-xl transition-shadow duration-500">
+              <div className="w-16 h-16 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center mb-8"><Eye className="w-8 h-8" /></div>
+              <h2 className="text-3xl font-medium text-chocolate-900 mb-6">Visión</h2>
+              <p className="text-lg text-stone-500 font-light leading-relaxed mb-8">Ser el referente mundial en producción de cacao fino de aroma, destacando por nuestra calidad excepcional, sostenibilidad comprobada y la prosperidad de nuestras familias.</p>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /><span className="text-stone-600 font-light">Liderazgo en mercados internacionales</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /><span className="text-stone-600 font-light">Innovación en derivados del cacao</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /><span className="text-stone-600 font-light">Desarrollo pleno de la región amazónica</span></li>
+              </ul>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Objetivos Estratégicos */}
-      <section className="py-20 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Objetivos Estratégicos
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Las metas que guían nuestro trabajo diario y nuestro crecimiento a largo plazo
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-emerald-500 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Calidad Premium</h3>
-              <p className="text-gray-300 text-sm">
-                Mantener los más altos estándares de calidad en todos nuestros productos de cacao.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-amber-500 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Sostenibilidad</h3>
-              <p className="text-gray-300 text-sm">
-                Promover prácticas agrícolas sostenibles que preserven nuestro ecosistema.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Innovación</h3>
-              <p className="text-gray-300 text-sm">
-                Implementar tecnologías y métodos innovadores en nuestros procesos productivos.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-purple-500 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">4</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Desarrollo Social</h3>
-              <p className="text-gray-300 text-sm">
-                Mejorar la calidad de vida de nuestras familias productoras y comunidades.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8">
-            Únete a Nuestra Misión
-          </h2>
-          <p className="text-xl text-emerald-100 max-w-3xl mx-auto mb-8">
-            Conoce más sobre nuestros valores y cómo trabajamos cada día para hacer realidad 
-            nuestra visión de un futuro sostenible.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/about/values"
-              className="bg-white text-emerald-700 px-8 py-3 rounded-lg font-semibold hover:bg-emerald-50 transition-colors inline-flex items-center justify-center"
-            >
-              Nuestros Valores
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Link>
-            <Link
-              to="/about/sustainability"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-emerald-700 transition-colors inline-flex items-center justify-center"
-            >
-              Sostenibilidad
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
-        </div>
+      <section className="py-32 bg-white text-center">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+          <h2 className="text-3xl font-light text-chocolate-900 mb-8">Nuestros Pilares</h2>
+          <Link to="/about/values" className="inline-flex items-center gap-3 px-8 py-4 bg-chocolate-900 text-white rounded-full hover:bg-chocolate-950 transition-colors">
+            Explorar Valores <ArrowRight className="w-5 h-5" />
+          </Link>
+        </motion.div>
       </section>
     </div>
   );

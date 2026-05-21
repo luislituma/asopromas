@@ -1,170 +1,160 @@
 import { type FC } from 'react';
-import { Leaf, Users, Handshake } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Leaf, Users, Handshake, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSEO } from '../hooks/useSEO';
 
+import type { Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
+};
+
 const About: FC = () => {
-  // SEO Configuration
   useSEO({
-    title: 'Nosotros - ASOPROMAS | Asociación de Productores de Cacao Ecuador',
-    description: 'Conoce ASOPROMAS, asociación de productores de cacao de Zamora Chinchipe. Fortaleciendo comunidades rurales a través del cacao de fino aroma desde 2000.',
-    keywords: 'ASOPROMAS, productores cacao Ecuador, Zamora Chinchipe, cacao fino aroma, cooperativa agrícola, desarrollo rural',
+    title: 'Nuestra Esencia | ASOPROMAS',
+    description: 'Conoce ASOPROMAS, la cooperativa agrícola que transforma la Amazonía ecuatoriana mediante cacao fino de aroma, comercio justo y equidad.',
+    keywords: 'ASOPROMAS, cooperativa agrícola, cacao fino aroma, comercio justo, mujeres rurales, Zamora Chinchipe',
     url: '/about',
-    type: 'article',
-    image: '/assets/images/hero-cacao.jpg'
   });
 
-  const values = [
+  const cards = [
     {
-      icon: <Leaf className="h-8 w-8 text-brown-600" />,
-      title: "Calidad y Sostenibilidad",
-      description: "Nos comprometemos con prácticas agrícolas responsables que protegen la tierra y la biodiversidad.",
-      link: "/about/sustainability"
+      icon: <Handshake className="w-8 h-8 text-chocolate-600" />,
+      title: "Nuestra Historia",
+      desc: "El camino que hemos recorrido desde el 2000 hasta convertirnos en referentes.",
+      img: "/assets/images/products/Palanda.jpg",
+      link: "/about/history"
     },
     {
-      icon: <Users className="h-8 w-8 text-brown-600" />,
-      title: "Comunidad y Equidad",
-      description: "Promovemos la participación activa de todos los socios, dando especial importancia al rol de las mujeres rurales.",
+      icon: <Users className="w-8 h-8 text-chocolate-600" />,
+      title: "Nuestros Productores",
+      desc: "188 socios, 51% mujeres rurales liderando el cambio en Zamora Chinchipe.",
+      img: "/assets/images/products/Asopromas-socios.jpg",
       link: "/about/producers"
     },
     {
-      icon: <Handshake className="h-8 w-8 text-brown-600" />,
-      title: "Transparencia y Cooperación",
-      description: "Cada decisión se toma colectivamente, asegurando un impacto positivo en la región.",
-      link: "/about/certifications"
+      icon: <Leaf className="w-8 h-8 text-cacao-green-600" />,
+      title: "Sostenibilidad",
+      desc: "Protegemos la selva mediante agroforestería y prácticas de deforestación cero.",
+      img: "/assets/images/products/zamora.png",
+      link: "/about/sustainability"
     }
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("/assets/images/products/General.jpg")' }}
+    <div className="min-h-screen bg-white font-sans text-stone-800">
+      
+      {/* Hero Inmersivo */}
+      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-chocolate-950">
+        <motion.div 
+          initial={{ scale: 1.05, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0"
         >
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
-        <div className="relative text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Asopromas: Fortaleciendo comunidades a través del cacao en Zamora Chinchipe y Morona Santiago
-          </h1>
-          <p className="text-lg md:text-xl opacity-90">
-            <strong className="text-amber-300">188 socios</strong> comprometidos con la producción sostenible, donde <strong className="text-amber-300">el 51% son mujeres y 49% hombres</strong>, personas rurales que lideran el cambio en sus comunidades.
-          </p>
+          <img 
+            src="/assets/images/products/General.jpg" 
+            alt="Productores de cacao" 
+            className="w-full h-full object-cover opacity-30 mix-blend-overlay grayscale-[30%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-chocolate-950/60 via-chocolate-900/40 to-chocolate-950"></div>
+        </motion.div>
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-20">
+          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
+            <motion.p variants={fadeInUp} className="text-chocolate-300 font-medium tracking-[0.2em] uppercase text-sm mb-6">
+              Nuestra Identidad
+            </motion.p>
+            <motion.h1 variants={fadeInUp} className="text-5xl sm:text-7xl font-light text-white mb-6 leading-tight">
+              Transformando la <br/>
+              <span className="font-medium font-serif tracking-wide text-amber-200">Amazonía Ecuatoriana</span>
+            </motion.h1>
+            <motion.p variants={fadeInUp} className="text-xl sm:text-2xl text-stone-300 font-light max-w-3xl mx-auto leading-relaxed">
+              Más que una asociación, somos el reflejo del esfuerzo de comunidades rurales unidas por el amor al cacao fino de aroma.
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Nuestra Comunidad Section */}
-      <section className="py-16 md:py-24 px-4">
+      {/* Hub de Navegación / Tarjetas */}
+      <section className="py-32 px-6 bg-stone-50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Nuestra Comunidad
-              </h2>
-              <p className="text-lg text-gray-600">
-                Asopromas es una asociación que une a productores locales de cacao, fomentando el desarrollo económico, social y cultural de la región. Nuestra comunidad está formada por hombres y mujeres que trabajan unidos, promoviendo prácticas sostenibles y valores de cooperación y responsabilidad.
-              </p>
-              <Link
-                to="/about/producers"
-                className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors mt-4"
-              >
-                Conoce a Nuestros Productores →
-              </Link>
-            </div>
-            <div className="rounded-2xl overflow-hidden shadow-xl">
-              <img
-                src="/assets/images/products/Asopromas-socios.jpg"
-                alt="Comunidad Asopromas"
-                className="w-full h-[400px] object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl font-light text-chocolate-900 mb-6">Conoce nuestra esencia</h2>
+            <p className="text-xl text-stone-500 font-light max-w-2xl mx-auto">
+              Explora los pilares que hacen de ASOPROMAS un proyecto único de desarrollo sostenible.
+            </p>
+          </motion.div>
 
-      {/* Valores y Filosofía Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Valores y Filosofía
-          </h2>
-          <p className="text-center text-gray-600 mb-8">
-            <Link to="/about/values" className="text-amber-600 hover:text-amber-700 font-medium">
-              Explora nuestros valores en detalle →
-            </Link>
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {values.map((value, index) => (
-              <Link
-                key={index}
-                to={value.link}
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 block group"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {cards.map((card, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: idx * 0.2 }}
+                viewport={{ once: true }}
               >
-                <div className="bg-brown-50 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:bg-amber-100 transition-colors">
-                  {value.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-4 group-hover:text-amber-600 transition-colors">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
-                <span className="text-amber-600 font-medium mt-4 inline-block group-hover:translate-x-1 transition-transform">
-                  Ver más →
-                </span>
-              </Link>
+                <Link to={card.link} className="group block relative rounded-[2rem] overflow-hidden bg-white shadow-sm hover:shadow-2xl transition-all duration-500 border border-stone-100 h-full flex flex-col">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={card.img} 
+                      alt={card.title} 
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                  </div>
+                  <div className="p-10 flex-1 flex flex-col relative bg-white">
+                    <div className="absolute -top-8 right-8 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform group-hover:-translate-y-2 transition-transform duration-500">
+                      {card.icon}
+                    </div>
+                    <h3 className="text-2xl font-medium text-chocolate-900 mb-4 pr-16">{card.title}</h3>
+                    <p className="text-stone-500 font-light leading-relaxed mb-8 flex-1">{card.desc}</p>
+                    <div className="flex items-center text-chocolate-700 font-medium group-hover:text-amber-600 transition-colors">
+                      <span>Descubrir más</span>
+                      <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Historia Section */}
-      <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1">
-              <img
-                src="/assets/images/products/Palanda.jpg"
-                alt="Historia de Asopromas"
-                className="rounded-2xl shadow-xl w-full h-[400px] object-cover"
-              />
-            </div>
-            <div className="order-1 md:order-2 space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Nuestra Historia
-              </h2>
-              <p className="text-lg text-gray-600">
-                Desde su fundación, Asopromas ha trabajado para fortalecer la economía local mediante la producción de cacao fino de aroma, promoviendo la cultura y el desarrollo de las comunidades rurales de Zamora Chinchipe.
-              </p>
-              <Link
-                to="/about/history"
-                className="inline-flex items-center text-amber-600 hover:text-amber-700 font-semibold transition-colors mt-4"
-              >
-                Descubre Nuestra Historia Completa →
-              </Link>
-            </div>
+      {/* Navegación Secundaria (Misión, Valores, Certificaciones) */}
+      <section className="py-32 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+            <Link to="/about/mission" className="group p-8 rounded-3xl hover:bg-stone-50 transition-colors">
+              <h3 className="text-xl font-medium text-chocolate-900 mb-3 border-b border-stone-200 pb-3 group-hover:border-chocolate-400 transition-colors">Misión y Visión</h3>
+              <p className="text-stone-500 font-light">Nuestro propósito a largo plazo.</p>
+            </Link>
+            <Link to="/about/values" className="group p-8 rounded-3xl hover:bg-stone-50 transition-colors">
+              <h3 className="text-xl font-medium text-chocolate-900 mb-3 border-b border-stone-200 pb-3 group-hover:border-chocolate-400 transition-colors">Valores</h3>
+              <p className="text-stone-500 font-light">Lo que rige nuestras acciones.</p>
+            </Link>
+            <Link to="/about/certifications" className="group p-8 rounded-3xl hover:bg-cacao-green-50 transition-colors">
+              <h3 className="text-xl font-medium text-cacao-green-900 mb-3 border-b border-cacao-green-200 pb-3 group-hover:border-cacao-green-600 transition-colors">Certificaciones</h3>
+              <p className="text-stone-500 font-light">Avales de nuestra calidad orgánica.</p>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="relative py-24">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("/assets/images/products/Chocolates.jpg")' }}
-        >
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-        <div className="relative max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-            Únete a nuestra misión de fortalecer comunidades y preservar la tradición del cacao en Ecuador
-          </h2>
-          <Link
-            to="/contact"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-brown-600 rounded-lg hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brown-500 transition-colors"
-          >
-            Contáctanos
-          </Link>
-        </div>
-      </section>
     </div>
   );
 };

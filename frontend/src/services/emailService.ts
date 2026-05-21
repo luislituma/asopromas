@@ -1,6 +1,13 @@
 import emailjs from '@emailjs/browser';
-import type { CartItem } from '../context/CartContext';
 import { SITE_CONFIG } from '../config/site';
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  variant?: string;
+}
 
 // Configuración de EmailJS
 // Ahora soportamos variables de entorno Vite (recomendado) con fallback a los valores actuales.

@@ -1,43 +1,78 @@
-// src/pages/Products.tsx
 import { type FC, memo } from "react";
+import { motion } from "framer-motion";
 import products from "../data/products.json";
 import ProductCard from "../components/ProductCard";
 import { useSEO } from "../hooks/useSEO";
 
+import type { Variants } from 'framer-motion';
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 }
+  }
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 60, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: "spring", stiffness: 100, damping: 20 }
+  }
+};
+
 const ProductsPageComponent: FC = () => {
-  // SEO Configuration
   useSEO({
-    title: 'Productos KUJEÑITO - Chocolate Artesanal Premium | ASOPROMAS',
-    description: 'Descubre toda la línea de productos KUJEÑITO: barras de chocolate 100% puro, chocolate con nibs, bombones artesanales y más. Cacao de fino aroma de Ecuador.',
-    keywords: 'productos KUJEÑITO, chocolate artesanal Ecuador, barras chocolate puro, bombones cacao, productos ASOPROMAS, cacao fino aroma',
+    title: 'Catálogo de Productos - Chocolate Premium | ASOPROMAS',
+    description: 'Descubre nuestra colección de productos: barras de chocolate puro, licores premium y bombones artesanales.',
+    keywords: 'productos, chocolate artesanal Ecuador, barras chocolate, bombones cacao',
     url: '/products',
-    type: 'website',
-    image: '/assets/images/products/chocolate-collection.jpg'
   });
 
   return (
-    <main className="container mx-auto px-4 py-12">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold">KUJEÑITO — Nuestros Productos</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mt-3">
-          Elaborados con amor por ASOPROMAS en Playas de Cuje, Zumbi, Zamora Chinchipe.
-        </p>
-      </header>
+    <main className="min-h-screen bg-stone-50 pt-32 pb-32 font-sans">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <motion.header 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-24 text-center max-w-3xl mx-auto"
+        >
+          <p className="text-chocolate-400 font-medium tracking-[0.3em] uppercase text-xs mb-6">
+            Colección Exclusiva
+          </p>
+          <h1 className="text-5xl md:text-7xl font-light text-chocolate-950 mb-6">
+            Nuestros <span className="font-medium font-serif tracking-wide text-chocolate-800">Tesoros</span>
+          </h1>
+          <p className="text-xl text-stone-500 font-light leading-relaxed">
+            Cada producto es una invitación a descubrir las notas profundas y aromáticas de nuestro cacao milenario cultivado en la Amazonía Ecuatoriana.
+          </p>
+        </motion.header>
 
-      <section>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products
-            .filter((p) => p.available !== false)
-            .map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-        </div>
-      </section>
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+            {products
+              .filter((p) => p.available !== false)
+              .map((p) => (
+                <motion.div key={p.id} variants={itemVariants} className="h-full">
+                  <ProductCard product={p} />
+                </motion.div>
+              ))}
+          </div>
+        </motion.section>
+      </div>
     </main>
   );
 };
 
-// Memoizar para evitar re-renders innecesarios
 const ProductsPage = memo(ProductsPageComponent);
 ProductsPage.displayName = 'ProductsPage';
 

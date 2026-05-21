@@ -1,317 +1,232 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Leaf, Globe, ArrowRight, Users, Mountain } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MapPin, Leaf, Globe, ArrowRight, Mountain, History } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
+
+import type { Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
+  }
+};
 
 const CacaoOrigin: FC = () => {
+  useSEO({
+    title: 'El Origen del Cacao Ancestral | ASOPROMAS',
+    description: 'Descubre la historia del cacao más antiguo del mundo en Zamora Chinchipe, Ecuador. 5,500 años de legado vivo cultivado por nuestras familias.',
+    keywords: 'origen del cacao, cacao ancestral, Palanda, Zamora Chinchipe, historia del cacao, Ecuador',
+    url: '/cacao-origin',
+  });
+
   return (
-    <div className="bg-gradient-to-b from-[#f9f5f0] to-white">
+    <div className="min-h-screen bg-white text-stone-800 font-sans">
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#3b1d0e] via-[#6b3e24] to-[#8b5a3c]">
-          <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]"></div>
-        </div>
+      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-cacao-green-950">
+        <motion.div 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0"
+        >
+          <img 
+            src="/assets/images/products/zamora.png" 
+            alt="Paisaje de Zamora Chinchipe" 
+            className="w-full h-full object-cover mix-blend-overlay opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-cacao-green-950/80 via-cacao-green-900/40 to-cacao-green-950/90"></div>
+        </motion.div>
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 backdrop-blur-sm rounded-full border border-amber-400/30 mb-6">
-            <Mountain className="w-5 h-5 text-amber-300" />
-            <span className="text-amber-100 font-semibold">5,500+ años de historia</span>
-          </div>
-          
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-            El Origen del Cacao
-            <span className="block text-amber-300 mt-2">Más Antiguo del Mundo</span>
-          </h1>
-          
-          <p className="text-xl text-amber-100 max-w-2xl mx-auto leading-relaxed">
-            Descubre la conexión ancestral entre Zamora Chinchipe y el nacimiento del cacao, 
-            una historia que comenzó hace más de 5 milenios.
-          </p>
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-20">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-5 py-2 bg-cacao-green-800/30 backdrop-blur-md rounded-full border border-cacao-green-400/20 mb-8">
+              <Mountain className="w-5 h-5 text-cacao-green-300" />
+              <span className="text-cacao-green-100 font-medium tracking-wide uppercase text-sm">Cuna Mundial del Cacao</span>
+            </motion.div>
+            
+            <motion.h1 variants={fadeInUp} className="text-5xl sm:text-7xl lg:text-8xl font-light text-white mb-6 leading-tight">
+              El Legado de <br/>
+              <span className="font-medium font-serif tracking-wide text-cacao-green-200">5,500 Años</span>
+            </motion.h1>
+            
+            <motion.p variants={fadeInUp} className="text-xl sm:text-2xl text-cacao-green-50 font-light max-w-3xl mx-auto leading-relaxed">
+              En lo profundo de la Amazonía ecuatoriana, descansa el secreto mejor guardado de la historia del chocolate.
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
-      {/* A. Herencia Ancestral */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* Herencia Ancestral */}
+      <section className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Contenido */}
-            <div className="order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full mb-6">
-                <Leaf className="w-5 h-5 text-amber-700" />
-                <span className="text-amber-900 font-semibold">Herencia Ancestral</span>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="space-y-8"
+            >
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 text-cacao-green-700 font-semibold uppercase tracking-widest text-sm">
+                <History className="w-5 h-5" />
+                <span>Herencia Ancestral</span>
+              </motion.div>
               
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#3b1d0e] mb-6">
-                En el Corazón de la Historia
-              </h2>
+              <motion.h2 variants={fadeInUp} className="text-4xl sm:text-5xl font-light text-chocolate-900 leading-tight">
+                El Descubrimiento que <br/>
+                <span className="font-medium font-serif tracking-wide text-cacao-green-800">cambió la historia</span>
+              </motion.h2>
               
-              <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
+              <motion.div variants={fadeInUp} className="space-y-6 text-lg text-stone-500 font-light leading-relaxed">
                 <p>
-                  En el corazón de <strong className="text-[#3b1d0e]">Zamora Chinchipe</strong>, 
-                  en los valles fértiles de <strong className="text-[#3b1d0e]">Palanda</strong>, 
-                  se descubrieron los vestigios del cacao más antiguo del mundo, con más de 
-                  <strong className="text-amber-700"> 5.500 años de historia</strong>.
+                  Durante mucho tiempo se creyó que el cacao se originó en Mesoamérica. Sin embargo, en el corazón de <strong className="text-chocolate-900 font-medium">Zamora Chinchipe</strong>, específicamente en el sitio arqueológico de Santa Ana de La Florida, en Palanda, se encontró la verdad.
                 </p>
-                
                 <p>
-                  <strong className="text-[#3b1d0e]">Asopromas</strong>, con sus raíces en 
-                  <strong className="text-[#3b1d0e]"> Zumbi</strong>, comparte ese mismo suelo 
-                  ancestral donde el cacao nació y evolucionó junto a nuestras comunidades.
+                  Las vasijas de la cultura Mayo-Chinchipe revelaron trazas de cacao con más de <strong className="text-cacao-green-700 font-medium">5,500 años de antigüedad</strong>. Este hallazgo demostró que la Amazonía ecuatoriana es la verdadera cuna del cacao.
                 </p>
-                
-                <p className="text-amber-800 font-semibold italic bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
-                  Cada grano que cultivamos honra esa herencia y continúa una tradición 
-                  que ha perdurado milenios.
-                </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            {/* Visual / Imagen */}
-            <div className="order-1 lg:order-2">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <div className="aspect-[4/3] relative bg-gradient-to-br from-[#6b3e24] to-[#c9a27e] flex items-center justify-center">
-                  {/* Imagen de fondo con opacidad */}
-                  <div className="absolute inset-0">
-                    <img 
-                      src="/assets/images/products/zamora.png" 
-                      alt="Zamora Chinchipe - Origen del Cacao"
-                      className="w-full h-full object-cover opacity-30"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#6b3e24]/60 to-[#c9a27e]/60"></div>
-                  </div>
-                  {/* Contenido sobre la imagen */}
-                  <div className="text-center p-8 relative z-10">
-                    <MapPin className="w-20 h-20 text-white/80 mx-auto mb-4" />
-                    <p className="text-white text-lg font-semibold">Santa Ana de Palanda</p>
-                    <p className="text-white/80 text-sm mt-2">Sitio Arqueológico</p>
-                  </div>
-                </div>
-                
-                {/* Mapa decorativo */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                  <div className="flex items-center gap-3 text-white">
-                    <MapPin className="w-5 h-5 text-amber-400" />
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative">
+                <img 
+                  src="/assets/images/products/Palanda.jpg" 
+                  alt="Sitio Arqueológico en Palanda"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-cacao-green-900/20 mix-blend-multiply"></div>
+                <div className="absolute bottom-8 left-8 right-8 bg-white/90 backdrop-blur p-6 rounded-2xl shadow-lg">
+                  <div className="flex items-center gap-4 text-chocolate-900">
+                    <MapPin className="w-8 h-8 text-cacao-green-600" />
                     <div>
-                      <p className="font-semibold">Zamora Chinchipe</p>
-                      <p className="text-sm text-white/80">Ecuador - Amazonía</p>
+                      <p className="font-semibold text-lg">Santa Ana de La Florida</p>
+                      <p className="text-sm text-stone-500">Palanda, Zamora Chinchipe</p>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* B. El Legado que Vive */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[#3b1d0e] to-[#6b3e24]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Visual / Imagen */}
-            <div>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <div className="aspect-[4/3] relative bg-gradient-to-br from-[#c9a27e] to-[#8b5a3c] flex items-center justify-center">
-                  {/* Imagen de fondo con opacidad */}
-                  <div className="absolute inset-0">
-                    <img 
-                      src="/assets/images/products/Asopromas-socios.jpg" 
-                      alt="Productores de ASOPROMAS"
-                      className="w-full h-full object-cover opacity-30"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#c9a27e]/60 to-[#8b5a3c]/60"></div>
-                  </div>
-                  {/* Contenido sobre la imagen */}
-                  <div className="text-center p-8 relative z-10">
-                    <Users className="w-20 h-20 text-white/80 mx-auto mb-4" />
-                    <p className="text-white text-lg font-semibold">Nuestros Productores</p>
-                    <p className="text-white/80 text-sm mt-2">Guardianes del Legado</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Un Legado Vivo (Sostenibilidad y Plantaciones - Fuerte uso de Verde) */}
+      <section className="py-32 bg-cacao-green-50 px-6 relative overflow-hidden">
+        {/* Elemento decorativo */}
+        <div className="absolute -left-40 -top-40 w-96 h-96 bg-cacao-green-200/50 rounded-full blur-3xl"></div>
+        <div className="absolute -right-40 -bottom-40 w-96 h-96 bg-cacao-green-300/30 rounded-full blur-3xl"></div>
 
-            {/* Contenido */}
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 backdrop-blur-sm rounded-full border border-amber-400/30 mb-6">
-                <Leaf className="w-5 h-5 text-amber-300" />
-                <span className="text-amber-100 font-semibold">El Legado que Vive</span>
-              </div>
-              
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                Herederos de una Historia Milenaria
-              </h2>
-              
-              <div className="space-y-4 text-lg text-amber-100 leading-relaxed">
-                <p>
-                  Nuestros socios —productores rurales de <strong className="text-amber-300">Palanda</strong>, 
-                  <strong className="text-amber-300"> Zumbi</strong>, <strong className="text-amber-300"> Morona Santiago</strong>,  y comunidades cercanas— son los 
-                  <strong className="text-white"> herederos de esa historia</strong>.
-                </p>
-                
-                <p>
-                  A través del <strong className="text-amber-300">cultivo sostenible</strong> y el 
-                  respeto por la naturaleza, mantenemos vivo el legado del cacao original, 
-                  conectando <strong className="text-white">pasado, presente y futuro</strong> en 
-                  cada tableta de chocolate <strong className="text-amber-300">Kujeñito</strong>.
-                </p>
-              </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-20"
+          >
+            <Leaf className="w-12 h-12 text-cacao-green-600 mx-auto mb-6" />
+            <h2 className="text-4xl sm:text-5xl font-light text-cacao-green-950 mb-6">
+              Guardianes de la <span className="font-medium font-serif tracking-wide">Selva</span>
+            </h2>
+            <p className="text-xl text-cacao-green-800/70 font-light leading-relaxed">
+              En ASOPROMAS no solo cultivamos cacao, cultivamos vida. Nuestras plantaciones en Zumbi y comunidades aledañas son verdaderos bosques comestibles que protegen la biodiversidad.
+            </p>
+          </motion.div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <p className="text-3xl font-bold text-amber-300">5500+</p>
-                  <p className="text-sm text-white/80 mt-1">Años de Historia</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Cultivo Sostenible",
+                desc: "Prácticas orgánicas que nutren la tierra y evitan la deforestación, conviviendo en armonía con la flora y fauna local.",
+                stat: "100%",
+                substat: "Orgánico"
+              },
+              {
+                title: "Sombra Amazónica",
+                desc: "Nuestro cacao crece bajo la sombra de árboles nativos, maderables y frutales, recreando su hábitat natural milenario.",
+                stat: "Agroforestería",
+                substat: "Sistema de cultivo"
+              },
+              {
+                title: "Comercio Justo",
+                desc: "El respeto por la tierra comienza con el respeto a quienes la trabajan. Garantizamos bienestar para más de 100 familias.",
+                stat: "100+",
+                substat: "Familias Productoras"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-[2rem] p-10 shadow-sm hover:shadow-xl transition-shadow duration-500 border border-cacao-green-100"
+              >
+                <div className="mb-6">
+                  <span className="block text-3xl font-semibold text-cacao-green-700 mb-1">{item.stat}</span>
+                  <span className="block text-sm font-medium text-cacao-green-400 uppercase tracking-wider">{item.substat}</span>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <p className="text-3xl font-bold text-amber-300">100%</p>
-                  <p className="text-sm text-white/80 mt-1">Cultivo Sostenible</p>
-                </div>
-              </div>
-            </div>
+                <h3 className="text-xl font-medium text-chocolate-900 mb-4">{item.title}</h3>
+                <p className="text-stone-500 font-light leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* C. De Zamora Chinchipe al Mundo */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* De Zamora para el mundo */}
+      <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-6">
-            <Globe className="w-5 h-5 text-blue-700" />
-            <span className="text-blue-900 font-semibold">De Zamora Chinchipe al Mundo</span>
-          </div>
-          
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#3b1d0e] mb-6">
-            Compartiendo Nuestro Origen con el Mundo
-          </h2>
-          
-          <div className="space-y-4 text-lg text-gray-700 leading-relaxed mb-12">
-            <p>
-              Desde las <strong className="text-[#3b1d0e]">montañas amazónicas</strong> hasta 
-              los paladares del mundo, el cacao de <strong className="text-[#3b1d0e]">Asopromas</strong> cuenta 
-              una historia que comenzó hace miles de años.
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+          >
+            <Globe className="w-16 h-16 text-chocolate-300 mx-auto mb-8" />
+            <h2 className="text-4xl sm:text-5xl font-light text-chocolate-900 mb-8 leading-tight">
+              Llevando el origen al <span className="font-medium font-serif tracking-wide text-cacao-green-700">Mundo</span>
+            </h2>
+            <p className="text-xl text-stone-500 font-light leading-relaxed mb-12">
+              Cada barra de chocolate, cada bombón y cada licor que sale de nuestras instalaciones lleva consigo el ADN del primer cacao del mundo. Es un privilegio y una responsabilidad que asumimos con total pasión.
             </p>
-            
-            <p className="text-xl font-semibold text-amber-700">
-              No solo producimos chocolate: compartimos un pedazo del origen del cacao.
-            </p>
-          </div>
 
-          {/* Mapa de Zamora Chinchipe */}
-          <div className="relative my-12 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="relative aspect-[16/10] bg-gradient-to-br from-blue-50 to-amber-50">
-              {/* Imagen de fondo del mapa con opacidad */}
-              <div className="absolute inset-0">
-                <img 
-                  src="/assets/images/products/Palanda.jpg" 
-                  alt="Mapa de Zamora Chinchipe, Ecuador"
-                  className="w-full h-full object-cover opacity-20"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 to-amber-50/80"></div>
-              </div>
-              
-              {/* Contenido sobre la imagen */}
-              <div className="relative z-10 flex flex-col items-center justify-center h-full p-8">
-                <Globe className="w-24 h-24 text-amber-600/30 mb-6" />
-                
-                <div className="relative">
-                  {/* Punto de origen animado */}
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-6 h-6 bg-amber-600 rounded-full animate-ping"></div>
-                    <div className="absolute inset-0 w-6 h-6 bg-amber-600 rounded-full shadow-lg"></div>
-                  </div>
-                  
-                  {/* Líneas que se expanden */}
-                  <svg className="w-64 h-64" viewBox="0 0 200 200">
-                    <line x1="100" y1="100" x2="20" y2="40" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-                    <line x1="100" y1="100" x2="180" y2="60" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-                    <line x1="100" y1="100" x2="160" y2="140" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-                    <line x1="100" y1="100" x2="40" y2="160" stroke="#d97706" strokeWidth="2" strokeDasharray="4 2" opacity="0.6"/>
-                  </svg>
-                </div>
-                
-                <div className="mt-8 bg-white/90 backdrop-blur-sm rounded-xl px-6 py-3 border-2 border-amber-200 shadow-lg">
-                  <p className="text-amber-800 font-bold text-lg">Zamora Chinchipe, Ecuador</p>
-                  <p className="text-amber-600 text-sm">Cuna del Cacao Ancestral</p>
-                </div>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link
+                to="/products"
+                className="group flex items-center gap-4 bg-cacao-green-800 text-white px-10 py-4 rounded-full text-lg font-medium hover:bg-cacao-green-950 transition-all duration-500 shadow-xl"
+              >
+                <span>Descubrir Nuestro Cacao</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link
+                to="/ruta-cacao-ancestral"
+                className="group flex items-center gap-4 bg-white text-chocolate-900 border border-chocolate-200 px-10 py-4 rounded-full text-lg font-medium hover:bg-chocolate-50 transition-all duration-500"
+              >
+                <span>Vivir la Experiencia</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
-            <Link
-              to="/products"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold text-white 
-                bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-xl
-                hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600
-                transform hover:scale-105 active:scale-100
-                shadow-xl hover:shadow-2xl hover:shadow-amber-500/50
-                transition-all duration-300"
-            >
-              <Leaf className="w-6 h-6" />
-              <span>Descubre Nuestro Cacao</span>
-              <ArrowRight className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-
-            <Link
-              to="/about/history"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-[#3b1d0e] 
-                bg-white border-2 border-amber-600 rounded-xl
-                hover:bg-amber-50
-                transform hover:scale-105 active:scale-100
-                shadow-lg hover:shadow-xl
-                transition-all duration-300"
-            >
-              <span>Nuestra Historia</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline Visual */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-amber-50 to-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-[#3b1d0e] mb-12">
-            Una Línea de Tiempo Extraordinaria
-          </h2>
-          
-          <div className="relative">
-            {/* Línea vertical */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 -translate-x-1/2"></div>
-            
-            {/* Hitos */}
-            <div className="space-y-12">
-              {/* 3500 AC */}
-              <div className="relative flex items-center">
-                <div className="flex-1 text-right pr-8">
-                  <h3 className="text-2xl font-bold text-amber-700">3500 AC</h3>
-                  <p className="text-gray-600 mt-2">Primeros vestigios de cacao en Palanda (hace 5500 años)</p>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 bg-amber-600 rounded-full border-4 border-white shadow-lg z-10"></div>
-                <div className="flex-1 pl-8"></div>
-              </div>
-              
-              {/* Culturas Ancestrales */}
-              <div className="relative flex items-center">
-                <div className="flex-1 pr-8"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 w-6 h-6 bg-amber-600 rounded-full border-4 border-white shadow-lg z-10"></div>
-                <div className="flex-1 pl-8">
-                  <h3 className="text-2xl font-bold text-amber-700">Culturas Mayo-Chinchipe</h3>
-                  <p className="text-gray-600 mt-2">Domesticación y cultivo del cacao</p>
-                </div>
-              </div>
-              
-              {/* Actualidad */}
-              <div className="relative flex items-center">
-                <div className="flex-1 text-right pr-8">
-                  <h3 className="text-2xl font-bold text-amber-700">2025</h3>
-                  <p className="text-gray-600 mt-2">ASOPROMAS continúa el legado</p>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-600 rounded-full border-4 border-white shadow-xl z-10 animate-pulse"></div>
-                <div className="flex-1 pl-8"></div>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
