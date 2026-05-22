@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
-import heroVideo from '../assets/video/Hero.mp4';
+
+// Use Vite env var if provided (for CDN-hosted video). Fallback to local file for dev.
+const heroVideoSrc = (import.meta as any).env?.VITE_HERO_VIDEO_URL || '/assets/video/Hero.mp4';
 
 const Landing: FC = () => {
   useSEO({
@@ -81,7 +83,7 @@ const Landing: FC = () => {
             poster="/assets/images/products/Chocolates.jpg"
             aria-hidden="true"
           >
-            <source src={heroVideo} type="video/mp4" />
+            <source src={heroVideoSrc} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/35 via-stone-950/15 to-stone-950/70"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.18)_70%,rgba(0,0,0,0.4)_100%)]"></div>
