@@ -4,8 +4,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 
-// Use Vite env var if provided (for CDN-hosted video). Fallback to local file for dev.
-const heroVideoSrc = (import.meta as any).env?.VITE_HERO_VIDEO_URL || '/assets/video/Hero.mp4';
+// Use Vite env var if provided (for CDN-hosted video). Fallback to Cloudinary URL then local file for dev.
+const heroVideoSrc = (import.meta as any).env?.VITE_HERO_VIDEO_URL || 'https://res.cloudinary.com/djvcofmr0/video/upload/v1779490371/Asopromas_fzp0xv.mp4' || '/assets/video/Hero.mp4';
 
 const Landing: FC = () => {
   useSEO({
