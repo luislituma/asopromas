@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import heroVideo from '../assets/video/Hero.mp4';
 
 const Landing: FC = () => {
   useSEO({
@@ -70,12 +71,22 @@ const Landing: FC = () => {
           className="absolute inset-0 z-0 origin-center"
           style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}
         >
-          <img 
-            src="/assets/images/products/Chocolates.jpg" 
-            alt="Cacao Ancestral" 
-            className="w-full h-full object-cover opacity-50 grayscale-[20%]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-transparent to-stone-50"></div>
+          <video
+            className="w-full h-full object-cover object-center md:object-[center_20%] opacity-60 grayscale-[10%] scale-105"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/assets/images/products/Chocolates.jpg"
+            aria-hidden="true"
+          >
+            <source src={heroVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/35 via-stone-950/15 to-stone-950/70"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.18)_70%,rgba(0,0,0,0.4)_100%)]"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/75 via-transparent to-stone-950/25"></div>
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-stone-950 to-transparent"></div>
         </motion.div>
 
         <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl mt-20">
@@ -91,7 +102,7 @@ const Landing: FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-light text-white leading-tight mb-8"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white leading-tight mb-8 drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
           >
             El origen del <br/>
             <span className="font-medium font-serif tracking-wide text-amber-100">Cacao Fino de Aroma</span>
@@ -100,7 +111,7 @@ const Landing: FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-xl md:text-2xl text-stone-200 font-light max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-lg sm:text-xl md:text-2xl text-stone-200 font-light max-w-3xl mx-auto mb-12 leading-relaxed drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)]"
           >
             Descubre la esencia pura de la Amazonía en cada bocado de nuestras colecciones premium.
           </motion.p>
@@ -123,7 +134,7 @@ const Landing: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.4 }}
-            className="flex flex-col items-center justify-center hidden md:flex"
+            className="hidden md:flex flex-col items-center justify-center"
           >
             <div className="w-px h-16 bg-gradient-to-b from-white/50 to-transparent"></div>
           </motion.div>
