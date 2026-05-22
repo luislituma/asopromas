@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Ignore raw video assets (kept out of repo)
+src/assets/video/
