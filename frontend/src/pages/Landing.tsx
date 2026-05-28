@@ -19,30 +19,30 @@ const Landing: FC = () => {
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end end"]
   });
   const heroScale = useTransform(heroProgress, [0, 1], [1, 1.15]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "50%"]);
 
-  // 2. Sticky Storytelling (Asociación)
-  const storyRef = useRef<HTMLElement>(null);
+  // 2. Sticky Storytelling (Asociación) - Framer Motion
+  const storyContainerRef = useRef<HTMLElement>(null);
   const { scrollYProgress: storyProgress } = useScroll({
-    target: storyRef,
+    target: storyContainerRef,
     offset: ["start start", "end end"]
   });
-  
-  // Crossfade between texts based on scroll inside the sticky section
-  const text1Opacity = useTransform(storyProgress, [0, 0.3, 0.4], [1, 1, 0]);
-  const text1Y = useTransform(storyProgress, [0, 0.4], [0, -50]);
-  
-  const text2Opacity = useTransform(storyProgress, [0.35, 0.5, 0.7, 0.8], [0, 1, 1, 0]);
-  const text2Y = useTransform(storyProgress, [0.35, 0.5], [50, 0]);
 
-  const text3Opacity = useTransform(storyProgress, [0.75, 0.9], [0, 1]);
-  const text3Y = useTransform(storyProgress, [0.75, 0.9], [50, 0]);
+  // Text 1: in (0 - 0.15), hold (0.15 - 0.25), out (0.25 - 0.35)
+  const text1Opacity = useTransform(storyProgress, [0, 0.15, 0.25, 0.35], [0, 1, 1, 0]);
+  const text1Y = useTransform(storyProgress, [0, 0.15, 0.25, 0.35], [50, 0, 0, -50]);
 
-  const bgScale = useTransform(storyProgress, [0, 1], [1, 1.2]);
+  // Text 2: in (0.35 - 0.5), hold (0.5 - 0.6), out (0.6 - 0.7)
+  const text2Opacity = useTransform(storyProgress, [0.35, 0.5, 0.6, 0.7], [0, 1, 1, 0]);
+  const text2Y = useTransform(storyProgress, [0.35, 0.5, 0.6, 0.7], [50, 0, 0, -50]);
+
+  // Text 3: in (0.7 - 0.85), hold (0.85 - 1.0)
+  const text3Opacity = useTransform(storyProgress, [0.7, 0.85, 1], [0, 1, 1]);
+  const text3Y = useTransform(storyProgress, [0.7, 0.85, 1], [50, 0, 0]);
 
   // 3. Video Reveal
   const videoRef = useRef<HTMLDivElement>(null);
@@ -59,17 +59,17 @@ const Landing: FC = () => {
     target: catalogRef,
     offset: ["start end", "end start"]
   });
-  
+
   const card1Y = useTransform(catalogProgress, [0, 1], [100, -100]);
   const card2Y = useTransform(catalogProgress, [0, 1], [0, 0]); // Centro estático
   const card3Y = useTransform(catalogProgress, [0, 1], [150, -150]);
 
   return (
     <div className="flex flex-col min-h-screen bg-stone-50 font-sans text-stone-800">
-      
+
       {/* 1. Hero Parallax Extremo */}
       <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-950">
-        <motion.div 
+        <motion.div
           className="absolute inset-0 z-0 origin-center"
           style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}
         >
@@ -80,7 +80,6 @@ const Landing: FC = () => {
             loop
             playsInline
             preload="metadata"
-            poster="/assets/images/products/Chocolates.jpg"
             aria-hidden="true"
           >
             <source src={heroVideoSrc} type="video/mp4" />
@@ -92,7 +91,7 @@ const Landing: FC = () => {
         </motion.div>
 
         <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl mt-20">
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -100,39 +99,39 @@ const Landing: FC = () => {
           >
             Zamora Chinchipe, Ecuador
           </motion.p>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white leading-tight mb-8 drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
           >
-            El origen del <br/>
-            <span className="font-medium font-serif tracking-wide text-amber-100">Cacao Fino de Aroma</span>
+            ORIGEN <br />
+            <span className="font-medium font-serif tracking-wide text-amber-100">Cacao Ancestral</span>
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="text-lg sm:text-xl md:text-2xl text-stone-200 font-light max-w-3xl mx-auto mb-12 leading-relaxed drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)]"
           >
-            Descubre la esencia pura de la Amazonía en cada bocado de nuestras colecciones premium.
+            Descubre la Ruta del Cacao Ancestral y vive la esencia de la Amazonía en cada aroma, sabor e historia nacida de nuestra tierra.
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
             className="flex justify-center mb-16"
           >
-            <Link 
-              to="/products"
+            <Link
+              to="/ruta-cacao-ancestral"
               className="inline-flex items-center gap-3 bg-white text-chocolate-950 hover:bg-stone-200 px-10 py-4 rounded-full text-lg font-medium transition-all duration-500 shadow-2xl hover:scale-105"
             >
-              Explorar Colección
+              Ruta del Cacao Ancestral <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.4 }}
@@ -144,60 +143,76 @@ const Landing: FC = () => {
       </section>
 
       {/* 2. Sticky Storytelling (La Asociación) */}
-      <section ref={storyRef} className="relative h-[300vh] bg-stone-950">
-        <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-          {/* Fondo animado que crece suavemente */}
-          <motion.div className="absolute inset-0 z-0" style={{ scale: bgScale }}>
-            <img 
-              src="/assets/images/products/Asopromas-socios.jpg" 
-              alt="Familias productoras" 
-              className="w-full h-full object-cover opacity-30 mix-blend-luminosity" 
+      <section ref={storyContainerRef} className="relative h-[300vh] bg-stone-950">
+        <div className="sticky top-0 h-screen overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0">
+            <img
+              src="/assets/images/products/Asopromas-socios.jpg"
+              className="w-full h-full object-cover opacity-30"
+              alt="Familias productoras de ASOPROMAS"
             />
-            <div className="absolute inset-0 bg-cacao-green-950/80 mix-blend-multiply"></div>
+            <div className="absolute inset-0 bg-cacao-green-950/80"></div>
+          </div>
+
+          {/* TEXT 1 */}
+          <motion.div
+            style={{ opacity: text1Opacity, y: text1Y }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-light text-white mb-6 leading-tight">
+              Origen{" "}
+              <span className="font-serif font-medium tracking-wide text-cacao-green-400">
+                Amazónico
+              </span>
+            </h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-cacao-green-100/80 font-light leading-relaxed max-w-3xl">
+              ASOPROMAS es la unión de 200 familias productoras de cacao
+              de la Amazonía Ecuatoriana.
+            </p>
           </motion.div>
 
-          {/* Textos cruzados (Crossfade) */}
-          <div className="relative z-10 container mx-auto px-6 text-center max-w-4xl">
-            {/* Texto 1 */}
-            <motion.div className="absolute inset-0 flex flex-col items-center justify-center" style={{ opacity: text1Opacity, y: text1Y, pointerEvents: "none" }}>
-              <h2 className="text-5xl md:text-7xl font-light text-white mb-6">
-                Nacimos de la <span className="font-serif font-medium tracking-wide text-cacao-green-300">Tierra</span>
-              </h2>
-              <p className="text-xl md:text-2xl text-cacao-green-100/80 font-light leading-relaxed">
-                ASOPROMAS es la unión de más de 100 familias apasionadas por la Amazonía ecuatoriana.
-              </p>
-            </motion.div>
+          {/* TEXT 2 */}
+          <motion.div
+            style={{ opacity: text2Opacity, y: text2Y }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-light text-white mb-6 leading-tight">
+              Cultivamos con{" "}
+              <span className="font-serif font-medium tracking-wide text-amber-200">
+                Respeto
+              </span>
+            </h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-cacao-green-100/80 font-light leading-relaxed max-w-3xl">
+              Rescatamos el cacao ancestral mediante prácticas orgánicas.
+            </p>
+          </motion.div>
 
-            {/* Texto 2 */}
-            <motion.div className="absolute inset-0 flex flex-col items-center justify-center" style={{ opacity: text2Opacity, y: text2Y, pointerEvents: "none" }}>
-              <h2 className="text-5xl md:text-7xl font-light text-white mb-6">
-                Cultivamos con <span className="font-serif font-medium tracking-wide text-amber-200">Respeto</span>
-              </h2>
-              <p className="text-xl md:text-2xl text-cacao-green-100/80 font-light leading-relaxed">
-                Rescatamos el cacao fino de aroma mediante prácticas orgánicas que nutren la biodiversidad.
-              </p>
-            </motion.div>
-
-            {/* Texto 3 */}
-            <motion.div className="absolute inset-0 flex flex-col items-center justify-center" style={{ opacity: text3Opacity, y: text3Y }}>
-              <h2 className="text-5xl md:text-7xl font-light text-white mb-10">
-                Llevamos el origen al <span className="font-serif font-medium tracking-wide text-white">Mundo</span>
-              </h2>
-              <Link 
-                to="/about" 
-                className="inline-flex items-center gap-4 bg-white text-cacao-green-950 px-8 py-4 rounded-full text-lg hover:bg-stone-200 transition-all duration-500 hover:scale-105"
-              >
-                Conoce nuestra historia <ArrowRight className="w-5 h-5"/>
-              </Link>
-            </motion.div>
-          </div>
+          {/* TEXT 3 */}
+          <motion.div
+            style={{ opacity: text3Opacity, y: text3Y }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          >
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-light text-white mb-10 leading-tight">
+              Llevamos el origen al{" "}
+              <span className="font-serif font-medium tracking-wide text-blue-400">
+                Mundo
+              </span>
+            </h2>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-4 bg-white text-cacao-green-950 px-8 py-4 rounded-full text-lg hover:bg-stone-200 transition-all duration-500 hover:scale-105 pointer-events-auto"
+            >
+              Conoce nuestra historia <ArrowRight className="w-5 h-5" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
       {/* 3. El Latido de la Selva (Video Reveal Cinematográfico) */}
       <section className="py-32 bg-stone-50 overflow-hidden relative">
         <div className="container mx-auto px-6 max-w-6xl text-center mb-16">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -206,7 +221,7 @@ const Landing: FC = () => {
           >
             El latido de la <span className="font-medium font-serif tracking-wide text-cacao-green-700">Selva</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -218,29 +233,26 @@ const Landing: FC = () => {
         </div>
 
         <div ref={videoRef} className="w-full flex justify-center px-4 md:px-10 h-[70vh]">
-          <motion.div 
+          <motion.div
             style={{ scale: videoScale, opacity: videoOpacity }}
             className="relative w-full h-full rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl group border border-stone-200"
           >
-            <img 
-              src="/assets/images/products/Palanda.jpg" 
-              alt="Documental ASOPROMAS" 
+            {/* TODO: Cambiar por la imagen referente al Cacao Ancestral */}
+            <img
+              src="/assets/images/products/Palanda.jpg"
+              alt="Cacao Ancestral"
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-stone-900/30 group-hover:bg-stone-900/10 transition-colors duration-500"></div>
+            <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-stone-900/30 transition-colors duration-500"></div>
             
-            <Link 
-              to="/ruta-cacao-ancestral"
-              className="absolute inset-0 flex flex-col items-center justify-center group/btn focus:outline-none"
-              aria-label="Descubrir la Ruta"
-            >
-              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover/btn:scale-110 group-hover/btn:bg-white/30 transition-all duration-500 shadow-xl mb-6">
-                <svg className="w-8 h-8 sm:w-12 sm:h-12 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-              <span className="text-white font-medium tracking-widest uppercase text-sm drop-shadow-md">Ver Ruta del Cacao</span>
-            </Link>
+            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+              <Link
+                to="/ruta-cacao-ancestral"
+                className="pointer-events-auto inline-flex items-center gap-3 bg-white/95 backdrop-blur-sm text-chocolate-950 hover:bg-white px-8 py-4 rounded-full text-lg font-medium transition-transform duration-500 shadow-2xl hover:scale-105 transform translate-y-4 group-hover:translate-y-0"
+              >
+                Ver Ruta del Cacao <ArrowRight className="w-5 h-5"/>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -248,19 +260,19 @@ const Landing: FC = () => {
       {/* 4. Catálogo Flotante (Cascada Parallax) */}
       <section ref={catalogRef} className="py-40 bg-stone-100 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-stone-300 to-transparent"></div>
-        
+
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-32 relative z-20">
             <h2 className="text-4xl md:text-6xl font-light text-chocolate-950 mb-6">
               Nuestras <span className="font-serif font-medium tracking-wide text-chocolate-800">Creaciones</span>
             </h2>
             <p className="text-xl text-stone-500 font-light max-w-2xl mx-auto">
-              Cada producto es una obra maestra elaborada para resaltar las notas únicas del cacao fino de aroma.
+              Cada producto esta elaborado con base de cacao ancestral y el fino de aroma.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative z-10">
-            
+
             {/* Tarjeta 1 */}
             <motion.div style={{ y: card1Y }} className="group cursor-pointer">
               <Link to="/products/chocolate-bar-100">
@@ -269,8 +281,8 @@ const Landing: FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Chocolate Puro</h3>
-                  <p className="text-stone-500 font-light">Barras que despiertan sentidos.</p>
+                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Chocolate 100%</h3>
+                  <p className="text-stone-500 font-light">Barras de chocolate puro, activa tus sentidos.</p>
                 </div>
               </Link>
             </motion.div>
@@ -283,8 +295,8 @@ const Landing: FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Licores Premium</h3>
-                  <p className="text-stone-500 font-light">El espíritu de la tierra.</p>
+                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Licores de Cacao</h3>
+                  <p className="text-stone-500 font-light">Bebida Tradicional.</p>
                 </div>
               </Link>
             </motion.div>
@@ -297,15 +309,15 @@ const Landing: FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Bombones Artesanales</h3>
-                  <p className="text-stone-500 font-light">Sabores exóticos amazónicos.</p>
+                  <h3 className="text-2xl font-medium text-chocolate-900 mb-2 group-hover:text-amber-700 transition-colors">Bombones</h3>
+                  <p className="text-stone-500 font-light">Con sabores exóticos de la Amazonía.</p>
                 </div>
               </Link>
             </motion.div>
 
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -313,7 +325,7 @@ const Landing: FC = () => {
             className="text-center mt-32 relative z-20"
           >
             <Link to="/products" className="inline-flex items-center gap-3 bg-chocolate-900 text-white hover:bg-chocolate-950 px-10 py-5 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105">
-              Explorar Catálogo Completo <ArrowRight className="w-5 h-5"/>
+              Explorar Catálogo Completo <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
         </div>
@@ -322,7 +334,7 @@ const Landing: FC = () => {
       {/* 5. Call to Action (CTA) */}
       <section className="py-32 bg-white relative overflow-hidden border-t border-stone-100">
         <div className="container mx-auto px-6 max-w-4xl text-center relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -335,14 +347,14 @@ const Landing: FC = () => {
               Descubre el verdadero origen del cacao fino de aroma. Visítanos en la Amazonía o lleva nuestra esencia a tu mesa.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link 
-                to="/ruta-cacao-ancestral" 
+              <Link
+                to="/ruta-cacao-ancestral"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-chocolate-900 text-white hover:bg-chocolate-950 px-10 py-4 rounded-full text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 Reservar Ruta Ancestral
               </Link>
-              <Link 
-                to="/products" 
+              <Link
+                to="/products"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white text-chocolate-900 border border-chocolate-200 hover:bg-stone-50 px-10 py-4 rounded-full text-lg transition-all"
               >
                 Adquirir Cacao

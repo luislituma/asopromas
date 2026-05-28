@@ -25,13 +25,13 @@ const Certifications: FC = () => {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] border border-stone-200 shadow-sm relative overflow-hidden group">
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-cacao-green-50 rounded-full blur-3xl group-hover:bg-cacao-green-100 transition-colors"></div>
             <div className="relative z-10">
-              <div className="w-16 h-16 bg-cacao-green-50 text-cacao-green-700 rounded-2xl flex items-center justify-center mb-8"><Award className="w-8 h-8"/></div>
+              <div className="w-16 h-16 bg-cacao-green-50 text-cacao-green-700 rounded-2xl flex items-center justify-center mb-8"><Award className="w-8 h-8" /></div>
               <h2 className="text-3xl font-medium text-chocolate-900 mb-2">USDA Organic</h2>
-              <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">Válido hasta 2025</span>
+              <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">Válido hasta 2027</span>
               <p className="text-stone-500 font-light leading-relaxed mb-8">Garantiza que nuestros productos están libres de pesticidas, herbicidas y fertilizantes sintéticos. Un sello de pureza para el mercado norteamericano y mundial.</p>
               <ul className="space-y-3">
-                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0"/><span className="text-stone-600 font-light">100% natural</span></li>
-                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0"/><span className="text-stone-600 font-light">Acceso a mercados premium</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0" /><span className="text-stone-600 font-light">100% natural</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-cacao-green-500 shrink-0" /><span className="text-stone-600 font-light">Acceso a mercados premium</span></li>
               </ul>
             </div>
           </motion.div>
@@ -39,13 +39,13 @@ const Certifications: FC = () => {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }} className="bg-white p-12 rounded-[2rem] border border-stone-200 shadow-sm relative overflow-hidden group">
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-amber-50 rounded-full blur-3xl group-hover:bg-amber-100 transition-colors"></div>
             <div className="relative z-10">
-              <div className="w-16 h-16 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center mb-8"><Shield className="w-8 h-8"/></div>
+              <div className="w-16 h-16 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center mb-8"><Shield className="w-8 h-8" /></div>
               <h2 className="text-3xl font-medium text-chocolate-900 mb-2">Buenas Prácticas (BPA)</h2>
               <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">Agrocalidad 2026</span>
               <p className="text-stone-500 font-light leading-relaxed mb-8">Certificación nacional que asegura la inocuidad, higiene y sostenibilidad de toda nuestra cadena de producción de cacao y chocolate.</p>
               <ul className="space-y-3">
-                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0"/><span className="text-stone-600 font-light">Seguridad alimentaria</span></li>
-                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0"/><span className="text-stone-600 font-light">Trazabilidad completa</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /><span className="text-stone-600 font-light">Seguridad alimentaria</span></li>
+                <li className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" /><span className="text-stone-600 font-light">Trazabilidad completa</span></li>
               </ul>
             </div>
           </motion.div>

@@ -30,21 +30,21 @@ const CacaoOrigin: FC = () => {
   return (
     <div className="min-h-screen bg-white text-stone-800 font-sans">
       {/* Hero Section */}
-      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-cacao-green-950">
-        <motion.div 
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-cacao-green-950">
+        <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          animate={{ scale: 1, opacity: 0.9 }}
           transition={{ duration: 1.5 }}
           className="absolute inset-0"
         >
-          <img 
-            src="/assets/images/products/zamora.png" 
-            alt="Paisaje de Zamora Chinchipe" 
+          <img
+            src="/assets/images/products/santa-ana-vista-panoramica.jpg"
+            alt="Centro Arqueológico Santa Ana - Palanda"
             className="w-full h-full object-cover mix-blend-overlay opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-cacao-green-950/80 via-cacao-green-900/40 to-cacao-green-950/90"></div>
         </motion.div>
-        
+
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-20">
           <motion.div
             initial="hidden"
@@ -53,14 +53,14 @@ const CacaoOrigin: FC = () => {
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-3 px-5 py-2 bg-cacao-green-800/30 backdrop-blur-md rounded-full border border-cacao-green-400/20 mb-8">
               <Mountain className="w-5 h-5 text-cacao-green-300" />
-              <span className="text-cacao-green-100 font-medium tracking-wide uppercase text-sm">Cuna Mundial del Cacao</span>
+              <span className="text-cacao-yellow-800 font-medium tracking-wide uppercase text-sm">Cuna Mundial del Cacao</span>
             </motion.div>
-            
+
             <motion.h1 variants={fadeInUp} className="text-5xl sm:text-7xl lg:text-8xl font-light text-white mb-6 leading-tight">
-              El Legado de <br/>
+              El Legado de <br />
               <span className="font-medium font-serif tracking-wide text-cacao-green-200">5,500 Años</span>
             </motion.h1>
-            
+
             <motion.p variants={fadeInUp} className="text-xl sm:text-2xl text-cacao-green-50 font-light max-w-3xl mx-auto leading-relaxed">
               En lo profundo de la Amazonía ecuatoriana, descansa el secreto mejor guardado de la historia del chocolate.
             </motion.p>
@@ -72,7 +72,7 @@ const CacaoOrigin: FC = () => {
       <section className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <motion.div 
+            <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
@@ -83,12 +83,12 @@ const CacaoOrigin: FC = () => {
                 <History className="w-5 h-5" />
                 <span>Herencia Ancestral</span>
               </motion.div>
-              
+
               <motion.h2 variants={fadeInUp} className="text-4xl sm:text-5xl font-light text-chocolate-900 leading-tight">
-                El Descubrimiento que <br/>
+                El Descubrimiento que <br />
                 <span className="font-medium font-serif tracking-wide text-cacao-green-800">cambió la historia</span>
               </motion.h2>
-              
+
               <motion.div variants={fadeInUp} className="space-y-6 text-lg text-stone-500 font-light leading-relaxed">
                 <p>
                   Durante mucho tiempo se creyó que el cacao se originó en Mesoamérica. Sin embargo, en el corazón de <strong className="text-chocolate-900 font-medium">Zamora Chinchipe</strong>, específicamente en el sitio arqueológico de Santa Ana de La Florida, en Palanda, se encontró la verdad.
@@ -99,7 +99,7 @@ const CacaoOrigin: FC = () => {
               </motion.div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
@@ -107,8 +107,8 @@ const CacaoOrigin: FC = () => {
               className="relative"
             >
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative">
-                <img 
-                  src="/assets/images/products/Palanda.jpg" 
+                <img
+                  src="/assets/images/products/Palanda.jpg"
                   alt="Sitio Arqueológico en Palanda"
                   className="w-full h-full object-cover"
                 />
@@ -135,7 +135,7 @@ const CacaoOrigin: FC = () => {
         <div className="absolute -right-40 -bottom-40 w-96 h-96 bg-cacao-green-300/30 rounded-full blur-3xl"></div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -167,8 +167,8 @@ const CacaoOrigin: FC = () => {
               },
               {
                 title: "Comercio Justo",
-                desc: "El respeto por la tierra comienza con el respeto a quienes la trabajan. Garantizamos bienestar para más de 100 familias.",
-                stat: "100+",
+                desc: "El respeto por la tierra comienza con el respeto a quienes la trabajan. Garantizamos bienestar para más de 200 familias.",
+                stat: "200+",
                 substat: "Familias Productoras"
               }
             ].map((item, index) => (

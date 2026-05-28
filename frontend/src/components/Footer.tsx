@@ -4,15 +4,15 @@ import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react"
 
 const Footer: FC = () => {
   return (
-    <footer 
+    <footer
       className="bg-cacao-green-950 text-cacao-green-50 pt-20 pb-10 border-t border-cacao-green-900"
       role="contentinfo"
       aria-label="Información de contacto y enlaces"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          
+
           {/* Brand & Info */}
           <div className="md:col-span-5 lg:col-span-4 space-y-6">
             <div className="flex items-center gap-3">
@@ -26,10 +26,10 @@ const Footer: FC = () => {
             <p className="text-cacao-green-200/80 font-light leading-relaxed max-w-sm text-sm">
               Cultivando el legado del cacao más antiguo del mundo. Desde la Amazonía ecuatoriana, protegiendo la biodiversidad y empoderando a nuestras comunidades.
             </p>
-            
+
             <div className="space-y-3 pt-4">
-              <a 
-                href="https://wa.me/593961706421" 
+              <a
+                href="https://wa.me/593961706421"
                 className="flex items-center gap-3 text-cacao-green-200 hover:text-white transition-colors text-sm font-light group"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -39,8 +39,8 @@ const Footer: FC = () => {
                 </div>
                 <span>+593 96 170 6421</span>
               </a>
-              <a 
-                href="mailto:info@asopromas.com" 
+              <a
+                href="mailto:info@asopromas.com"
                 className="flex items-center gap-3 text-cacao-green-200 hover:text-white transition-colors text-sm font-light group"
               >
                 <div className="w-8 h-8 rounded-full bg-cacao-green-900 flex items-center justify-center group-hover:bg-cacao-green-800 transition-colors">
@@ -62,7 +62,7 @@ const Footer: FC = () => {
             <h3 className="text-sm font-semibold tracking-widest uppercase text-cacao-green-400 mb-6">Explorar</h3>
             <nav className="space-y-4">
               <Link to="/cacao-origin" className="block text-cacao-green-200/80 hover:text-white transition-colors font-light text-sm">
-                Origen del Cacao
+                Origen
               </Link>
               <Link to="/products" className="block text-cacao-green-200/80 hover:text-white transition-colors font-light text-sm">
                 Nuestra Colección
@@ -83,7 +83,7 @@ const Footer: FC = () => {
           <div className="md:col-span-4 lg:col-span-3">
             <h3 className="text-sm font-semibold tracking-widest uppercase text-cacao-green-400 mb-6">Comunidad</h3>
             <p className="text-cacao-green-200/80 font-light text-sm mb-6">
-              Síguenos para conocer más sobre nuestro proceso artesanal y las historias de nuestros productores.
+              Síguenos para conocer más sobre nuestros procesos y las historias de nuestra asociación.
             </p>
             <div className="flex gap-4">
               <a
@@ -121,7 +121,7 @@ const Footer: FC = () => {
                 rel="noopener noreferrer"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                 </svg>
               </a>
             </div>
@@ -134,7 +134,7 @@ const Footer: FC = () => {
           <p className="text-cacao-green-400 text-xs font-light">
             © {new Date().getFullYear()} ASOPROMAS. Todos los derechos reservados.
           </p>
-          
+
           <div className="flex items-center gap-6 text-cacao-green-400 text-xs font-light">
             <Link to="/privacy" className="hover:text-white transition-colors">
               Política de Privacidad
@@ -143,7 +143,7 @@ const Footer: FC = () => {
               Términos y Condiciones
             </Link>
           </div>
-          
+
           <p className="flex items-center gap-1 text-cacao-green-400 text-xs font-light">
             Hecho en Ecuador con <span className="text-chocolate-400">♥</span>
           </p>

@@ -6,7 +6,7 @@ import { useSEO } from "../../hooks/useSEO";
 
 const CocoaNibs: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -22,37 +22,37 @@ const CocoaNibs: FC = () => {
   });
 
   const features = [
-    { icon: <Award/>, title: "Superalimento Ancestral", desc: "La forma más pura de consumir cacao, lleno de antioxidantes y magnesio." },
-    { icon: <Leaf/>, title: "100% Naturales", desc: "Granos pelados y triturados, sin ningún tipo de aditivo ni proceso químico." },
-    { icon: <Star/>, title: "Tostado Perfecto", desc: "Tostados lentamente para revelar notas profundas sin quemar los aceites esenciales." },
-    { icon: <Heart/>, title: "Versatilidad", desc: "Ideales para repostería, batidos, o simplemente como un snack crujiente." }
+    { icon: <Award />, title: "Superalimento Ancestral", desc: "La forma más pura de consumir cacao, lleno de antioxidantes y magnesio." },
+    { icon: <Leaf />, title: "100% Naturales", desc: "Granos pelados y triturados, sin ningún tipo de aditivo ni proceso químico." },
+    { icon: <Star />, title: "Tostado Perfecto", desc: "Tostados lentamente para revelar notas profundas sin quemar los aceites esenciales." },
+    { icon: <Heart />, title: "Versatilidad", desc: "Ideales para repostería, batidos, o simplemente como un snack crujiente." }
   ];
 
   const uses = [
-    { icon: <Coffee/>, title: 'Smoothies y Batidos', desc: 'Agrega una cucharada para un boost de energía natural.' },
-    { icon: <Sparkles/>, title: 'Repostería Gourmet', desc: 'Perfecto para decorar pasteles o hacer chocolate.' },
-    { icon: <Heart/>, title: 'Snack Saludable', desc: 'Consume directamente como un snack nutritivo.' },
-    { icon: <Zap/>, title: 'Yogurts y Cereales', desc: 'Espolvorea sobre avena para un desayuno energético.' }
+    { icon: <Coffee />, title: 'Smoothies y Batidos', desc: 'Agrega una cucharada para un boost de energía natural.' },
+    { icon: <Sparkles />, title: 'Repostería Gourmet', desc: 'Perfecto para decorar pasteles o hacer chocolate.' },
+    { icon: <Heart />, title: 'Snack Saludable', desc: 'Consume directamente como un snack nutritivo.' },
+    { icon: <Zap />, title: 'Yogurts y Cereales', desc: 'Espolvorea sobre avena para un desayuno energético.' }
   ];
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-800">
-      
+
       {/* Parallax Hero */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden bg-white">
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative z-10 max-w-4xl mx-auto"
         >
           <p className="text-chocolate-400 font-medium tracking-[0.3em] uppercase text-xs mb-8">Colección Premium</p>
           <h1 className="text-6xl sm:text-8xl md:text-9xl font-light text-chocolate-950 mb-8 leading-none tracking-tight">
-            Nibs de <br/>
+            Nibs de <br />
             <span className="font-medium font-serif text-chocolate-800 tracking-wide">Cacao</span>
           </h1>
           <p className="text-xl sm:text-2xl text-stone-500 font-light max-w-2xl mx-auto">
-            El superalimento amazónico en su forma más pura y crujiente.
+            El superalimento amazónico en su forma más natural.
           </p>
         </motion.div>
       </section>
@@ -61,14 +61,14 @@ const CocoaNibs: FC = () => {
       <section ref={containerRef} className="relative bg-stone-900 pb-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 relative">
-            
+
             {/* Left: Sticky Image */}
             <div className="lg:w-1/2 lg:sticky lg:top-0 lg:h-screen flex items-center justify-center py-20 lg:py-0">
               <div className="relative aspect-[3/4] w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-stone-800 flex items-center justify-center">
-                <motion.img 
+                <motion.img
                   style={{ scale: imgScale }}
-                  src="/assets/images/products/cocoa-nibs.jpg" 
-                  alt="Nibs de Cacao" 
+                  src="/assets/images/products/cocoa-nibs.jpg"
+                  alt="Nibs de Cacao"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -83,7 +83,7 @@ const CocoaNibs: FC = () => {
             {/* Right: Scrolling Features */}
             <div className="lg:w-1/2 py-10 lg:py-[30vh]">
               <div className="space-y-32">
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8 }}
@@ -97,7 +97,7 @@ const CocoaNibs: FC = () => {
                 </motion.div>
 
                 {features.map((feat, idx) => (
-                  <motion.div 
+                  <motion.div
                     key={idx}
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -129,7 +129,7 @@ const CocoaNibs: FC = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {uses.map((use, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -151,7 +151,7 @@ const CocoaNibs: FC = () => {
       {/* Contact Section */}
       <section className="py-32 bg-stone-50 px-6">
         <div className="max-w-4xl mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}

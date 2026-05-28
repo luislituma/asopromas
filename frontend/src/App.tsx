@@ -7,6 +7,7 @@ import { SITE_CONFIG } from './config/site';
 
 // Layouts
 import Layout from './components/Layout';
+import ScrollToTop from './components/ScrollToTop';
 
 // Coming Soon Page
 import ComingSoon from './pages/ComingSoon';
@@ -51,7 +52,9 @@ const App: FC = () => {
 
   // Sitio completo cuando COMING_SOON_MODE = false
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Landing />} />
         <Route path="cacao-origin" element={<CacaoOrigin />} />
@@ -76,6 +79,7 @@ const App: FC = () => {
         <Route path="terms" element={<Terms />} />
       </Route>
     </Routes>
+    </>
   );
 }
 

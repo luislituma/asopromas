@@ -81,7 +81,7 @@ const HeaderComponent: FC = () => {
 
     const navLinks: NavItem[] = [
         { to: '/', text: 'Inicio' },
-        { to: '/cacao-origin', text: 'Origen del Cacao' },
+        { to: '/cacao-origin', text: 'Origen' },
         { to: '/ruta-cacao-ancestral', text: 'Ruta del Cacao' },
         {
             to: '/about',

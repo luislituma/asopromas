@@ -6,7 +6,7 @@ import { useSEO } from "../../hooks/useSEO";
 
 const ProductComponent: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -22,26 +22,26 @@ const ProductComponent: FC = () => {
   });
 
   const features = [
-    { icon: <Award/>, title: "20 Grados de Carácter", desc: "Un licor con cuerpo y presencia, perfecto para la sobremesa." },
-    { icon: <Leaf/>, title: "Maceración Lenta", desc: "Los nibs de cacao liberan sus aceites en un proceso paciente y tradicional." },
-    { icon: <Star/>, title: "Dulzor Equilibrado", desc: "El dulzor resalta las notas a madera y frutos secos del cacao." },
-    { icon: <Heart/>, title: "Artesanal", desc: "Hecho a mano con dedicación en Zamora Chinchipe." }
+    { icon: <Award />, title: "20 Grados de Carácter", desc: "Un licor con cuerpo y presencia, perfecto para la sobremesa." },
+    { icon: <Leaf />, title: "Maceración Lenta", desc: "Los nibs de cacao liberan sus aceites en un proceso paciente y tradicional." },
+    { icon: <Star />, title: "Dulzor Equilibrado", desc: "El dulzor resalta las notas a madera y frutos secos del cacao." },
+    { icon: <Heart />, title: "Artesanal", desc: "Hecho a mano con dedicación en Zamora Chinchipe." }
   ];
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-800">
-      
+
       {/* Parallax Hero */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden bg-white">
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative z-10 max-w-4xl mx-auto"
         >
-          <p className="text-chocolate-400 font-medium tracking-[0.3em] uppercase text-xs mb-8">Colección Premium</p>
+          <p className="text-chocolate-400 font-medium tracking-[0.3em] uppercase text-xs mb-8">LICORES</p>
           <h1 className="text-6xl sm:text-8xl md:text-9xl font-light text-chocolate-950 mb-8 leading-none tracking-tight">
-            Licor de <br/>
+            Licor de <br />
             <span className="font-medium font-serif text-chocolate-800 tracking-wide">Cacao</span>
           </h1>
           <p className="text-xl sm:text-2xl text-stone-500 font-light max-w-2xl mx-auto">
@@ -54,14 +54,14 @@ const ProductComponent: FC = () => {
       <section ref={containerRef} className="relative bg-stone-900 pb-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 relative">
-            
+
             {/* Left: Sticky Image */}
             <div className="lg:w-1/2 lg:sticky lg:top-0 lg:h-screen flex items-center justify-center py-20 lg:py-0">
               <div className="relative aspect-[3/4] w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
-                <motion.img 
+                <motion.img
                   style={{ scale: imgScale }}
-                  src="/assets/images/products/Licor-Grande-1.jpg" 
-                  alt="Licor de Cacao" 
+                  src="/assets/images/products/Licor-Grande-1.jpg"
+                  alt="Licor de Cacao"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -71,7 +71,7 @@ const ProductComponent: FC = () => {
             {/* Right: Scrolling Features */}
             <div className="lg:w-1/2 py-10 lg:py-[30vh]">
               <div className="space-y-32">
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8 }}
@@ -80,12 +80,12 @@ const ProductComponent: FC = () => {
                 >
                   <h2 className="text-4xl font-light text-white mb-6">El Alma del <span className="font-serif text-amber-200 tracking-wide">Grano</span></h2>
                   <p className="text-xl text-stone-400 font-light leading-relaxed">
-                    Extraemos la esencia pura del cacao de fino aroma a través de un cuidadoso proceso de maceración. El resultado es un elixir elegante y reconfortante.
+                    Extraemos la esencia pura del cacao de fino aroma a través de un cuidadoso proceso de maceración. El resultado es una bebida elegante y reconfortante.
                   </p>
                 </motion.div>
 
                 {features.map((feat, idx) => (
-                  <motion.div 
+                  <motion.div
                     key={idx}
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -112,7 +112,7 @@ const ProductComponent: FC = () => {
       {/* Contact Section */}
       <section className="py-32 bg-white px-6">
         <div className="max-w-4xl mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
