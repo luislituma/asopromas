@@ -33,17 +33,17 @@ const RutaCacaoAncestral: FC = () => {
       {/* Hero Inmersivo */}
       <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-cacao-green-950">
         <motion.div
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0"
+          initial={{ scale: 1.05, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.5 }}
+          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 z-0"
         >
           <img
-            src="/assets/images/products/zamora.png"
+            src="/assets/images/ruta-cacao.jpg"
             alt="Paisaje de las fincas de cacao"
-            className="w-full h-full object-cover mix-blend-overlay opacity-50"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-cacao-green-950/60 via-cacao-green-900/30 to-cacao-green-950"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-cacao-green-950"></div>
         </motion.div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-20">

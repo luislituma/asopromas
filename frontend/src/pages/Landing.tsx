@@ -149,10 +149,10 @@ const Landing: FC = () => {
           <div className="absolute inset-0">
             <img
               src="/assets/images/products/Asopromas-socios.jpg"
-              className="w-full h-full object-cover opacity-30"
+              className="w-full h-full object-cover opacity-50"
               alt="Familias productoras de ASOPROMAS"
             />
-            <div className="absolute inset-0 bg-cacao-green-950/80"></div>
+            <div className="absolute inset-0 bg-cacao-green-950/70"></div>
           </div>
 
           {/* TEXT 1 */}
@@ -237,20 +237,22 @@ const Landing: FC = () => {
             style={{ scale: videoScale, opacity: videoOpacity }}
             className="relative w-full h-full rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl group border border-stone-200"
           >
-            {/* TODO: Cambiar por la imagen referente al Cacao Ancestral */}
-            <img
-              src="/assets/images/products/Palanda.jpg"
-              alt="Cacao Ancestral"
+            <video
+              src="https://res.cloudinary.com/djvcofmr0/video/upload/v1780004240/Video-Ruta_hu4ojk.mp4"
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              autoPlay
+              muted
+              loop
+              playsInline
             />
             <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-stone-900/30 transition-colors duration-500"></div>
-            
+
             <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
               <Link
                 to="/ruta-cacao-ancestral"
                 className="pointer-events-auto inline-flex items-center gap-3 bg-white/95 backdrop-blur-sm text-chocolate-950 hover:bg-white px-8 py-4 rounded-full text-lg font-medium transition-transform duration-500 shadow-2xl hover:scale-105 transform translate-y-4 group-hover:translate-y-0"
               >
-                Ver Ruta del Cacao <ArrowRight className="w-5 h-5"/>
+                Ver Ruta del Cacao <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
           </motion.div>
@@ -277,7 +279,7 @@ const Landing: FC = () => {
             <motion.div style={{ y: card1Y }} className="group cursor-pointer">
               <Link to="/products/chocolate-bar-100">
                 <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden mb-8 shadow-xl">
-                  <img src="/assets/images/products/Barra-Pura-1.jpg" alt="Chocolate Puro" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+                  <img src="/assets/images/products/barra.jpg" alt="Chocolate Puro" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
@@ -291,7 +293,7 @@ const Landing: FC = () => {
             <motion.div style={{ y: card2Y }} className="group cursor-pointer">
               <Link to="/products/cocoa-liqueur">
                 <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden mb-8 shadow-xl">
-                  <img src="/assets/images/products/Licor-Grande-1.jpg" alt="Licores" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+                  <img src="/assets/images/products/licor.jpg" alt="Licores" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
@@ -305,7 +307,7 @@ const Landing: FC = () => {
             <motion.div style={{ y: card3Y }} className="group cursor-pointer">
               <Link to="/products/fruit-bonbons">
                 <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden mb-8 shadow-xl">
-                  <img src="/assets/images/products/Bombones-1.jpg" alt="Bombones" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+                  <img src="/assets/images/products/bombon.jpg" alt="Bombones" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div className="text-center">
@@ -344,7 +346,7 @@ const Landing: FC = () => {
               Sé parte de nuestra <span className="font-serif font-medium tracking-wide text-chocolate-800">Historia</span>
             </h2>
             <p className="text-xl md:text-2xl text-stone-500 font-light mb-12 leading-relaxed">
-              Descubre el verdadero origen del cacao fino de aroma. Visítanos en la Amazonía o lleva nuestra esencia a tu mesa.
+              Descubre el verdadero origen del Cacao Ancestral, el fino de aroma. Visítanos en nuestras instalaciones o lleva nuestros productos contigo.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Link
