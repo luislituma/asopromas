@@ -165,3 +165,53 @@ body {
 .animate-float-delayed {
   animation: float-delayed 8s ease-in-out infinite 2s;
 }
+
+/* Reglas específicas para impresión (Reportes PDF físicos) */
+@media print {
+  /* Ocultar elementos de la interfaz de usuario */
+  header, nav, aside, button:not(.print-visible), .no-print {
+    display: none !important;
+  }
+
+  /* El body debe verse en blanco con letras negras para evitar consumo de tinta masivo */
+  body, html {
+    background-color: white !important;
+    color: black !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Los contenedores que normalmente son oscuros ahora deben ser sin fondo y con texto negro */
+  .bg-neutral-900, .bg-neutral-800, .bg-neutral-850, .bg-black {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  .text-white, .text-neutral-400, .text-neutral-300, .text-neutral-50 {
+    color: black !important;
+  }
+  
+  .border-neutral-700, .border-neutral-800 {
+    border-color: #000 !important;
+  }
+
+  /* Configuración de página A4 */
+  @page {
+    size: auto;
+    margin: 1cm;
+  }
+
+  /* Permitir forzar saltos de página antes o después si es necesario */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  /* Evitar que bloques importantes (ej: tablas o firmas) se corten a la mitad */
+  .avoid-page-break {
+    page-break-inside: avoid;
+  }
+}
