@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Download, Search, Plus, Edit2, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Columns, Settings } from 'lucide-react';
+import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
@@ -354,7 +354,7 @@ export default function SociosDirectorio() {
     // Auto-ajustar ancho de columnas
     worksheet.columns.forEach((column) => {
       let maxLength = 12;
-      column.eachCell({ includeEmpty: true }, (cell) => {
+      column.eachCell?.({ includeEmpty: true }, (cell) => {
         const columnLength = cell.value ? cell.value.toString().length : 10;
         if (columnLength > maxLength) {
           maxLength = columnLength + 2; 
