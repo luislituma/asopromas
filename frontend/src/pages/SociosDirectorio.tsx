@@ -19,25 +19,26 @@ export default function SociosDirectorio() {
   const [searchColumn, setSearchColumn] = useState('all');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
-  
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+
   // Modal Edit/Add
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<any | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  
+
   // Modal Fields
   const [isFieldsModalOpen, setIsFieldsModalOpen] = useState(false);
   const [newFieldInput, setNewFieldInput] = useState('');
-  
+
   // Modal PDF
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [selectedPdfFields, setSelectedPdfFields] = useState<string[]>([]);
-  
+
   // Double buffering for PDF to prevent flickering
   const [previewUrls, setPreviewUrls] = useState({ a: null as string | null, b: null as string | null });
   const [activeFrame, setActiveFrame] = useState<'a' | 'b'>('a');
   const frameRef = useRef<'a' | 'b'>('a');
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check auth session on load
@@ -56,20 +57,42 @@ export default function SociosDirectorio() {
 
   // Helper para poner la columna "codigo" al principio
   const reorderHeaders = (headerList: string[]) => {
-    const sorted = [...headerList];
+    let sorted = [...headerList];
+
+    // 1. Extraer APELLIDOS y NOMBRES
+    const apellidosIndex = sorted.findIndex(h => h.toUpperCase() === 'APELLIDOS');
+    let apellidosHeader: string | null = null;
+    if (apellidosIndex >= 0) apellidosHeader = sorted.splice(apellidosIndex, 1)[0];
+
+    const nombresIndex = sorted.findIndex(h => h.toUpperCase() === 'NOMBRES');
+    let nombresHeader: string | null = null;
+    if (nombresIndex >= 0) nombresHeader = sorted.splice(nombresIndex, 1)[0];
+
+    // 2. Extraer CÓDIGO
     const codigoIndex = sorted.findIndex(h => h.toLowerCase().includes('código') || h.toLowerCase().includes('codigo'));
+    let insertIndex = 0;
     if (codigoIndex >= 0) {
       const codigoHeader = sorted.splice(codigoIndex, 1)[0];
-      // Mover a la segunda posición (índice 1). Si solo hay 1 columna, la pone al final.
-      sorted.splice(1, 0, codigoHeader); 
+      sorted.splice(0, 0, codigoHeader);
+      insertIndex = 1;
     }
+
+    // 3. Insertar APELLIDOS y NOMBRES en orden
+    if (apellidosHeader) {
+      sorted.splice(insertIndex, 0, apellidosHeader);
+      insertIndex++;
+    }
+    if (nombresHeader) {
+      sorted.splice(insertIndex, 0, nombresHeader);
+    }
+
     return sorted;
   };
 
   // Fetch data when user is authenticated
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchData = async () => {
       setIsLoadingData(true);
       const { data: dbData, error } = await supabase
@@ -77,7 +100,7 @@ export default function SociosDirectorio() {
         .select('*')
         .eq('id', 1)
         .single();
-        
+
       if (error && error.code !== 'PGRST116') {
         console.error("Error cargando de Supabase:", error);
       } else if (dbData) {
@@ -120,7 +143,7 @@ export default function SociosDirectorio() {
           if (lowerH === 'provincia') {
             let val = newRow[h] ? newRow[h].toString().trim() : '';
             const lowerVal = val.toLowerCase();
-            
+
             if (lowerVal.includes('chinchipe') || lowerVal.includes('zamora')) {
               if (val !== 'ZAMORA CHINCHIPE') {
                 newRow[h] = 'ZAMORA CHINCHIPE';
@@ -137,23 +160,93 @@ export default function SociosDirectorio() {
         return newRow;
       });
 
+      let newHeaders = [...headers];
+      let finalData = [...fixedData];
+
+      // Dividir "Nombres y Apellidos" en "APELLIDOS" y "NOMBRES"
+      const combinedHeaderIndex = newHeaders.findIndex(h => {
+        const lower = h.toLowerCase();
+        return (lower.includes('nombre') && lower.includes('apellido'));
+      });
+
+      if (combinedHeaderIndex >= 0 && !newHeaders.includes('APELLIDOS') && !newHeaders.includes('NOMBRES')) {
+        const combinedName = newHeaders[combinedHeaderIndex];
+        // Remover la cabecera combinada
+        newHeaders.splice(combinedHeaderIndex, 1);
+        // Insertar APELLIDOS primero, luego NOMBRES
+        newHeaders.splice(combinedHeaderIndex, 0, 'APELLIDOS', 'NOMBRES');
+
+        finalData = finalData.map(r => {
+          const rCopy = { ...r };
+          const fullName = (rCopy[combinedName] || '').toString().trim();
+          const parts = fullName.split(' ').filter(Boolean);
+
+          let apellidos = '';
+          let nombres = '';
+
+          const isApellidosFirst = combinedName.toUpperCase().startsWith('APELLIDO');
+
+          if (parts.length >= 4) {
+            if (isApellidosFirst) {
+              apellidos = parts[0] + ' ' + parts[1];
+              nombres = parts.slice(2).join(' ');
+            } else {
+              nombres = parts[0] + ' ' + parts[1];
+              apellidos = parts.slice(2).join(' ');
+            }
+          } else {
+            const half = Math.ceil(parts.length / 2);
+            if (isApellidosFirst) {
+              apellidos = parts.slice(0, half).join(' ');
+              nombres = parts.slice(half).join(' ');
+            } else {
+              nombres = parts.slice(0, half).join(' ');
+              apellidos = parts.slice(half).join(' ');
+            }
+          }
+
+          rCopy['APELLIDOS'] = apellidos;
+          rCopy['NOMBRES'] = nombres;
+          delete rCopy[combinedName];
+
+          return rCopy;
+        });
+        needsFix = true;
+      }
+
       if (needsFix) {
-        saveData(fixedData, headers);
+        saveData(finalData, newHeaders);
       }
     }
   }, [data, headers, isLoadingData]);
 
   const filteredData = data.filter(row => {
     if (!searchTerm) return true;
-    
-    if (searchColumn === 'all') {
-      const values = Object.values(row).join(' ').toLowerCase();
-      return values.includes(searchTerm.toLowerCase());
-    } else {
-      const value = (row[searchColumn] || '').toString().toLowerCase();
-      return value.includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase();
+    if (searchColumn !== 'all') {
+      const val = row[searchColumn] ? row[searchColumn].toString().toLowerCase() : '';
+      return val.includes(term);
     }
-  });
+    return Object.values(row).some(v =>
+      v ? v.toString().toLowerCase().includes(term) : false
+    );
+  })
+    .sort((a, b) => {
+      if (!sortConfig) return 0;
+      const valA = (a[sortConfig.key] || '').toString().toLowerCase();
+      const valB = (b[sortConfig.key] || '').toString().toLowerCase();
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
 
   // Generar filtros rápidos dinámicos si es una columna geográfica
   const isGeoColumn = searchColumn.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/);
@@ -180,7 +273,7 @@ export default function SociosDirectorio() {
     setData(newData);
     setHeaders(newHeaders);
     setIsSaving(true);
-    
+
     const { error } = await supabase
       .from('directorio_temporal')
       .update({
@@ -189,12 +282,12 @@ export default function SociosDirectorio() {
         updated_at: new Date().toISOString()
       })
       .eq('id', 1);
-      
+
     if (error) {
       alert("Error guardando en la nube: " + error.message);
       console.error(error);
     }
-    
+
     setIsSaving(false);
   };
 
@@ -202,14 +295,14 @@ export default function SociosDirectorio() {
   const parseCSV = (text: string) => {
     const lines = text.split('\n');
     if (lines.length === 0) return;
-    
+
     const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
     const parsedData = [];
-    
+
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      
+
       const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
       const row: any = {};
       rawHeaders.forEach((h, index) => {
@@ -217,21 +310,21 @@ export default function SociosDirectorio() {
       });
       parsedData.push(row);
     }
-    
+
     saveData(parsedData, reorderHeaders(rawHeaders));
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
       parseCSV(text);
     };
     reader.readAsText(file);
-    
+
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -239,18 +332,18 @@ export default function SociosDirectorio() {
     e.preventDefault();
     const cleanName = newFieldInput.trim();
     if (!cleanName) return;
-    
+
     if (headers.includes(cleanName)) {
       alert("Este campo ya existe en la base de datos.");
       return;
     }
-    
+
     const newHeaders = [...headers, cleanName];
     const newData = data.map(row => ({
       ...row,
       [cleanName]: ''
     }));
-    
+
     saveData(newData, newHeaders);
     setNewFieldInput('');
   };
@@ -289,18 +382,18 @@ export default function SociosDirectorio() {
 
   const handleExportExcel = async () => {
     if (filteredData.length === 0 || headers.length === 0) return;
-    
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Directorio Socios', { views: [{ showGridLines: false }] });
 
-    const endColChar = String.fromCharCode(64 + Math.min(headers.length, 26)); 
+    const endColChar = String.fromCharCode(64 + Math.min(headers.length, 26));
     let currentRow = 1;
 
     // Título Principal
     const titleRow = worksheet.addRow(['Directorio de Socios Asopromas']);
     titleRow.height = 25;
     worksheet.getCell(`A${currentRow}`).font = { size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
-    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEA580C' } }; 
+    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEA580C' } };
     worksheet.getCell(`A${currentRow}`).alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.mergeCells(`A${currentRow}:${endColChar}${currentRow}`);
     currentRow++;
@@ -309,11 +402,11 @@ export default function SociosDirectorio() {
     const subtitle = getDynamicSubtitle();
     worksheet.addRow([subtitle]);
     worksheet.getCell(`A${currentRow}`).font = { size: 10, italic: true, color: { argb: 'FF475569' } };
-    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } }; 
+    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
     worksheet.getCell(`A${currentRow}`).alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.mergeCells(`A${currentRow}:${endColChar}${currentRow}`);
     currentRow++;
-    
+
     // Timestamp
     worksheet.addRow([`Reporte generado el: ${new Date().toLocaleString()}`]);
     worksheet.getCell(`A${currentRow}`).font = { size: 8, color: { argb: 'FF94A3B8' } };
@@ -357,7 +450,7 @@ export default function SociosDirectorio() {
       column.eachCell?.({ includeEmpty: true }, (cell) => {
         const columnLength = cell.value ? cell.value.toString().length : 10;
         if (columnLength > maxLength) {
-          maxLength = columnLength + 2; 
+          maxLength = columnLength + 2;
         }
       });
       column.width = Math.min(maxLength, 40); // Cap width at 40
@@ -380,20 +473,20 @@ export default function SociosDirectorio() {
 
   const generatePdfDoc = async () => {
     const doc = new jsPDF('landscape');
-    
+
     try {
       // Cargar logo
       const base64Logo = await getBase64Image('/Logo-Asopromas-Completo.jpg');
       if (base64Logo) {
         doc.addImage(base64Logo, 'JPEG', 14, 10, 45, 18);
       }
-      
+
       doc.setFontSize(16);
       doc.setTextColor(15, 23, 42); // slate-900
       doc.text('Directorio de Socios Asopromas', 65, 18);
       doc.setFontSize(10);
       doc.setTextColor(100, 116, 139); // slate-500
-      
+
       const subtitle = getDynamicSubtitle();
       doc.text(`${subtitle} | Total exportados: ${filteredData.length}`, 65, 25);
 
@@ -419,20 +512,20 @@ export default function SociosDirectorio() {
       body: tableData,
       startY: 35,
       theme: 'grid',
-      styles: { 
-        fontSize: 8, 
-        cellPadding: 3, 
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
         lineColor: [226, 232, 240], // slate-200
         lineWidth: 0.1,
         textColor: [51, 65, 85] // slate-700
       },
-      headStyles: { 
+      headStyles: {
         fillColor: [234, 88, 12], // orange-600
-        textColor: 255, 
+        textColor: 255,
         fontStyle: 'bold',
         halign: 'center'
       },
-      alternateRowStyles: { 
+      alternateRowStyles: {
         fillColor: [248, 250, 252] // slate-50
       },
       didDrawPage: function (data) {
@@ -441,7 +534,7 @@ export default function SociosDirectorio() {
         doc.setTextColor(148, 163, 184); // slate-400
         const str = 'Página ' + (doc.internal as any).getCurrentPageInfo().pageNumber;
         doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
-        
+
         const timestamp = `Generado: ${new Date().toLocaleString()}`;
         doc.text(timestamp, doc.internal.pageSize.width - data.settings.margin.right - 40, doc.internal.pageSize.height - 10);
       }
@@ -458,15 +551,15 @@ export default function SociosDirectorio() {
       generatePdfDoc().then(doc => {
         const blobUrl = doc.output('bloburl').toString();
         const nextFrame = frameRef.current === 'a' ? 'b' : 'a';
-        
+
         // 1. Cargar el nuevo PDF en el iframe oculto
         setPreviewUrls(prev => ({ ...prev, [nextFrame]: blobUrl }));
-        
+
         // 2. Esperar a que el iframe oculto cargue y haga su "parpadeo negro" de forma invisible
         setTimeout(() => {
           setActiveFrame(nextFrame);
           frameRef.current = nextFrame;
-          
+
           // 3. Destruir el PDF viejo
           setPreviewUrls(prev => {
             const oldFrame = nextFrame === 'a' ? 'b' : 'a';
@@ -475,12 +568,12 @@ export default function SociosDirectorio() {
             return { ...prev, [oldFrame]: null };
           });
         }, 500); // 500ms de espera invisible
-        
+
       }).catch(err => {
         console.error("Error generando PDF preview:", err);
       });
     }, 400); // 400ms de retraso al escribir
-    
+
     return () => clearTimeout(timer);
   }, [isPdfModalOpen, selectedPdfFields, filteredData]);
 
@@ -511,10 +604,49 @@ export default function SociosDirectorio() {
     setIsModalOpen(true);
   };
 
+  const validarCedulaEcuatoriana = (cedula: string) => {
+    if (cedula.length !== 10) return false;
+    
+    const digito_region = parseInt(cedula.substring(0, 2), 10);
+    if (digito_region < 1 || (digito_region > 24 && digito_region !== 30)) return false;
+    
+    const tercer_digito = parseInt(cedula.substring(2, 3), 10);
+    if (tercer_digito >= 6) return false; 
+    
+    const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+    const verificador = parseInt(cedula.substring(9, 10), 10);
+    
+    let suma = 0;
+    for (let i = 0; i < 9; i++) {
+      let valor = parseInt(cedula.substring(i, i + 1), 10) * coeficientes[i];
+      if (valor > 9) valor -= 9;
+      suma += valor;
+    }
+    
+    const decenaSuperior = Math.ceil(suma / 10) * 10;
+    let digitoCalculado = decenaSuperior - suma;
+    if (digitoCalculado === 10) digitoCalculado = 0;
+    
+    return digitoCalculado === verificador;
+  };
+
   const saveModal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingRow) return;
-    
+
+    // Validar Cédula/Identificación antes de guardar
+    const cedulaKey = headers.find(h => {
+      const lowerH = h.toLowerCase();
+      return lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cédula') || lowerH.includes('cedula');
+    });
+    if (cedulaKey && editingRow[cedulaKey]) {
+      const cedulaVal = editingRow[cedulaKey].toString().trim();
+      if (cedulaVal.length > 0 && !validarCedulaEcuatoriana(cedulaVal)) {
+        alert("El número de cédula ingresado no es válido. Verifica que los 10 dígitos sean correctos.");
+        return;
+      }
+    }
+
     // Forzar mayúsculas antes de guardar
     const upperEditingRow: any = {};
     for (const key in editingRow) {
@@ -531,7 +663,7 @@ export default function SociosDirectorio() {
     } else {
       newData.unshift(upperEditingRow);
     }
-    
+
     saveData(newData, headers);
     setIsModalOpen(false);
   };
@@ -558,7 +690,7 @@ export default function SociosDirectorio() {
           <p className="text-center text-slate-500 mb-8">
             Ingresa tus credenciales de Supabase para acceder al directorio temporal compartido.
           </p>
-          
+
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Correo Electrónico</label>
@@ -597,7 +729,7 @@ export default function SociosDirectorio() {
   // ==========================================
   return (
     <div className="min-h-screen bg-[#FDF9F3] pb-8 font-sans">
-      
+
       {/* Minimalist Header */}
       <div className="bg-white border-b border-orange-100 shadow-sm px-6 py-4 mb-8 sticky top-0 z-50 flex items-center justify-center md:justify-start">
         <a href="https://asopromas.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
@@ -606,7 +738,7 @@ export default function SociosDirectorio() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-sm border border-orange-100 p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -614,33 +746,33 @@ export default function SociosDirectorio() {
               <div className="flex items-center gap-3">
                 <FileText className="h-8 w-8 text-orange-600" />
                 <h1 className="text-3xl font-bold text-slate-800">
-                  Directorio Nube
+                  Socios Asopromas
                 </h1>
-                {isSaving && <span className="flex items-center text-xs font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-full"><Loader2 className="h-3 w-3 animate-spin mr-1"/> Guardando...</span>}
+                {isSaving && <span className="flex items-center text-xs font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-full"><Loader2 className="h-3 w-3 animate-spin mr-1" /> Guardando...</span>}
               </div>
               <p className="text-slate-500 mt-2">
-                Conectado a Supabase. Los cambios se sincronizan en vivo para todos los usuarios.
+                Conectado a Base de Datos. Los cambios se sincronizan en vivo para todos los usuarios.
               </p>
             </div>
-            
+
             <div className="flex flex-wrap gap-3">
               {user?.email?.toLowerCase().trim() !== 'invitado@asopromas.com' && (
                 <>
-                  <input 
-                    type="file" 
-                    accept=".csv" 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="hidden"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
                   />
-                  <button 
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-colors"
                   >
                     <Upload className="h-4 w-4" /> Importar CSV
                   </button>
 
-                  <button 
+                  <button
                     onClick={() => setIsFieldsModalOpen(true)}
                     disabled={data.length === 0}
                     className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
@@ -649,8 +781,8 @@ export default function SociosDirectorio() {
                   </button>
                 </>
               )}
-              
-              <button 
+
+              <button
                 onClick={handleExportExcel}
                 disabled={data.length === 0}
                 className="flex items-center gap-2 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-4 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
@@ -658,7 +790,7 @@ export default function SociosDirectorio() {
                 <Download className="h-4 w-4" /> Excel
               </button>
 
-              <button 
+              <button
                 onClick={openPdfModal}
                 disabled={data.length === 0}
                 className="flex items-center gap-2 bg-red-100 text-red-800 hover:bg-red-200 px-4 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
@@ -666,7 +798,7 @@ export default function SociosDirectorio() {
                 <FileText className="h-4 w-4" /> PDF
               </button>
 
-              <button 
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl font-medium transition-colors ml-4 border border-red-200"
               >
@@ -700,7 +832,7 @@ export default function SociosDirectorio() {
                         <option key={i} value={h}>Solo en: {h}</option>
                       ))}
                     </select>
-                    
+
                     <div className="relative flex-1">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <input
@@ -712,8 +844,8 @@ export default function SociosDirectorio() {
                       />
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     onClick={() => openModal()}
                     className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:shadow transition-all whitespace-nowrap h-[50px]"
                   >
@@ -724,14 +856,13 @@ export default function SociosDirectorio() {
                 {/* Filtros Rápidos Dinámicos */}
                 {quickFilters.length > 0 && (
                   <div className="w-full mt-3 flex flex-wrap gap-2 items-center bg-slate-50/80 p-3 rounded-xl border border-slate-200 animate-in fade-in slide-in-from-top-2">
-                    <span className="text-sm font-bold text-slate-500 mr-2 flex items-center"><FileText className="w-4 h-4 mr-1"/>Filtro Rápido ({searchColumn}):</span>
+                    <span className="text-sm font-bold text-slate-500 mr-2 flex items-center"><FileText className="w-4 h-4 mr-1" />Filtro Rápido ({searchColumn}):</span>
                     <button
                       onClick={() => setSearchTerm('')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${
-                        searchTerm === '' 
-                          ? 'bg-slate-800 text-white shadow-sm' 
-                          : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100 hover:border-slate-400'
-                      }`}
+                      className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${searchTerm === ''
+                        ? 'bg-slate-800 text-white shadow-sm'
+                        : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100 hover:border-slate-400'
+                        }`}
                     >
                       Mostrar Todos
                     </button>
@@ -739,11 +870,10 @@ export default function SociosDirectorio() {
                       <button
                         key={idx}
                         onClick={() => setSearchTerm(qf)}
-                        className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${
-                          searchTerm === qf 
-                            ? 'bg-orange-600 text-white shadow-md scale-105' 
-                            : 'bg-white text-slate-600 border border-orange-200 hover:bg-orange-50 hover:border-orange-300'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${searchTerm === qf
+                          ? 'bg-orange-600 text-white shadow-md scale-105'
+                          : 'bg-white text-slate-600 border border-orange-200 hover:bg-orange-50 hover:border-orange-300'
+                          }`}
                       >
                         {qf}
                       </button>
@@ -763,7 +893,7 @@ export default function SociosDirectorio() {
                 <p className="text-slate-500 max-w-md mx-auto mb-8">
                   Nadie ha subido un archivo CSV todavía. Si tienes el archivo original de socios, súbelo ahora para que quede disponible para todos.
                 </p>
-                <button 
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
                 >
@@ -781,14 +911,28 @@ export default function SociosDirectorio() {
                       <tr>
                         <th className="px-6 py-4 whitespace-nowrap w-16 text-center">#</th>
                         {headers.map((h, i) => (
-                          <th key={i} className="px-6 py-4 whitespace-nowrap">{h}</th>
+                          <th
+                            key={i}
+                            className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-200 transition-colors select-none"
+                            onClick={() => requestSort(h)}
+                            title={`Click para ordenar por ${h}`}
+                          >
+                            <div className="flex items-center gap-2">
+                              {h}
+                              {sortConfig?.key === h && (
+                                <span className="text-orange-500 text-xs">
+                                  {sortConfig.direction === 'asc' ? '▲' : '▼'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {filteredData.map((row, rowIndex) => (
-                        <tr 
-                          key={rowIndex} 
+                        <tr
+                          key={rowIndex}
                           onClick={() => openModal(row, data.indexOf(row))}
                           className="hover:bg-orange-50/50 transition-colors cursor-pointer group"
                         >
@@ -814,7 +958,7 @@ export default function SociosDirectorio() {
                 </div>
                 <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 text-sm text-slate-500 font-medium flex justify-between">
                   <span>Mostrando {filteredData.length} de {data.length} socios.</span>
-                  <span className="text-orange-600 font-bold">Autoguardado en Nube Activado</span>
+                  <span className="text-orange-600 font-bold">Autoguardado Activado</span>
                 </div>
               </div>
             )}
@@ -833,7 +977,7 @@ export default function SociosDirectorio() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              
+
               <form onSubmit={saveModal} className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2 pb-2">
                   {headers.map((h, i) => (
@@ -843,7 +987,18 @@ export default function SociosDirectorio() {
                         type="text"
                         list={h.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/) ? `datalist-${h}` : undefined}
                         value={editingRow?.[h] || ''}
-                        onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value })}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          const lowerH = h.toLowerCase();
+                          
+                          if (lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cédula') || lowerH.includes('cedula')) {
+                            val = val.replace(/\D/g, '').substring(0, 10);
+                          } else if (lowerH.includes('teléf') || lowerH.includes('telef') || lowerH.includes('celular') || lowerH.includes('telefono')) {
+                            val = val.replace(/\D/g, '').substring(0, 10);
+                          }
+                          
+                          setEditingRow({ ...editingRow, [h]: val });
+                        }}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         autoComplete="off"
                       />
@@ -857,7 +1012,7 @@ export default function SociosDirectorio() {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-100">
                   {editingIndex !== null && (
                     <button
@@ -902,7 +1057,7 @@ export default function SociosDirectorio() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              
+
               <div className="p-6">
                 <form onSubmit={handleAddField} className="mb-6 flex gap-2">
                   <input
@@ -937,7 +1092,7 @@ export default function SociosDirectorio() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="p-6 border-t border-slate-100 flex justify-end">
                 <button
                   onClick={() => setIsFieldsModalOpen(false)}
@@ -962,21 +1117,21 @@ export default function SociosDirectorio() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              
+
               <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
                 {/* Columna Izquierda: Controles */}
                 <div className="w-full md:w-1/3 border-r border-slate-100 flex flex-col p-6 bg-slate-50 overflow-y-auto">
                   <h3 className="font-bold text-slate-700 mb-2">Campos a imprimir</h3>
                   <p className="text-xs text-slate-500 mb-4">La columna "#" (numeración) se agregará automáticamente al inicio.</p>
-                  
+
                   <div className="flex gap-2 mb-4">
-                    <button 
+                    <button
                       onClick={() => setSelectedPdfFields(pdfAvailableHeaders)}
                       className="flex-1 text-xs font-bold bg-white border border-slate-200 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
                     >
                       Todos
                     </button>
-                    <button 
+                    <button
                       onClick={() => setSelectedPdfFields([])}
                       className="flex-1 text-xs font-bold bg-white border border-slate-200 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
                     >
@@ -987,7 +1142,7 @@ export default function SociosDirectorio() {
                   <div className="space-y-2 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                     {pdfAvailableHeaders.map((h, i) => (
                       <label key={i} className="flex items-center gap-3 p-2 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200">
-                        <input 
+                        <input
                           type="checkbox"
                           checked={selectedPdfFields.includes(h)}
                           onChange={(e) => {
@@ -1010,15 +1165,15 @@ export default function SociosDirectorio() {
                   <h3 className="font-bold text-slate-700 mb-2">Vista Previa en Vivo</h3>
                   <div className="relative flex-1 rounded-xl overflow-hidden border border-slate-200 bg-white shadow-inner">
                     {/* Iframe A */}
-                    <iframe 
-                      src={previewUrls.a ? `${previewUrls.a}#toolbar=0` : 'about:blank'} 
+                    <iframe
+                      src={previewUrls.a ? `${previewUrls.a}#toolbar=0` : 'about:blank'}
                       className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-300 ${activeFrame === 'a' && previewUrls.a ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                       title="PDF Preview A"
                     />
-                    
+
                     {/* Iframe B */}
-                    <iframe 
-                      src={previewUrls.b ? `${previewUrls.b}#toolbar=0` : 'about:blank'} 
+                    <iframe
+                      src={previewUrls.b ? `${previewUrls.b}#toolbar=0` : 'about:blank'}
                       className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-300 ${activeFrame === 'b' && previewUrls.b ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                       title="PDF Preview B"
                     />
@@ -1032,7 +1187,7 @@ export default function SociosDirectorio() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-6 border-t border-slate-100 flex justify-end gap-3 shrink-0 bg-white rounded-b-2xl">
                 <button
                   onClick={() => setIsPdfModalOpen(false)}
