@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings } from 'lucide-react';
+import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
@@ -29,6 +29,8 @@ export default function SociosDirectorio() {
   // Modal Fields
   const [isFieldsModalOpen, setIsFieldsModalOpen] = useState(false);
   const [newFieldInput, setNewFieldInput] = useState('');
+  const [editingColumn, setEditingColumn] = useState<string | null>(null);
+  const [newColumnName, setNewColumnName] = useState('');
 
   // Modal PDF
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
@@ -38,6 +40,14 @@ export default function SociosDirectorio() {
   const [previewUrls, setPreviewUrls] = useState({ a: null as string | null, b: null as string | null });
   const [activeFrame, setActiveFrame] = useState<'a' | 'b'>('a');
   const frameRef = useRef<'a' | 'b'>('a');
+
+  // Table Interactivity (Scroll & Column Drag)
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDraggingScroll, setIsDraggingScroll] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
+  const [draggedCol, setDraggedCol] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,6 +78,10 @@ export default function SociosDirectorio() {
     let nombresHeader: string | null = null;
     if (nombresIndex >= 0) nombresHeader = sorted.splice(nombresIndex, 1)[0];
 
+    const generoIndex = sorted.findIndex(h => h.toUpperCase() === 'GÉNERO' || h.toUpperCase() === 'GENERO');
+    let generoHeader: string | null = null;
+    if (generoIndex >= 0) generoHeader = sorted.splice(generoIndex, 1)[0];
+
     // 2. Extraer CÓDIGO
     const codigoIndex = sorted.findIndex(h => h.toLowerCase().includes('código') || h.toLowerCase().includes('codigo'));
     let insertIndex = 0;
@@ -77,15 +91,19 @@ export default function SociosDirectorio() {
       insertIndex = 1;
     }
 
-    // 3. Insertar APELLIDOS y NOMBRES en orden
+    // 3. Insertar APELLIDOS, NOMBRES y GÉNERO en orden
     if (apellidosHeader) {
       sorted.splice(insertIndex, 0, apellidosHeader);
       insertIndex++;
     }
     if (nombresHeader) {
       sorted.splice(insertIndex, 0, nombresHeader);
+      insertIndex++;
     }
-
+    if (generoHeader) {
+      sorted.splice(insertIndex, 0, generoHeader);
+    }
+    
     return sorted;
   };
 
@@ -104,8 +122,16 @@ export default function SociosDirectorio() {
       if (error && error.code !== 'PGRST116') {
         console.error("Error cargando de Supabase:", error);
       } else if (dbData) {
+        let loadedHeaders = dbData.headers || [];
+        const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
+        newCols.forEach(col => {
+          if (!loadedHeaders.find((h: string) => h.toUpperCase() === col)) {
+            loadedHeaders.push(col);
+          }
+        });
+        
         setData(dbData.socios_data || []);
-        setHeaders(reorderHeaders(dbData.headers || []));
+        setHeaders(reorderHeaders(loadedHeaders));
       }
       setIsLoadingData(false);
     };
@@ -120,12 +146,19 @@ export default function SociosDirectorio() {
       const fixedData = data.map(row => {
         const newRow = { ...row };
         headers.forEach(h => {
-          // Convertir a mayúsculas
+          // Convertir a mayúsculas, excepto si es enlace
           if (typeof newRow[h] === 'string') {
-            const upperVal = newRow[h].toUpperCase();
-            if (newRow[h] !== upperVal) {
-              newRow[h] = upperVal;
-              needsFix = true;
+            const val = newRow[h];
+            const lowerVal = val.toLowerCase();
+            const lowerH = h.toLowerCase();
+            const isLink = lowerVal.startsWith('http://') || lowerVal.startsWith('https://') || lowerH.includes('drive') || lowerH.includes('documento') || lowerH.includes('enlace') || lowerH.includes('url') || lowerH.includes('link') || lowerH === 'email' || lowerH === 'cuenta';
+            
+            if (!isLink) {
+              const upperVal = val.toUpperCase();
+              if (val !== upperVal) {
+                newRow[h] = upperVal;
+                needsFix = true;
+              }
             }
           }
 
@@ -214,6 +247,40 @@ export default function SociosDirectorio() {
         needsFix = true;
       }
 
+      // Autocompletar "GÉNERO" basado en "NOMBRES"
+      const generoColIndex = newHeaders.findIndex(h => h.toUpperCase() === 'GÉNERO' || h.toUpperCase() === 'GENERO');
+      const nombresIndexForGender = newHeaders.findIndex(h => h.toUpperCase() === 'NOMBRES');
+      
+      if (generoColIndex === -1 && nombresIndexForGender !== -1) {
+        newHeaders.splice(nombresIndexForGender + 1, 0, 'GÉNERO');
+        
+        finalData = finalData.map(r => {
+          const rCopy = { ...r };
+          const nombresStr = (rCopy['NOMBRES'] || '').toString().trim();
+          let genero = '';
+          
+          if (nombresStr) {
+            const firstWord = nombresStr.split(' ')[0].toUpperCase();
+            const femaleExceptions = ['ROCIO', 'CONSUELO', 'AMPARO', 'SOCORRO', 'ROSARIO', 'LOURDES', 'MARILU', 'MARIBEL', 'ISABEL', 'ESTHER', 'RUTH', 'BEATRIZ', 'CARMEN', 'INÉS', 'INES', 'MABEL', 'SHIRLEY', 'EVELYN', 'ABIGAIL', 'RAQUEL', 'MIRIAM', 'MIRIAN', 'EDITH', 'JUDITH', 'MAGALY', 'BETTY', 'GLADYS', 'MILDRED', 'KAREN', 'IVETH', 'JANETH', 'MARIA', 'MARÍA'];
+            const maleExceptions = ['JOSE', 'JOSÉ', 'JESUS', 'JESÚS', 'LUCAS', 'MATIAS', 'ELIAS', 'NICOLAS', 'TOMAS', 'BAUTISTA', 'ISAIAS', 'JEREMIAS', 'LUIS', 'CARLOS', 'JUAN'];
+
+            if (femaleExceptions.includes(firstWord)) {
+              genero = 'FEMENINO';
+            } else if (maleExceptions.includes(firstWord)) {
+              genero = 'MASCULINO';
+            } else if (firstWord.endsWith('A')) {
+              genero = 'FEMENINO';
+            } else {
+              genero = 'MASCULINO';
+            }
+          }
+          
+          rCopy['GÉNERO'] = genero;
+          return rCopy;
+        });
+        needsFix = true;
+      }
+
       if (needsFix) {
         saveData(finalData, newHeaders);
       }
@@ -223,13 +290,26 @@ export default function SociosDirectorio() {
   const filteredData = data.filter(row => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
+    const searchTerms = term.split(' ').filter(t => t.trim() !== '');
+
+    if (searchColumn === 'DATOS_BANCARIOS') {
+      let rowString = '';
+      Object.entries(row).forEach(([key, val]) => {
+        const up = key.toUpperCase();
+        if (up.includes('APELLIDO') || up.includes('NOMBRE') || up.includes('CÉDULA') || up.includes('CEDULA') || up.includes('IDENTIFICACION') || up === 'CUENTA') {
+           if (val) rowString += val.toString().toLowerCase() + ' ';
+        }
+      });
+      return searchTerms.every(t => rowString.includes(t));
+    }
+
     if (searchColumn !== 'all') {
       const val = row[searchColumn] ? row[searchColumn].toString().toLowerCase() : '';
-      return val.includes(term);
+      return searchTerms.every(t => val.includes(t));
     }
-    return Object.values(row).some(v =>
-      v ? v.toString().toLowerCase().includes(term) : false
-    );
+
+    const allString = Object.values(row).map(v => v ? v.toString().toLowerCase() : '').join(' ');
+    return searchTerms.every(t => allString.includes(t));
   })
     .sort((a, b) => {
       if (!sortConfig) return 0;
@@ -252,8 +332,16 @@ export default function SociosDirectorio() {
   const isGeoColumn = searchColumn.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/);
   const quickFilters = isGeoColumn ? Array.from(new Set(data.map(row => row[searchColumn]).filter(Boolean))).sort() : [];
 
+  const isBankView = searchColumn === 'DATOS_BANCARIOS';
+  const displayedHeaders = isBankView 
+    ? headers.filter(h => {
+        const up = h.toUpperCase();
+        return up.includes('APELLIDO') || up.includes('NOMBRE') || up.includes('IDENTIFICACION') || up.includes('CÉDULA') || up.includes('CEDULA') || up === 'EMAIL' || up === 'BANCO' || up === 'TIPO DE CUENTA' || up === 'CUENTA';
+      })
+    : headers;
+
   // Filtrar columnas de numeración del CSV para que no aparezcan en el PDF (ya que el PDF genera su propio '#')
-  const pdfAvailableHeaders = headers.filter(h => !/^(n°|nro\.?|no\.?|número|numero|#)$/i.test(h.trim()));
+  const pdfAvailableHeaders = displayedHeaders.filter(h => !/^(n°|nro\.?|no\.?|número|numero|#)$/i.test(h.trim()));
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,16 +357,168 @@ export default function SociosDirectorio() {
     await supabase.auth.signOut();
   };
 
+  // Drag to Scroll Handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDraggingScroll(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+  const handleMouseLeave = () => {
+    setIsDraggingScroll(false);
+  };
+  const handleMouseUp = () => {
+    setIsDraggingScroll(false);
+    setTimeout(() => setHasDragged(false), 50);
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingScroll || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // velocidad de scroll
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+    if (Math.abs(walk) > 10) setHasDragged(true);
+  };
+
+  // Drag and Drop Column Handlers
+  const handleDragStart = (e: React.DragEvent, h: string) => {
+    setDraggedCol(h);
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => {
+      if (e.target instanceof HTMLElement) e.target.classList.add('opacity-50');
+    }, 0);
+  };
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
+  const handleDrop = (e: React.DragEvent, targetH: string) => {
+    e.preventDefault();
+    if (e.target instanceof HTMLElement) e.target.classList.remove('opacity-50');
+    if (!draggedCol || draggedCol === targetH) return;
+    
+    const newHeaders = [...headers];
+    const fromIndex = newHeaders.indexOf(draggedCol);
+    const toIndex = newHeaders.indexOf(targetH);
+    
+    newHeaders.splice(fromIndex, 1);
+    newHeaders.splice(toIndex, 0, draggedCol);
+    
+    saveData(data, newHeaders);
+    setDraggedCol(null);
+  };
+  const handleDragEnd = (e: React.DragEvent) => {
+    if (e.target instanceof HTMLElement) e.target.classList.remove('opacity-50');
+    setDraggedCol(null);
+  };
+
+  // Render helpers
+  const renderCellContent = (h: string, val: any) => {
+    if (!val || val.toString().trim() === '') return <span className="text-slate-300">-</span>;
+    
+    const lowerH = h.toLowerCase();
+    const valueStr = val.toString();
+
+    if (lowerH.includes('código') || lowerH.includes('codigo')) {
+      return <span className="bg-orange-100 text-orange-800 font-mono text-xs font-bold rounded-lg px-2.5 py-1 border border-orange-200 shadow-sm inline-block">{valueStr}</span>;
+    }
+    if (lowerH.includes('provincia')) {
+      return <span className="bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200 px-2.5 py-1 inline-block">{valueStr}</span>;
+    }
+    if (lowerH.includes('canton') || lowerH.includes('cantón') || lowerH.includes('parroquia')) {
+      return <span className="bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200 px-2.5 py-1 inline-block">{valueStr}</span>;
+    }
+    if (lowerH.includes('apellidos') || lowerH.includes('nombres')) {
+      return <span className="font-bold text-slate-800">{valueStr}</span>;
+    }
+    if (lowerH.includes('género') || lowerH.includes('genero')) {
+      const isFem = valueStr.toUpperCase() === 'FEMENINO';
+      const badgeClass = isFem 
+        ? 'bg-pink-50 text-pink-700 border-pink-200' 
+        : 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      return <span className={`text-xs font-bold rounded-full border px-2.5 py-1 inline-block ${badgeClass}`}>{valueStr}</span>;
+    }
+    if (lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cedula') || lowerH.includes('cédula')) {
+      return <span className="font-mono text-slate-600 tracking-wider bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-xs">{valueStr}</span>;
+    }
+
+    const lowerVal = valueStr.toLowerCase();
+    
+    // Si la columna es de enlace, o si el valor empieza con http
+    const isLinkColumn = lowerH.includes('drive') || lowerH.includes('documento') || lowerH.includes('enlace') || lowerH.includes('link') || lowerH.includes('url');
+    
+    if (isLinkColumn || lowerVal.startsWith('http://') || lowerVal.startsWith('https://')) {
+      if (lowerVal.startsWith('http://') || lowerVal.startsWith('https://')) {
+        return (
+          <a 
+            href={valueStr} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg w-max shadow-sm transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" /> Abrir Enlace
+          </a>
+        );
+      }
+    }
+
+    return <span className="text-slate-600">{valueStr}</span>;
+  };
+
+  const calculateAges = (inputData: any[], inputHeaders: string[]) => {
+    let newHeaders = [...inputHeaders];
+    
+    // Buscar la columna de fecha de nacimiento
+    const fechaNacKey = newHeaders.find(h => h.toUpperCase().includes('FECHA') && h.toUpperCase().includes('NACIMIENTO'));
+    
+    if (fechaNacKey) {
+      if (!newHeaders.find(h => h.toUpperCase() === 'EDAD')) {
+        const idx = newHeaders.indexOf(fechaNacKey);
+        newHeaders.splice(idx + 1, 0, 'EDAD');
+      }
+      
+      const edadKey = newHeaders.find(h => h.toUpperCase() === 'EDAD') || 'EDAD';
+      
+      const newData = inputData.map(row => {
+        const fechaStr = row[fechaNacKey];
+        if (fechaStr) {
+          let birthDate = new Date(fechaStr);
+          if (isNaN(birthDate.getTime()) && fechaStr.includes('/')) {
+            const parts = fechaStr.split('/');
+            if (parts.length === 3) {
+              birthDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); // DD/MM/YYYY fallback
+            }
+          }
+          if (!isNaN(birthDate.getTime())) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            return { ...row, [edadKey]: age.toString() };
+          }
+        }
+        return { ...row, [edadKey]: row[edadKey] || '' };
+      });
+      return { data: newData, headers: newHeaders };
+    }
+    
+    return { data: inputData, headers: inputHeaders };
+  };
+
   const saveData = async (newData: any[], newHeaders: string[]) => {
-    setData(newData);
-    setHeaders(newHeaders);
+    const processed = calculateAges(newData, newHeaders);
+    const finalData = processed.data;
+    const finalHeaders = processed.headers;
+
+    setData(finalData);
+    setHeaders(finalHeaders);
     setIsSaving(true);
 
     const { error } = await supabase
       .from('directorio_temporal')
       .update({
-        socios_data: newData,
-        headers: newHeaders,
+        socios_data: finalData,
+        headers: finalHeaders,
         updated_at: new Date().toISOString()
       })
       .eq('id', 1);
@@ -310,6 +550,13 @@ export default function SociosDirectorio() {
       });
       parsedData.push(row);
     }
+
+    const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
+    newCols.forEach(col => {
+      if (!rawHeaders.find(h => h.toUpperCase() === col)) {
+        rawHeaders.push(col);
+      }
+    });
 
     saveData(parsedData, reorderHeaders(rawHeaders));
   };
@@ -357,6 +604,38 @@ export default function SociosDirectorio() {
         return newRow;
       });
       saveData(newData, newHeaders);
+    }
+  };
+
+  const handleRenameField = (oldName: string) => {
+    const cleanName = newColumnName.trim();
+    if (!cleanName || cleanName === oldName) {
+      setEditingColumn(null);
+      return;
+    }
+
+    if (headers.includes(cleanName)) {
+      alert("Este campo ya existe en la base de datos.");
+      return;
+    }
+
+    const upOld = oldName.toUpperCase();
+    if (['EDAD', 'EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'].includes(upOld)) {
+      alert(`No puedes cambiar el nombre de la columna "${oldName}" porque es crítica para el funcionamiento del sistema (Vistas Bancarias o Cálculos Automáticos).`);
+      setEditingColumn(null);
+      return;
+    }
+
+    if (window.confirm(`¿Renombrar "${oldName}" a "${cleanName}" en todos los registros?`)) {
+      const newHeaders = headers.map(h => h === oldName ? cleanName : h);
+      const newData = data.map(row => {
+        const newRow = { ...row };
+        newRow[cleanName] = newRow[oldName] !== undefined ? newRow[oldName] : '';
+        delete newRow[oldName];
+        return newRow;
+      });
+      saveData(newData, newHeaders);
+      setEditingColumn(null);
     }
   };
 
@@ -473,29 +752,57 @@ export default function SociosDirectorio() {
 
   const generatePdfDoc = async () => {
     const doc = new jsPDF('landscape');
+    const pageWidth = doc.internal.pageSize.width;
+    let currentY = 10;
 
     try {
-      // Cargar logo
+      // Cargar logo cuadrado y centrado
       const base64Logo = await getBase64Image('/Logo-Asopromas-Completo.jpg');
       if (base64Logo) {
-        doc.addImage(base64Logo, 'JPEG', 14, 10, 45, 18);
+        const logoSize = 25;
+        doc.addImage(base64Logo, 'JPEG', (pageWidth - logoSize) / 2, currentY, logoSize, logoSize);
+        currentY += logoSize + 5;
       }
 
       doc.setFontSize(16);
       doc.setTextColor(15, 23, 42); // slate-900
-      doc.text('Directorio de Socios Asopromas', 65, 18);
+      doc.text('Directorio de Socios Asopromas', pageWidth / 2, currentY, { align: 'center' });
+      currentY += 6;
+
       doc.setFontSize(10);
       doc.setTextColor(100, 116, 139); // slate-500
-
       const subtitle = getDynamicSubtitle();
-      doc.text(`${subtitle} | Total exportados: ${filteredData.length}`, 65, 25);
+      doc.text(`${subtitle} | Total: ${filteredData.length}`, pageWidth / 2, currentY, { align: 'center' });
+      currentY += 5;
+
+      // Stats
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+      const textDemography = `Demografía: Mujeres ${totalMujeres} (${pctMujeres}%) | Hombres ${totalHombres} (${pctHombres}%)`;
+      doc.text(textDemography, pageWidth / 2, currentY, { align: 'center' });
+      currentY += 4;
+      
+      if (topProvincias.length > 0) {
+        const textProvincias = `Provincias: ${topProvincias.slice(0, 6).map(([p, c]) => `${p} (${Math.round(c/totalConProvincia*100)}%)`).join(', ')}`;
+        doc.text(textProvincias, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 4;
+      }
+      
+      if (totalConEdad > 0) {
+        const textEdades = `Edades: 18-35 años: ${edad18_35} (${Math.round((edad18_35/totalConEdad)*100)}%) | 36-65 años: ${edad36_65} (${Math.round((edad36_65/totalConEdad)*100)}%) | +65 años: ${edadMas65} (${Math.round((edadMas65/totalConEdad)*100)}%)`;
+        doc.text(textEdades, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 4;
+      }
+      
+      currentY += 2;
 
     } catch (error) {
       doc.setFontSize(16);
-      doc.text('Directorio de Socios Asopromas', 14, 15);
+      doc.text('Directorio de Socios Asopromas', pageWidth / 2, 15, { align: 'center' });
       doc.setFontSize(10);
       const subtitle = getDynamicSubtitle();
-      doc.text(`${subtitle} | Total exportados: ${filteredData.length}`, 14, 22);
+      doc.text(`${subtitle} | Total: ${filteredData.length}`, pageWidth / 2, 22, { align: 'center' });
+      currentY = 28;
     }
 
     // Agregar la columna "#" al inicio
@@ -510,7 +817,7 @@ export default function SociosDirectorio() {
     autoTable(doc, {
       head: [pdfHeaders],
       body: tableData,
-      startY: 35,
+      startY: currentY,
       theme: 'grid',
       styles: {
         fontSize: 8,
@@ -634,24 +941,67 @@ export default function SociosDirectorio() {
     e.preventDefault();
     if (!editingRow) return;
 
-    // Validar Cédula/Identificación antes de guardar
+    // Validar Cédula/Identificación (Formato y Unicidad)
     const cedulaKey = headers.find(h => {
       const lowerH = h.toLowerCase();
       return lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cédula') || lowerH.includes('cedula');
     });
     if (cedulaKey && editingRow[cedulaKey]) {
       const cedulaVal = editingRow[cedulaKey].toString().trim();
-      if (cedulaVal.length > 0 && !validarCedulaEcuatoriana(cedulaVal)) {
-        alert("El número de cédula ingresado no es válido. Verifica que los 10 dígitos sean correctos.");
+      if (cedulaVal.length > 0) {
+        if (!validarCedulaEcuatoriana(cedulaVal)) {
+          alert("El número de cédula ingresado no es válido. Verifica que los 10 dígitos sean correctos.");
+          return;
+        }
+        const isDuplicate = data.some((row, idx) => idx !== editingIndex && row[cedulaKey]?.toString().trim() === cedulaVal);
+        if (isDuplicate) {
+          alert(`Ya existe un socio registrado con la cédula/identificación "${cedulaVal}". No se permiten duplicados.`);
+          return;
+        }
+      }
+    }
+
+    // Validar Unicidad de Código
+    const codigoKey = headers.find(h => {
+      const lowerH = h.toLowerCase();
+      return lowerH === 'codigo' || lowerH === 'código' || lowerH === 'cod' || lowerH === 'código socio';
+    });
+    if (codigoKey && editingRow[codigoKey]) {
+      const codigoVal = editingRow[codigoKey].toString().trim();
+      if (codigoVal.length > 0) {
+        const isDuplicate = data.some((row, idx) => idx !== editingIndex && row[codigoKey]?.toString().trim() === codigoVal);
+        if (isDuplicate) {
+          alert(`Ya existe un socio registrado con el código "${codigoVal}". El código debe ser único.`);
+          return;
+        }
+      }
+    }
+
+    // Validar Email
+    const emailKey = headers.find(h => h.toUpperCase() === 'EMAIL');
+    if (emailKey && editingRow[emailKey]) {
+      const emailVal = editingRow[emailKey].toString().trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailVal.length > 0 && !emailRegex.test(emailVal)) {
+        alert("El formato del correo electrónico (Email) no es válido.");
         return;
       }
     }
 
-    // Forzar mayúsculas antes de guardar
+    // Forzar mayúsculas antes de guardar, excepto en enlaces
     const upperEditingRow: any = {};
     for (const key in editingRow) {
       if (typeof editingRow[key] === 'string') {
-        upperEditingRow[key] = editingRow[key].toUpperCase();
+        const val = editingRow[key];
+        const lowerVal = val.toLowerCase();
+        const lowerKey = key.toLowerCase();
+        
+        // Si el valor es un enlace web o la columna es explícitamente un link
+        if (lowerVal.startsWith('http://') || lowerVal.startsWith('https://') || lowerKey.includes('drive') || lowerKey.includes('documento') || lowerKey.includes('enlace') || lowerKey.includes('link') || lowerKey.includes('url') || lowerKey === 'email' || lowerKey === 'cuenta') {
+          upperEditingRow[key] = val;
+        } else {
+          upperEditingRow[key] = val.toUpperCase();
+        }
       } else {
         upperEditingRow[key] = editingRow[key];
       }
@@ -671,6 +1021,55 @@ export default function SociosDirectorio() {
   // ==========================================
   // PANTALLA DE LOGIN
   // ==========================================
+  // Gender Stats Calculation
+  const generoKey = headers.find(h => h.toUpperCase() === 'GÉNERO' || h.toUpperCase() === 'GENERO');
+  let totalMujeres = 0;
+  let totalHombres = 0;
+  if (generoKey) {
+    filteredData.forEach(row => {
+      const g = (row[generoKey] || '').toString().toUpperCase();
+      if (g === 'FEMENINO') totalMujeres++;
+      if (g === 'MASCULINO') totalHombres++;
+    });
+  }
+  const totalConGenero = totalMujeres + totalHombres;
+  const pctMujeres = totalConGenero > 0 ? Math.round((totalMujeres / totalConGenero) * 100) : 0;
+  const pctHombres = totalConGenero > 0 ? Math.round((totalHombres / totalConGenero) * 100) : 0;
+
+  // Province Stats Calculation
+  const provinciaKey = headers.find(h => h.toLowerCase() === 'provincia');
+  const provinciaStats: Record<string, number> = {};
+  let totalConProvincia = 0;
+  if (provinciaKey) {
+    filteredData.forEach(row => {
+      const p = (row[provinciaKey] || '').toString().toUpperCase().trim();
+      if (p && p !== '-') {
+        provinciaStats[p] = (provinciaStats[p] || 0) + 1;
+        totalConProvincia++;
+      }
+    });
+  }
+  const topProvincias = Object.entries(provinciaStats).sort((a, b) => b[1] - a[1]);
+
+  // Age Stats Calculation
+  const edadKey = headers.find(h => h.toUpperCase() === 'EDAD');
+  let edad18_35 = 0;
+  let edad36_65 = 0;
+  let edadMas65 = 0;
+  let totalConEdad = 0;
+
+  if (edadKey) {
+    filteredData.forEach(row => {
+      const e = parseInt(row[edadKey], 10);
+      if (!isNaN(e)) {
+        totalConEdad++;
+        if (e >= 18 && e <= 35) edad18_35++;
+        else if (e > 35 && e <= 65) edad36_65++;
+        else if (e > 65) edadMas65++;
+      }
+    });
+  }
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDF9F3]">
@@ -814,6 +1213,59 @@ export default function SociosDirectorio() {
           </div>
         ) : (
           <>
+            {/* Top Toolbar: Stats & Sort */}
+            {data.length > 0 && (
+              <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                {/* Gender Stats */}
+                <div className="flex gap-4 items-center w-full md:w-auto">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-slate-500 uppercase">Demografía</span>
+                    <div className="flex flex-wrap gap-3 mt-1">
+                      <div className="bg-pink-50 border border-pink-100 text-pink-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 shadow-sm">
+                        Mujeres: {totalMujeres} ({pctMujeres}%)
+                      </div>
+                      <div className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 shadow-sm">
+                        Hombres: {totalHombres} ({pctHombres}%)
+                      </div>
+                      
+                      {topProvincias.length > 0 && (
+                        <div className="flex items-center gap-2 border-l border-slate-200 pl-3 ml-1">
+                          <span className="text-xs font-bold text-slate-400">PROVINCIAS:</span>
+                          <div className="flex gap-2 overflow-x-auto max-w-[200px] sm:max-w-[300px] md:max-w-md pb-1 hide-scrollbar">
+                            {topProvincias.map(([prov, count]) => {
+                              const pct = Math.round((count / totalConProvincia) * 100);
+                              return (
+                                <div key={prov} className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap">
+                                  {prov} {pct}%
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {totalConEdad > 0 && (
+                        <div className="flex items-center gap-2 border-l border-slate-200 pl-3 ml-1">
+                          <span className="text-xs font-bold text-slate-400">EDADES:</span>
+                          <div className="flex gap-2 overflow-x-auto max-w-[200px] sm:max-w-[300px] md:max-w-md pb-1 hide-scrollbar">
+                            <div className="bg-amber-50 border border-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap">
+                              18-35: {edad18_35} ({totalConEdad > 0 ? Math.round((edad18_35 / totalConEdad) * 100) : 0}%)
+                            </div>
+                            <div className="bg-amber-50 border border-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap">
+                              36-65: {edad36_65} ({totalConEdad > 0 ? Math.round((edad36_65 / totalConEdad) * 100) : 0}%)
+                            </div>
+                            <div className="bg-amber-50 border border-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg text-sm font-bold shadow-sm whitespace-nowrap">
+                              +65: {edadMas65} ({totalConEdad > 0 ? Math.round((edadMas65 / totalConEdad) * 100) : 0}%)
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Search & Actions */}
             {data.length > 0 && (
               <div className="mb-6">
@@ -828,16 +1280,20 @@ export default function SociosDirectorio() {
                       className="bg-white border border-slate-200 px-4 py-3 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-700 min-w-[200px]"
                     >
                       <option value="all">Todos los campos</option>
-                      {headers.map((h, i) => (
-                        <option key={i} value={h}>Solo en: {h}</option>
+                      {headers.filter(h => {
+                         const up = h.toUpperCase();
+                         return up !== 'BANCO' && up !== 'TIPO DE CUENTA' && up !== 'CUENTA';
+                      }).map((h, i) => (
+                        <option key={i} value={h}>{h}</option>
                       ))}
+                      <option value="DATOS_BANCARIOS" className="font-bold text-orange-600">Vista: Datos Bancarios</option>
                     </select>
 
                     <div className="relative flex-1">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <input
                         type="text"
-                        placeholder={searchColumn === 'all' ? "Buscar por cualquier campo..." : `Buscar en ${searchColumn}...`}
+                        placeholder={searchColumn === 'all' ? "Buscar por cualquier campo..." : searchColumn === 'DATOS_BANCARIOS' ? "Buscar socio para transferencia..." : `Buscar en ${searchColumn}...`}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white border border-slate-200 pl-11 pr-4 py-3 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
@@ -905,19 +1361,34 @@ export default function SociosDirectorio() {
             {/* Table */}
             {data.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-slate-600">
+                <div 
+                  className={`overflow-x-auto ${isDraggingScroll ? 'cursor-grabbing' : 'cursor-grab'}`}
+                  ref={scrollRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+                >
+                  <table className="w-full text-left text-sm text-slate-600 select-none">
                     <thead className="bg-slate-50 text-slate-800 font-bold border-b border-slate-200">
                       <tr>
                         <th className="px-6 py-4 whitespace-nowrap w-16 text-center">#</th>
-                        {headers.map((h, i) => (
+                        {displayedHeaders.map((h, i) => (
                           <th
                             key={i}
-                            className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-200 transition-colors select-none"
-                            onClick={() => requestSort(h)}
-                            title={`Click para ordenar por ${h}`}
+                            draggable={true}
+                            onDragStart={(e) => handleDragStart(e, h)}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, h)}
+                            onDragEnd={handleDragEnd}
+                            className={`px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-200 transition-colors ${draggedCol === h ? 'opacity-50 bg-orange-100' : ''}`}
+                            onClick={() => {
+                              if (hasDragged) return;
+                              requestSort(h);
+                            }}
+                            title={`Arrastra para mover, o haz click para ordenar por ${h}`}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 pointer-events-none">
                               {h}
                               {sortConfig?.key === h && (
                                 <span className="text-orange-500 text-xs">
@@ -933,15 +1404,18 @@ export default function SociosDirectorio() {
                       {filteredData.map((row, rowIndex) => (
                         <tr
                           key={rowIndex}
-                          onClick={() => openModal(row, data.indexOf(row))}
-                          className="hover:bg-orange-50/50 transition-colors cursor-pointer group"
+                          onClick={() => {
+                            if (hasDragged) return;
+                            openModal(row, data.indexOf(row));
+                          }}
+                          className="odd:bg-white even:bg-slate-50/80 hover:bg-orange-100/60 transition-colors cursor-pointer group"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap text-center font-bold text-slate-400">
+                          <td className="px-6 py-4 whitespace-nowrap text-center font-bold text-slate-400 border-r border-slate-100/50 group-hover:bg-orange-200/40 transition-colors">
                             {rowIndex + 1}
                           </td>
-                          {headers.map((h, colIndex) => (
+                          {displayedHeaders.map((h, colIndex) => (
                             <td key={colIndex} className="px-6 py-4 whitespace-nowrap">
-                              {row[h] || '-'}
+                              {renderCellContent(h, row[h])}
                             </td>
                           ))}
                         </tr>
@@ -983,31 +1457,107 @@ export default function SociosDirectorio() {
                   {headers.map((h, i) => (
                     <div key={i} className="space-y-1">
                       <label className="text-xs font-bold text-slate-500 uppercase">{h}</label>
-                      <input
-                        type="text"
-                        list={h.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/) ? `datalist-${h}` : undefined}
-                        value={editingRow?.[h] || ''}
-                        onChange={(e) => {
-                          let val = e.target.value;
-                          const lowerH = h.toLowerCase();
-                          
-                          if (lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cédula') || lowerH.includes('cedula')) {
-                            val = val.replace(/\D/g, '').substring(0, 10);
-                          } else if (lowerH.includes('teléf') || lowerH.includes('telef') || lowerH.includes('celular') || lowerH.includes('telefono')) {
-                            val = val.replace(/\D/g, '').substring(0, 10);
-                          }
-                          
-                          setEditingRow({ ...editingRow, [h]: val });
-                        }}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        autoComplete="off"
-                      />
-                      {h.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/) && (
-                        <datalist id={`datalist-${h}`}>
-                          {Array.from(new Set(data.map(row => row[h]).filter(val => val && val.toString().trim() !== ''))).sort().map((val: any, idx) => (
-                            <option key={idx} value={val} />
-                          ))}
-                        </datalist>
+                      {(h.toLowerCase().includes('género') || h.toLowerCase().includes('genero')) ? (
+                        <div className="flex flex-col gap-2">
+                          <select
+                            value={['MASCULINO', 'FEMENINO', ''].includes((editingRow?.[h] || '').toString().toUpperCase()) ? (editingRow?.[h] || '').toString().toUpperCase() : 'OTRO'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === 'OTRO') {
+                                setEditingRow({ ...editingRow, [h]: 'OTRO_ESPECIFICAR' });
+                              } else {
+                                setEditingRow({ ...editingRow, [h]: val });
+                              }
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          >
+                            <option value="" disabled>Seleccionar...</option>
+                            <option value="MASCULINO">MASCULINO</option>
+                            <option value="FEMENINO">FEMENINO</option>
+                            <option value="OTRO">OTRO (Especificar)</option>
+                          </select>
+                          {!['MASCULINO', 'FEMENINO', ''].includes((editingRow?.[h] || '').toString().toUpperCase()) && (
+                            <input
+                              type="text"
+                              placeholder="Especifique su género..."
+                              value={editingRow?.[h] === 'OTRO_ESPECIFICAR' ? '' : editingRow?.[h] || ''}
+                              onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value })}
+                              className="w-full bg-white border border-orange-300 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              autoFocus
+                            />
+                          )}
+                        </div>
+                      ) : h.toUpperCase() === 'EDAD' ? (
+                        <input
+                          type="text"
+                          readOnly
+                          value={editingRow?.[h] || ''}
+                          placeholder="Autocalculado..."
+                          className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-slate-400 focus:outline-none cursor-not-allowed"
+                        />
+                      ) : (h.toUpperCase().includes('FECHA') && h.toUpperCase().includes('NACIMIENTO')) ? (
+                        <input
+                          type="date"
+                          value={editingRow?.[h] || ''}
+                          onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      ) : h.toLowerCase().includes('drive') || h.toLowerCase().includes('documento') || h.toLowerCase().includes('enlace') || h.toLowerCase().includes('url') || h.toLowerCase().includes('link') ? (
+                        <input
+                          type="url"
+                          value={editingRow?.[h] || ''}
+                          onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value.trim() })}
+                          className="w-full bg-blue-50 border border-blue-300 rounded-lg px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder-blue-300"
+                          placeholder="https://..."
+                          autoComplete="off"
+                        />
+                      ) : h.toUpperCase() === 'EMAIL' ? (
+                        <input
+                          type="email"
+                          value={editingRow?.[h] || ''}
+                          onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value.trim() })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          placeholder="ejemplo@correo.com"
+                        />
+                      ) : h.toUpperCase() === 'TIPO DE CUENTA' ? (
+                        <select
+                          value={['AHORROS', 'CORRIENTE', ''].includes((editingRow?.[h] || '').toString().toUpperCase()) ? (editingRow?.[h] || '').toString().toUpperCase() : ''}
+                          onChange={(e) => setEditingRow({ ...editingRow, [h]: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        >
+                          <option value="" disabled>Seleccionar tipo...</option>
+                          <option value="AHORROS">AHORROS</option>
+                          <option value="CORRIENTE">CORRIENTE</option>
+                        </select>
+                      ) : (
+                        <>
+                          <input
+                            type="text"
+                            list={h.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/) ? `datalist-${h}` : undefined}
+                            value={editingRow?.[h] || ''}
+                            onChange={(e) => {
+                              let val = e.target.value;
+                              const lowerH = h.toLowerCase();
+                              
+                              if (lowerH.includes('identificacion') || lowerH.includes('identificación') || lowerH.includes('cédula') || lowerH.includes('cedula')) {
+                                val = val.replace(/\D/g, '').substring(0, 10);
+                              } else if (lowerH.includes('teléf') || lowerH.includes('telef') || lowerH.includes('celular') || lowerH.includes('telefono')) {
+                                val = val.replace(/\D/g, '').substring(0, 10);
+                              }
+                              
+                              setEditingRow({ ...editingRow, [h]: val });
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            autoComplete="off"
+                          />
+                          {h.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/) && (
+                            <datalist id={`datalist-${h}`}>
+                              {Array.from(new Set(data.map(row => row[h]).filter(val => val && val.toString().trim() !== ''))).sort().map((val: any, idx) => (
+                                <option key={idx} value={val} />
+                              ))}
+                            </datalist>
+                          )}
+                        </>
                       )}
                     </div>
                   ))}
@@ -1080,14 +1630,46 @@ export default function SociosDirectorio() {
                 <div className="max-h-[50vh] overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50">
                   {headers.map((h, i) => (
                     <div key={i} className="flex justify-between items-center p-3 hover:bg-white transition-colors group">
-                      <span className="font-medium text-slate-700">{h}</span>
-                      <button
-                        onClick={() => handleDeleteField(h)}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                        title={`Eliminar campo: ${h}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      {editingColumn === h ? (
+                        <div className="flex w-full gap-2 items-center">
+                          <input
+                            type="text"
+                            autoFocus
+                            value={newColumnName}
+                            onChange={(e) => setNewColumnName(e.target.value)}
+                            className="flex-1 bg-white border border-orange-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleRenameField(h);
+                              if (e.key === 'Escape') setEditingColumn(null);
+                            }}
+                          />
+                          <button onClick={() => handleRenameField(h)} className="text-green-600 hover:bg-green-50 p-1.5 rounded-lg transition-colors" title="Guardar Nuevo Nombre"><Save className="h-4 w-4" /></button>
+                          <button onClick={() => setEditingColumn(null)} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors" title="Cancelar"><X className="h-4 w-4" /></button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="font-medium text-slate-700">{h}</span>
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => {
+                                setEditingColumn(h);
+                                setNewColumnName(h);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title={`Editar nombre de: ${h}`}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteField(h)}
+                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title={`Eliminar campo: ${h}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
