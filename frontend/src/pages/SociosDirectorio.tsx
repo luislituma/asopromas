@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2 } from 'lucide-react';
+import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import SocioLotesModal from './SocioLotesModal';
 
 export default function SociosDirectorio() {
   const [user, setUser] = useState<User | null>(null);
@@ -35,6 +36,9 @@ export default function SociosDirectorio() {
   // Modal PDF
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [selectedPdfFields, setSelectedPdfFields] = useState<string[]>([]);
+
+  // Modal Lotes
+  const [isLotesModalOpen, setIsLotesModalOpen] = useState(false);
 
   // Double buffering for PDF to prevent flickering
   const [previewUrls, setPreviewUrls] = useState({ a: null as string | null, b: null as string | null });
@@ -531,13 +535,123 @@ export default function SociosDirectorio() {
     setIsSaving(false);
   };
 
+  const sanitizeImportData = (parsedData: any[], rawHeaders: string[]) => {
+    const correoKeyIndex = rawHeaders.findIndex(h => h.toLowerCase().includes('correo'));
+    const emailKeyIndex = rawHeaders.findIndex(h => h.toUpperCase() === 'EMAIL');
+    
+    let finalEmailKey = emailKeyIndex >= 0 ? rawHeaders[emailKeyIndex] : 'EMAIL';
+    let correoKey = correoKeyIndex >= 0 ? rawHeaders[correoKeyIndex] : null;
+
+    if (!rawHeaders.includes(finalEmailKey)) {
+      rawHeaders.push(finalEmailKey);
+    }
+
+    parsedData.forEach(row => {
+      let emailVal = row[finalEmailKey]?.toString().trim() || '';
+      
+      if (correoKey && correoKey !== finalEmailKey) {
+        const correoVal = row[correoKey]?.toString().trim() || '';
+        if (correoVal) {
+          if (!emailVal || emailVal === '-' || emailVal.toLowerCase() === 'n/a' || !emailVal.includes('@')) {
+            emailVal = correoVal;
+          }
+        }
+        delete row[correoKey];
+      }
+
+      if (emailVal) {
+        emailVal = emailVal.toLowerCase().replace(/\s/g, '');
+        if (!emailVal.includes('@') || !emailVal.includes('.')) {
+          emailVal = '';
+        }
+      }
+      
+      row[finalEmailKey] = emailVal;
+    });
+
+    if (correoKey && correoKey !== finalEmailKey) {
+      rawHeaders = rawHeaders.filter(h => h !== correoKey);
+    }
+
+    const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
+    newCols.forEach(col => {
+      if (!rawHeaders.find(h => h.toUpperCase() === col)) {
+        rawHeaders.push(col);
+      }
+    });
+
+    const upperHeaders = rawHeaders.map(h => h.toUpperCase());
+    const upperData = parsedData.map(row => {
+      const newRow: any = {};
+      Object.keys(row).forEach(k => {
+        if (k) newRow[k.toUpperCase()] = row[k];
+      });
+      return newRow;
+    });
+
+    return { sanitizedData: upperData, sanitizedHeaders: upperHeaders };
+  };
+
+  useEffect(() => {
+    if (data.length > 0 && headers.length > 0 && !isLoadingData) {
+      const migrationKey = 'migration_v3_uppercase_correo';
+      if (!localStorage.getItem(migrationKey)) {
+        localStorage.setItem(migrationKey, 'true');
+        setTimeout(() => {
+          const { sanitizedData, sanitizedHeaders } = sanitizeImportData([...data], [...headers]);
+          saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
+        }, 1000);
+      }
+
+      const migrationLotesKey = 'migration_lotes_fincas_v2';
+      if (!localStorage.getItem(migrationLotesKey)) {
+        localStorage.setItem(migrationLotesKey, 'true');
+        setTimeout(async () => {
+          const lotesToInsert: any[] = [];
+          data.forEach(socio => {
+            const x = socio['COORDENADA X'] || socio['X'];
+            const y = socio['COORDENADA Y'] || socio['Y'];
+            const z = socio['COORDENADA Z'] || socio['Z'] || 0;
+            const codigo = socio['CÓDIGO'] || socio['CODIGO'];
+
+            if (x && y && codigo) {
+              const parsedX = parseFloat(x.toString().replace(/,/g, '').trim());
+              const parsedY = parseFloat(y.toString().replace(/,/g, '').trim());
+              const parsedZ = parseFloat(z.toString().replace(/,/g, '').trim()) || 0;
+              
+              if (!isNaN(parsedX) && !isNaN(parsedY)) {
+                lotesToInsert.push({
+                  socio_codigo: codigo.toString().trim(),
+                  nombre_lote: 'Lote 1 (Principal)',
+                  coord_x: parsedX,
+                  coord_y: parsedY,
+                  coord_z: parsedZ
+                });
+              }
+            }
+          });
+
+          if (lotesToInsert.length > 0) {
+            const { error } = await supabase.from('lotes_fincas').insert(lotesToInsert);
+            if (error) {
+              console.error("Error migrando lotes:", error);
+              localStorage.removeItem(migrationLotesKey);
+            } else {
+              console.log("Migración de lotes exitosa!", lotesToInsert.length, "lotes insertados.");
+            }
+          }
+        }, 3000);
+      }
+    }
+  }, [data, headers, isLoadingData]);
+
   // Simple CSV Parser
   const parseCSV = (text: string) => {
     const lines = text.split('\n');
     if (lines.length === 0) return;
 
-    const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    const parsedData = [];
+    let rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    let parsedData: any[] = [];
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -551,26 +665,86 @@ export default function SociosDirectorio() {
       parsedData.push(row);
     }
 
-    const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
-    newCols.forEach(col => {
-      if (!rawHeaders.find(h => h.toUpperCase() === col)) {
-        rawHeaders.push(col);
+    const { sanitizedData, sanitizedHeaders } = sanitizeImportData(parsedData, rawHeaders);
+    saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
+  };
+
+  const parseExcel = async (arrayBuffer: ArrayBuffer) => {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(arrayBuffer);
+    const worksheet = workbook.worksheets[0];
+    
+    if (!worksheet) return;
+
+    let rawHeaders: string[] = [];
+    let headerRowNumber = 0;
+    const parsedData: any[] = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (headerRowNumber === 0) {
+        let isHeader = false;
+        row.eachCell((cell) => {
+          const val = cell.value ? cell.value.toString().toUpperCase().trim() : '';
+          if (['#', 'NOMBRES', 'NOMBRE', 'CÓDIGO', 'CODIGO', 'APELLIDOS', 'APELLIDO', 'PROVINCIA', 'CEDULA', 'CÉDULA', 'IDENTIFICACION', 'IDENTIFICACIÓN'].includes(val)) {
+            isHeader = true;
+          }
+        });
+        
+        if (isHeader) {
+          headerRowNumber = rowNumber;
+          row.eachCell((cell, colNumber) => {
+            rawHeaders[colNumber - 1] = cell.value ? cell.value.toString().trim() : `Column${colNumber}`;
+          });
+          rawHeaders = Array.from(rawHeaders || []).map(h => h || '');
+        }
+      } else if (headerRowNumber > 0 && rowNumber > headerRowNumber) {
+        const rowData: any = {};
+        let hasData = false;
+        rawHeaders.forEach((h, index) => {
+          if (!h) return;
+          const cell = row.getCell(index + 1);
+          let val = cell.value;
+          if (val instanceof Date) {
+            val = val.toISOString().split('T')[0];
+          } else if (val && typeof val === 'object' && 'richText' in val) {
+             val = (val as any).richText.map((t: any) => t.text).join('');
+          }
+          const finalVal = val !== null && val !== undefined ? val.toString().trim() : '';
+          rowData[h] = finalVal;
+          if (finalVal) hasData = true;
+        });
+        if (hasData) parsedData.push(rowData);
       }
     });
 
-    saveData(parsedData, reorderHeaders(rawHeaders));
+    if (rawHeaders.length > 0 && rawHeaders[0] === '#') {
+       rawHeaders.shift();
+       parsedData.forEach(row => delete row['#']);
+    }
+
+    const { sanitizedData, sanitizedHeaders } = sanitizeImportData(parsedData, rawHeaders);
+    saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      parseCSV(text);
-    };
-    reader.readAsText(file);
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith('.csv')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        parseCSV(text);
+      };
+      reader.readAsText(file);
+    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      const arrayBuffer = await file.arrayBuffer();
+      await parseExcel(arrayBuffer);
+    } else {
+      alert('Formato de archivo no soportado. Por favor sube un archivo .csv o .xlsx');
+    }
 
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -1159,7 +1333,7 @@ export default function SociosDirectorio() {
                 <>
                   <input
                     type="file"
-                    accept=".csv"
+                    accept=".csv, .xlsx, .xls"
                     className="hidden"
                     ref={fileInputRef}
                     onChange={handleFileUpload}
@@ -1168,7 +1342,7 @@ export default function SociosDirectorio() {
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-colors"
                   >
-                    <Upload className="h-4 w-4" /> Importar CSV
+                    <Upload className="h-4 w-4" /> Importar Datos
                   </button>
 
                   <button
@@ -1444,9 +1618,21 @@ export default function SociosDirectorio() {
           <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-8">
               <div className="flex justify-between items-center p-6 border-b border-slate-100">
-                <h2 className="text-xl font-bold text-slate-800">
-                  {editingIndex !== null ? 'Editar Socio' : 'Nuevo Socio'}
-                </h2>
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    {editingIndex !== null ? 'Editar Socio' : 'Nuevo Socio'}
+                  </h2>
+                  {editingIndex !== null && (editingRow?.['CÓDIGO'] || editingRow?.['CODIGO']) && (
+                    <button
+                      type="button"
+                      onClick={() => setIsLotesModalOpen(true)}
+                      className="flex items-center gap-2 bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Ver Lotes y Mapa
+                    </button>
+                  )}
+                </div>
                 <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                   <X className="h-6 w-6" />
                 </button>
@@ -1790,6 +1976,14 @@ export default function SociosDirectorio() {
         )}
 
       </div>
+
+      <SocioLotesModal 
+        isOpen={isLotesModalOpen}
+        onClose={() => setIsLotesModalOpen(false)}
+        socioCodigo={(editingRow?.['CÓDIGO'] || editingRow?.['CODIGO'] || '').toString()}
+        socioNombre={`${editingRow?.['NOMBRES'] || ''} ${editingRow?.['APELLIDOS'] || ''}`.trim()}
+        socioFinca={(editingRow?.['NOMBRE DE LA FINCA'] || editingRow?.['FINCA'] || '').toString().trim()}
+      />
     </div>
   );
 }
