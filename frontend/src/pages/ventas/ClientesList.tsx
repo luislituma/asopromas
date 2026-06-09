@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
-import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail, Trash2 } from 'lucide-react';
+import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail, Trash2, RotateCcw } from 'lucide-react';
 
 export default function ClientesList() {
   const [clientes, setClientes] = useState<any[]>([]);
@@ -71,6 +71,19 @@ export default function ClientesList() {
     } finally {
        setDeleteModalOpen(false);
        setSoftDeletePrompt(false);
+    }
+  };
+
+  const handleRestore = async (id: string, nombre: string) => {
+    try {
+      const { error } = await supabase.from('clientes').update({ estado: 'activo' }).eq('id', id);
+      if (error) {
+        alert('Error al reactivar cliente: ' + error.message);
+      } else {
+        fetchClientes();
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -166,13 +179,23 @@ export default function ClientesList() {
                         <Link to={`/ventas/clientes/editar/${cliente.id}`} className="text-neutral-400 hover:text-amber-500 transition-colors p-2 inline-block" title="Editar Cliente">
                           <Edit className="h-4 w-4" />
                         </Link>
-                        <button 
-                          onClick={() => handleDeleteClick(cliente.id, cliente.nombre_razon_social)}
-                          className="text-neutral-400 hover:text-red-500 transition-colors p-2 inline-block"
-                          title="Eliminar Cliente"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {cliente.estado === 'activo' ? (
+                          <button 
+                            onClick={() => handleDeleteClick(cliente.id, cliente.nombre_razon_social)}
+                            className="text-neutral-400 hover:text-red-500 transition-colors p-2 inline-block"
+                            title="Eliminar / Desactivar Cliente"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => handleRestore(cliente.id, cliente.nombre_razon_social)}
+                            className="text-neutral-400 hover:text-emerald-500 transition-colors p-2 inline-block"
+                            title="Restaurar / Activar Cliente"
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
