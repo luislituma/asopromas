@@ -15,6 +15,9 @@ export default function ClienteForm() {
   const [socios, setSocios] = useState<any[]>([]);
   const [tipoId, setTipoId] = useState<'cedula' | 'ruc' | 'pasaporte'>('cedula');
   
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState('');
+  
   const [formData, setFormData] = useState({
     nombre_razon_social: '',
     identificacion: '',
@@ -81,6 +84,50 @@ export default function ClienteForm() {
     }
   };
 
+  // Validación en tiempo real para Identificación
+  useEffect(() => {
+    const checkIdentificacion = async () => {
+      if (!formData.identificacion) {
+        setErrors(prev => { const next = {...prev}; delete next.identificacion; return next; });
+        return;
+      }
+      
+      if (tipoId === 'cedula' || tipoId === 'ruc') {
+        const validacion = validarIdentificacionEcuador(formData.identificacion, tipoId);
+        if (!validacion.valido) {
+          setErrors(prev => ({ ...prev, identificacion: validacion.error || 'Identificación inválida' }));
+          return;
+        }
+      }
+      
+      let query = supabase.from('clientes').select('id').eq('identificacion', formData.identificacion);
+      if (isEdit) query = query.neq('id', id);
+      const { data: ext } = await query;
+      if (ext && ext.length > 0) {
+        setErrors(prev => ({ ...prev, identificacion: 'Esta identificación ya está registrada en otro cliente.' }));
+      } else {
+        setErrors(prev => { const next = {...prev}; delete next.identificacion; return next; });
+      }
+    };
+    
+    const timeoutId = setTimeout(checkIdentificacion, 600);
+    return () => clearTimeout(timeoutId);
+  }, [formData.identificacion, tipoId, isEdit, id]);
+
+  // Validación en tiempo real para Email
+  useEffect(() => {
+    if (formData.email) {
+      const isValid = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email);
+      if (!isValid) {
+        setErrors(prev => ({ ...prev, email: 'Formato de correo electrónico inválido.' }));
+      } else {
+        setErrors(prev => { const next = {...prev}; delete next.email; return next; });
+      }
+    } else {
+      setErrors(prev => { const next = {...prev}; delete next.email; return next; });
+    }
+  }, [formData.email]);
+
   const handleSocioSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const sId = e.target.value;
     if (sId) {
@@ -100,30 +147,16 @@ export default function ClienteForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+    
+    if (Object.keys(errors).length > 0) {
+      setFormError('Por favor, corrige los errores marcados en rojo antes de continuar.');
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      if (formData.identificacion) {
-        if (tipoId === 'cedula' || tipoId === 'ruc') {
-          const validacion = validarIdentificacionEcuador(formData.identificacion, tipoId);
-          if (!validacion.valido) {
-            alert(`Error en Identificación: ${validacion.error}`);
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Verificar unicidad
-        let query = supabase.from('clientes').select('id').eq('identificacion', formData.identificacion);
-        if (isEdit) query = query.neq('id', id);
-        
-        const { data: ext } = await query;
-        if (ext && ext.length > 0) {
-          alert('Ya existe un cliente registrado con esta misma identificación (Cédula/RUC).');
-          setLoading(false);
-          return;
-        }
-      }
 
       const payload = {
         nombre_razon_social: formData.nombre_razon_social,
@@ -154,7 +187,7 @@ export default function ClienteForm() {
       }
     } catch (error: any) {
       console.error(error);
-      alert('Error guardando el cliente.');
+      setFormError(error.message || 'Error guardando el cliente. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -177,6 +210,12 @@ export default function ClienteForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-neutral-800 border border-neutral-700 rounded-xl p-6 md:p-8 space-y-6">
+          {formError && (
+            <div className="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-400 font-medium">
+              ⚠️ {formError}
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <div>
@@ -256,9 +295,10 @@ export default function ClienteForm() {
                   placeholder={tipoId === 'cedula' ? '10 dígitos' : tipoId === 'ruc' ? '13 dígitos (001)' : 'Pasaporte...'}
                   value={formData.identificacion}
                   onChange={(e) => setFormData({...formData, identificacion: e.target.value})}
-                  className="w-2/3 bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                  className={`w-2/3 bg-neutral-900 border ${errors.identificacion ? 'border-red-500 focus:border-red-500' : 'border-neutral-700 focus:border-amber-500'} rounded-lg px-4 py-2.5 text-white focus:outline-none`}
                 />
               </div>
+              {errors.identificacion && <p className="text-red-400 text-xs mt-1">{errors.identificacion}</p>}
             </div>
 
             <div>
@@ -287,8 +327,9 @@ export default function ClienteForm() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                className={`w-full bg-neutral-900 border ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-neutral-700 focus:border-amber-500'} rounded-lg px-4 py-2.5 text-white focus:outline-none`}
               />
+              {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
             </div>
 
             <div className="md:col-span-2">
