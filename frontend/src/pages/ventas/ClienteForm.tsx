@@ -223,49 +223,23 @@ export default function ClienteForm() {
               <select
                 required
                 value={formData.tipo_cliente}
-                onChange={(e) => setFormData({...formData, tipo_cliente: e.target.value})}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({...formData, tipo_cliente: val});
+                  if (val === 'exportacion') {
+                    setTipoId('pasaporte'); // Para omitir validación ecuatoriana por defecto
+                  } else {
+                    setTipoId('ruc'); // Por defecto a empresas/RUC nacional
+                  }
+                }}
                 className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
               >
                 <option value="nacional">Nacional (Empresa/Persona)</option>
-                <option value="exportacion">Exportación (Internacional)</option>
                 <option value="distribuidor">Distribuidor / Mayorista</option>
                 <option value="tienda">Tienda / Local Comercial</option>
-                <option value="socio">Socio de ASOPROMAS</option>
+                <option value="exportacion">Exportación (Internacional)</option>
               </select>
             </div>
-
-            {formData.tipo_cliente === 'socio' ? (
-              <div>
-                <label className="text-sm font-medium text-amber-400 block mb-2">Seleccionar Socio de la Base de Datos</label>
-                <input
-                  type="text"
-                  list="socios-list"
-                  placeholder="Escribe el nombre o cédula del socio..."
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    const socio = socios.find(s => `${s.nombres} ${s.apellidos} (${s.cedula})` === val);
-                    if (socio) {
-                      setFormData(prev => ({
-                        ...prev,
-                        socio_id: socio.id,
-                        nombre_razon_social: `${socio.nombres} ${socio.apellidos}`,
-                        identificacion: socio.cedula || prev.identificacion
-                      }));
-                    } else if (val === '') {
-                      setFormData(prev => ({...prev, socio_id: ''}));
-                    }
-                  }}
-                  className="w-full bg-neutral-900 border border-amber-500/50 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-                />
-                <datalist id="socios-list">
-                  {socios.map(s => (
-                    <option key={s.id} value={`${s.nombres} ${s.apellidos} (${s.cedula})`} />
-                  ))}
-                </datalist>
-              </div>
-            ) : (
-              <div></div>
-            )}
 
             <div className="md:col-span-2">
               <label className="text-sm font-medium text-neutral-300 block mb-2">Nombre o Razón Social *</label>
@@ -279,16 +253,24 @@ export default function ClienteForm() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-neutral-300 block mb-2">Identificación</label>
+              <label className="text-sm font-medium text-neutral-300 block mb-2">
+                {formData.tipo_cliente === 'exportacion' ? 'Tax ID / Identificación Fiscal' : 'Identificación'}
+              </label>
               <div className="flex gap-2">
                 <select
                   value={tipoId}
                   onChange={(e) => setTipoId(e.target.value as any)}
                   className="w-1/3 bg-neutral-900 border border-neutral-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-amber-500"
                 >
-                  <option value="cedula">Cédula</option>
-                  <option value="ruc">RUC</option>
-                  <option value="pasaporte">Otro (Pasaporte)</option>
+                  {formData.tipo_cliente !== 'exportacion' && (
+                    <>
+                      <option value="cedula">Cédula</option>
+                      <option value="ruc">RUC</option>
+                    </>
+                  )}
+                  <option value="pasaporte">
+                    {formData.tipo_cliente === 'exportacion' ? 'Tax ID / Extranjero' : 'Otro (Pasaporte)'}
+                  </option>
                 </select>
                 <input
                   type="text"
@@ -333,11 +315,14 @@ export default function ClienteForm() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-neutral-300 block mb-2">Dirección Completa</label>
+              <label className="text-sm font-medium text-neutral-300 block mb-2">
+                {formData.tipo_cliente === 'exportacion' ? 'País, Ciudad y Dirección de Destino' : 'Dirección Completa'}
+              </label>
               <textarea
                 value={formData.direccion}
                 onChange={(e) => setFormData({...formData, direccion: e.target.value})}
                 rows={2}
+                placeholder={formData.tipo_cliente === 'exportacion' ? 'Ej: Miami, USA. 123 Export Ave...' : ''}
                 className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
               />
             </div>
