@@ -33,6 +33,7 @@ import EjecutarOrdenForm from './pages/procesamiento/EjecutarOrdenForm';
 import OrdenProcesamientoDetalle from './pages/procesamiento/OrdenProcesamientoDetalle';
 import ClientesList from './pages/ventas/ClientesList';
 import ClienteForm from './pages/ventas/ClienteForm';
+import VerCliente from './pages/ventas/VerCliente';
 import VentasList from './pages/ventas/VentasList';
 import TiendaList from './pages/ventas/TiendaList';
 import NuevaVentaForm from './pages/ventas/NuevaVentaForm';
@@ -162,6 +163,7 @@ const App: FC = () => {
             <Route path="/ventas/clientes" element={<ClientesList />} />
             <Route path="/ventas/clientes/nuevo" element={<ClienteForm />} />
             <Route path="/ventas/clientes/editar/:id" element={<ClienteForm />} />
+            <Route path="/ventas/clientes/ver/:id" element={<VerCliente />} />
             <Route path="/campo/visitas" element={<VisitasList />} />
             <Route path="/campo/visitas/nueva" element={<VisitaForm />} />
             <Route path="/campo/visitas/ejecutar/:id" element={<VisitaForm />} />

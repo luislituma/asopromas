@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
-import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail, Trash2, RotateCcw } from 'lucide-react';
+import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail, Trash2, RotateCcw, Eye } from 'lucide-react';
 
 export default function ClientesList() {
   const [clientes, setClientes] = useState<any[]>([]);
@@ -156,7 +156,9 @@ export default function ClientesList() {
                   {filteredClientes.map((cliente) => (
                     <tr key={cliente.id} className="hover:bg-neutral-700/20">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-white">{cliente.nombre_razon_social}</div>
+                        <Link to={`/ventas/clientes/ver/${cliente.id}`} className="font-bold text-white hover:text-amber-500 transition-colors block">
+                          {cliente.nombre_razon_social}
+                        </Link>
                         <div className="text-xs text-neutral-500">{cliente.identificacion || 'Sin ID'}</div>
                       </td>
                       <td className="px-6 py-4">
@@ -176,6 +178,9 @@ export default function ClientesList() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right flex justify-end gap-2">
+                        <Link to={`/ventas/clientes/ver/${cliente.id}`} className="text-neutral-400 hover:text-emerald-500 transition-colors p-2 inline-block" title="Ver Perfil">
+                          <Eye className="h-4 w-4" />
+                        </Link>
                         <Link to={`/ventas/clientes/editar/${cliente.id}`} className="text-neutral-400 hover:text-amber-500 transition-colors p-2 inline-block" title="Editar Cliente">
                           <Edit className="h-4 w-4" />
                         </Link>
