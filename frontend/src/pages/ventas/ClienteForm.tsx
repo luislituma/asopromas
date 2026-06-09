@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { validarIdentificacionEcuador } from '../../utils/validations';
 import { ArrowLeft, Save, Loader2, User } from 'lucide-react';
 
 export default function ClienteForm() {
@@ -12,6 +13,7 @@ export default function ClienteForm() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
   const [socios, setSocios] = useState<any[]>([]);
+  const [tipoId, setTipoId] = useState<'cedula' | 'ruc' | 'pasaporte'>('cedula');
   
   const [formData, setFormData] = useState({
     nombre_razon_social: '',
@@ -53,6 +55,13 @@ export default function ClienteForm() {
       if (error) throw error;
       
       if (data) {
+        let tipoLocal: 'cedula' | 'ruc' | 'pasaporte' = 'pasaporte';
+        if (data.identificacion) {
+          if (data.identificacion.length === 10) tipoLocal = 'cedula';
+          else if (data.identificacion.length === 13) tipoLocal = 'ruc';
+        }
+        setTipoId(tipoLocal);
+
         setFormData({
           nombre_razon_social: data.nombre_razon_social,
           identificacion: data.identificacion || '',
@@ -94,6 +103,28 @@ export default function ClienteForm() {
     setLoading(true);
 
     try {
+      if (formData.identificacion) {
+        if (tipoId === 'cedula' || tipoId === 'ruc') {
+          const validacion = validarIdentificacionEcuador(formData.identificacion, tipoId);
+          if (!validacion.valido) {
+            alert(`Error en Identificación: ${validacion.error}`);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Verificar unicidad
+        let query = supabase.from('clientes').select('id').eq('identificacion', formData.identificacion);
+        if (isEdit) query = query.neq('id', id);
+        
+        const { data: ext } = await query;
+        if (ext && ext.length > 0) {
+          alert('Ya existe un cliente registrado con esta misma identificación (Cédula/RUC).');
+          setLoading(false);
+          return;
+        }
+      }
+
       const payload = {
         nombre_razon_social: formData.nombre_razon_social,
         identificacion: formData.identificacion || null,
@@ -209,13 +240,25 @@ export default function ClienteForm() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-neutral-300 block mb-2">Identificación (RUC/CI)</label>
-              <input
-                type="text"
-                value={formData.identificacion}
-                onChange={(e) => setFormData({...formData, identificacion: e.target.value})}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-              />
+              <label className="text-sm font-medium text-neutral-300 block mb-2">Identificación</label>
+              <div className="flex gap-2">
+                <select
+                  value={tipoId}
+                  onChange={(e) => setTipoId(e.target.value as any)}
+                  className="w-1/3 bg-neutral-900 border border-neutral-700 rounded-lg px-2 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="cedula">Cédula</option>
+                  <option value="ruc">RUC</option>
+                  <option value="pasaporte">Otro (Pasaporte)</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder={tipoId === 'cedula' ? '10 dígitos' : tipoId === 'ruc' ? '13 dígitos (001)' : 'Pasaporte...'}
+                  value={formData.identificacion}
+                  onChange={(e) => setFormData({...formData, identificacion: e.target.value})}
+                  className="w-2/3 bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
             </div>
 
             <div>
