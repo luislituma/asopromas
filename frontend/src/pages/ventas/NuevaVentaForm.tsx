@@ -168,7 +168,7 @@ export default function NuevaVentaForm() {
         .from('ventas')
         .insert([{
           codigo_venta: formData.codigo_venta,
-          cliente_id: formData.cliente_id,
+          cliente_id: formData.cliente_id === 'consumidor_final' ? null : formData.cliente_id,
           subtotal: subtotalTotal,
           descuento: descuentoNum,
           monto_total: montoTotal,
@@ -268,6 +268,7 @@ export default function NuevaVentaForm() {
                 className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-4 py-3 text-white font-medium focus:outline-none focus:border-amber-500"
               >
                 <option value="">-- Seleccionar Cliente --</option>
+                <option value="consumidor_final" className="font-bold text-amber-500">Consumidor Final (Sin Datos)</option>
                 {clientes.map(c => (
                   <option key={c.id} value={c.id}>
                     {c.nombre_razon_social} ({c.tipo_cliente})

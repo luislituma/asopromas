@@ -46,7 +46,8 @@ export default function VentasList() {
   };
 
   const filteredVentas = ventas.filter(v => {
-    const matchSearch = v.codigo_venta.toLowerCase().includes(searchTerm.toLowerCase()) || v.clientes?.nombre_razon_social.toLowerCase().includes(searchTerm.toLowerCase());
+    const nombreCliente = v.clientes?.nombre_razon_social || 'Consumidor Final';
+    const matchSearch = v.codigo_venta.toLowerCase().includes(searchTerm.toLowerCase()) || nombreCliente.toLowerCase().includes(searchTerm.toLowerCase());
     const matchSync = filtroSincronizado === 'todos' ? true : 
                       filtroSincronizado === 'pendientes' ? !v.sincronizado_contabilidad :
                       v.sincronizado_contabilidad;
@@ -126,7 +127,7 @@ export default function VentasList() {
                     <tr key={venta.id} className="hover:bg-neutral-800/50 transition-colors">
                       <td className="p-4 font-mono text-sm text-amber-400">{venta.codigo_venta}</td>
                       <td className="p-4">{new Date(venta.fecha).toLocaleDateString()}</td>
-                      <td className="p-4 font-medium">{venta.clientes?.nombre_razon_social}</td>
+                      <td className="p-4 font-medium">{venta.clientes?.nombre_razon_social || 'Consumidor Final'}</td>
                       <td className="p-4 font-bold text-emerald-400">${venta.monto_total.toFixed(2)}</td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-bold border ${

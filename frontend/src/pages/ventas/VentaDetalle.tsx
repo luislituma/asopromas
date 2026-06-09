@@ -153,10 +153,11 @@ export default function VentaDetalle() {
             <div className="grid grid-cols-2 gap-8 mt-8">
               <div>
                 <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-2 print:text-neutral-400">Cliente</h3>
-                <p className="font-medium text-white print:text-black">{venta.clientes?.nombre_razon_social}</p>
+                <p className="font-medium text-white print:text-black">{venta.clientes?.nombre_razon_social || 'Consumidor Final'}</p>
                 {venta.clientes?.identificacion && <p className="text-neutral-400 text-sm mt-1 print:text-neutral-600">ID: {venta.clientes.identificacion}</p>}
                 {venta.clientes?.direccion && <p className="text-neutral-400 text-sm mt-1 print:text-neutral-600">{venta.clientes.direccion}</p>}
                 {venta.clientes?.email && <p className="text-neutral-400 text-sm mt-1 print:text-neutral-600">{venta.clientes.email}</p>}
+                {!venta.clientes && <p className="text-neutral-500 text-sm mt-1 italic print:text-neutral-500">Venta rápida sin datos asignados</p>}
               </div>
               <div className="text-right">
                 <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-2 print:text-neutral-400">Detalles</h3>
