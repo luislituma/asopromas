@@ -17,6 +17,7 @@ export default function ClientesList() {
       const { data, error } = await supabase
         .from('clientes')
         .select('*')
+        .neq('tipo_cliente', 'socio')
         .order('nombre_razon_social');
 
       if (error) throw error;
