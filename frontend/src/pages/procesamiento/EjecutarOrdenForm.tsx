@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ArrowLeft, Save, Loader2, Factory, PackageOpen } from 'lucide-react';
@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Loader2, Factory, PackageOpen } from 'lucide-react';
 export default function EjecutarOrdenForm() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -46,6 +47,28 @@ export default function EjecutarOrdenForm() {
       setFetching(false);
     }
   };
+
+  // Pre-llenado desde Ventas (URL params)
+  useEffect(() => {
+    if (recetas.length > 0 && !formData.receta_id) {
+      const params = new URLSearchParams(location.search);
+      const prodId = params.get('producto_id');
+      const faltante = params.get('faltante');
+      
+      if (prodId) {
+        // Buscar receta vinculada al producto
+        const rec = recetas.find(r => r.producto_id === prodId || r.productos_catalogo?.id === prodId);
+        if (rec) {
+          setFormData(prev => ({
+            ...prev,
+            receta_id: rec.id,
+            cantidad_a_producir: faltante || prev.cantidad_a_producir,
+            notas: faltante ? `Orden auto-generada para cubrir faltante de ventas.` : prev.notas
+          }));
+        }
+      }
+    }
+  }, [recetas, location.search]);
 
   // Preview de materiales a utilizar
   useEffect(() => {
@@ -245,22 +268,56 @@ export default function EjecutarOrdenForm() {
                 })}
               </ul>
               
-              {selectedRecetaInfo.receta_ingredientes.some((ing: any) => {
-                 const rendimientoEstandar = selectedRecetaInfo.rendimiento_estandar || 1;
-                 const factorEscala = parseFloat(formData.cantidad_a_producir) / rendimientoEstandar;
-                 const cantTotal = factorEscala * ing.cantidad_requerida;
-                 if (ing.tipo_ingrediente === 'cacao_grano') {
-                   const l = lotes.find(l => l.id === formData.lote_id);
-                   return !l || cantTotal > (l.peso_total - (l.peso_utilizado || 0));
-                 } else {
-                   const insumo = insumosList.find(i => i.id === ing.insumo_id);
-                   return !insumo || cantTotal > insumo.stock_disponible;
-                 }
-              }) && (
-                <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <p className="text-red-400 text-sm font-medium">⚠️ No hay suficiente inventario físico para completar esta orden. Solicita la materia prima faltante antes de crear la orden.</p>
-                </div>
-              )}
+              {(() => {
+                const faltantesCacao: any[] = [];
+                const faltantesInsumos: any[] = [];
+                
+                selectedRecetaInfo.receta_ingredientes.forEach((ing: any) => {
+                  const rendimientoEstandar = selectedRecetaInfo.rendimiento_estandar || 1;
+                  const factorEscala = parseFloat(formData.cantidad_a_producir) / rendimientoEstandar;
+                  const cantTotal = factorEscala * ing.cantidad_requerida;
+                  
+                  if (ing.tipo_ingrediente === 'cacao_grano') {
+                    const l = lotes.find(l => l.id === formData.lote_id);
+                    if (!l || cantTotal > (l.peso_total - (l.peso_utilizado || 0))) {
+                      faltantesCacao.push(ing);
+                    }
+                  } else {
+                    const insumo = insumosList.find(i => i.id === ing.insumo_id);
+                    if (!insumo || cantTotal > insumo.stock_disponible) {
+                      faltantesInsumos.push(ing);
+                    }
+                  }
+                });
+
+                if (faltantesCacao.length > 0 || faltantesInsumos.length > 0) {
+                  return (
+                    <div className="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+                      <p className="text-red-400 font-bold mb-2">⚠️ Stock Físico Insuficiente</p>
+                      <p className="text-neutral-300 text-sm mb-4">No hay suficiente inventario para completar la orden. Debes solicitar la materia prima faltante:</p>
+                      <div className="flex flex-wrap gap-3">
+                        {faltantesCacao.length > 0 && (
+                          <Link 
+                            to="/acopio/nuevo" 
+                            className="bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm font-bold px-4 py-2 rounded-lg border border-red-500/30 transition-colors"
+                          >
+                            Ir a Solicitar Cacao (Acopio)
+                          </Link>
+                        )}
+                        {faltantesInsumos.length > 0 && (
+                          <Link 
+                            to="/inventario/insumos/nuevo" 
+                            className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-500 text-sm font-bold px-4 py-2 rounded-lg border border-amber-500/30 transition-colors"
+                          >
+                            Ir a Comprar/Asignar Insumos
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
           )}
 

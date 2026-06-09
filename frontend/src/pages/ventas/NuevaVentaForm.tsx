@@ -122,6 +122,44 @@ export default function NuevaVentaForm() {
       return;
     }
 
+    // Validación estricta de stock
+    for (const item of items) {
+      let disponible = 0;
+      let nombreItem = '';
+      
+      if (item.tipo_item === 'producto_derivado' || item.tipo_item === 'cacao_transferido') {
+        const p = productos.find(x => x.id === item.item_id);
+        if (p) {
+          disponible = p.stock_actual;
+          nombreItem = p.nombre;
+        }
+      } else if (item.tipo_item === 'cacao_grano') {
+        const l = lotes.find(x => x.id === item.item_id);
+        if (l) {
+          disponible = l.peso_total - (l.peso_utilizado || 0);
+          nombreItem = `Lote ${l.codigo_lote}`;
+        }
+      } else if (item.tipo_item === 'insumo') {
+        const i = insumos.find(x => x.id === item.item_id);
+        if (i) {
+          disponible = i.stock_disponible;
+          nombreItem = i.nombre;
+        }
+      }
+
+      if (parseFloat(item.cantidad) > disponible) {
+        if (item.tipo_item === 'producto_derivado' || item.tipo_item === 'cacao_transferido') {
+          const faltante = parseFloat(item.cantidad) - disponible;
+          if (window.confirm(`Stock Insuficiente de "${nombreItem}".\n\nIntentas vender ${item.cantidad} pero solo hay ${disponible} disponibles.\n\n¿Deseas ir a generar una Orden de Producción por el faltante (${faltante})?`)) {
+            navigate(`/procesamiento/ordenes/nueva?producto_id=${item.item_id}&faltante=${faltante}`);
+          }
+        } else {
+          alert(`Stock Insuficiente de "${nombreItem}".\n\nIntentas vender ${item.cantidad} pero solo hay ${disponible} disponibles.`);
+        }
+        return; // Detener guardado
+      }
+    }
+
     setLoading(true);
 
     try {
