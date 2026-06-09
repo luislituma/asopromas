@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
-import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail } from 'lucide-react';
+import { Users, Search, Plus, Loader2, ArrowLeft, Edit, MapPin, Phone, Mail, Trash2 } from 'lucide-react';
 
 export default function ClientesList() {
   const [clientes, setClientes] = useState<any[]>([]);
@@ -25,6 +25,32 @@ export default function ClientesList() {
       console.error('Error fetching clientes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string, nombre: string) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar al cliente "${nombre}"?`)) return;
+
+    try {
+      const { error } = await supabase.from('clientes').delete().eq('id', id);
+      if (error) {
+        // Error de llave foránea (23503) significa que tiene ventas asociadas
+        if (error.code === '23503') {
+           const wantSoftDelete = window.confirm(`El cliente "${nombre}" tiene ventas asociadas y no puede ser eliminado permanentemente. ¿Deseas marcarlo como "inactivo" para ocultarlo?`);
+           if (wantSoftDelete) {
+             const { error: updErr } = await supabase.from('clientes').update({ estado: 'inactivo' }).eq('id', id);
+             if (updErr) alert('Error al desactivar: ' + updErr.message);
+             else fetchClientes();
+           }
+        } else {
+           alert('Error al eliminar: ' + error.message);
+        }
+      } else {
+        fetchClientes();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error inesperado al intentar eliminar el cliente.');
     }
   };
 
@@ -116,10 +142,17 @@ export default function ClientesList() {
                           {cliente.estado}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <Link to={`/ventas/clientes/editar/${cliente.id}`} className="text-neutral-400 hover:text-amber-500 transition-colors p-2 inline-block">
+                      <td className="px-6 py-4 text-right flex justify-end gap-2">
+                        <Link to={`/ventas/clientes/editar/${cliente.id}`} className="text-neutral-400 hover:text-amber-500 transition-colors p-2 inline-block" title="Editar Cliente">
                           <Edit className="h-4 w-4" />
                         </Link>
+                        <button 
+                          onClick={() => handleDelete(cliente.id, cliente.nombre_razon_social)}
+                          className="text-neutral-400 hover:text-red-500 transition-colors p-2 inline-block"
+                          title="Eliminar Cliente"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </td>
                     </tr>
                   ))}
