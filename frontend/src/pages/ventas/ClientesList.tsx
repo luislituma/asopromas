@@ -7,6 +7,11 @@ export default function ClientesList() {
   const [clientes, setClientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState<{id: string, nombre: string} | null>(null);
+  const [softDeletePrompt, setSoftDeletePrompt] = useState(false);
 
   useEffect(() => {
     fetchClientes();
@@ -29,29 +34,43 @@ export default function ClientesList() {
     }
   };
 
-  const handleDelete = async (id: string, nombre: string) => {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar al cliente "${nombre}"?`)) return;
+  const handleDeleteClick = (id: string, nombre: string) => {
+    setClientToDelete({ id, nombre });
+    setSoftDeletePrompt(false);
+    setDeleteModalOpen(true);
+  };
 
+  const confirmDelete = async () => {
+    if (!clientToDelete) return;
     try {
-      const { error } = await supabase.from('clientes').delete().eq('id', id);
+      const { error } = await supabase.from('clientes').delete().eq('id', clientToDelete.id);
       if (error) {
-        // Error de llave foránea (23503) significa que tiene ventas asociadas
         if (error.code === '23503') {
-           const wantSoftDelete = window.confirm(`El cliente "${nombre}" tiene ventas asociadas y no puede ser eliminado permanentemente. ¿Deseas marcarlo como "inactivo" para ocultarlo?`);
-           if (wantSoftDelete) {
-             const { error: updErr } = await supabase.from('clientes').update({ estado: 'inactivo' }).eq('id', id);
-             if (updErr) alert('Error al desactivar: ' + updErr.message);
-             else fetchClientes();
-           }
+           setSoftDeletePrompt(true);
         } else {
            alert('Error al eliminar: ' + error.message);
+           setDeleteModalOpen(false);
         }
       } else {
         fetchClientes();
+        setDeleteModalOpen(false);
       }
     } catch (err) {
       console.error(err);
       alert('Error inesperado al intentar eliminar el cliente.');
+      setDeleteModalOpen(false);
+    }
+  };
+
+  const confirmSoftDelete = async () => {
+    if (!clientToDelete) return;
+    try {
+       const { error: updErr } = await supabase.from('clientes').update({ estado: 'inactivo' }).eq('id', clientToDelete.id);
+       if (updErr) alert('Error al desactivar: ' + updErr.message);
+       else fetchClientes();
+    } finally {
+       setDeleteModalOpen(false);
+       setSoftDeletePrompt(false);
     }
   };
 
@@ -148,7 +167,7 @@ export default function ClientesList() {
                           <Edit className="h-4 w-4" />
                         </Link>
                         <button 
-                          onClick={() => handleDelete(cliente.id, cliente.nombre_razon_social)}
+                          onClick={() => handleDeleteClick(cliente.id, cliente.nombre_razon_social)}
                           className="text-neutral-400 hover:text-red-500 transition-colors p-2 inline-block"
                           title="Eliminar Cliente"
                         >
@@ -163,6 +182,69 @@ export default function ClientesList() {
           )}
         </div>
       </div>
+
+      {/* Custom Delete Modal */}
+      {deleteModalOpen && clientToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            {!softDeletePrompt ? (
+              <>
+                <div className="flex items-center gap-3 mb-4 text-red-500">
+                  <div className="p-3 bg-red-500/10 rounded-full">
+                    <Trash2 className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Eliminar Cliente</h3>
+                </div>
+                <p className="text-neutral-400 mb-6">
+                  ¿Estás seguro de que deseas eliminar permanentemente a <strong className="text-white">{clientToDelete.nombre}</strong>? Esta acción no se puede deshacer.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button 
+                    onClick={() => setDeleteModalOpen(false)}
+                    className="px-4 py-2 text-neutral-400 hover:text-white font-medium transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={confirmDelete}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium transition-colors"
+                  >
+                    Eliminar Permanentemente
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-4 text-amber-500">
+                  <div className="p-3 bg-amber-500/10 rounded-full">
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Ventas Asociadas</h3>
+                </div>
+                <p className="text-neutral-300 mb-6">
+                  El cliente <strong className="text-white">{clientToDelete.nombre}</strong> tiene ventas u operaciones previas. Para proteger el historial contable, el sistema no permite borrarlo.
+                  <br/><br/>
+                  ¿Deseas marcarlo como <strong className="text-amber-400">Inactivo</strong> para ocultarlo de tu directorio?
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button 
+                    onClick={() => setDeleteModalOpen(false)}
+                    className="px-4 py-2 text-neutral-400 hover:text-white font-medium transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={confirmSoftDelete}
+                    className="px-4 py-2 bg-amber-500 text-black rounded-md font-medium hover:bg-amber-600 transition-colors"
+                  >
+                    Desactivar Cliente
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
