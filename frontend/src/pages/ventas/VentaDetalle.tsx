@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Loader2, Printer, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Printer, CheckCircle2, X, Save } from 'lucide-react';
 
 export default function VentaDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [venta, setVenta] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [invoiceInput, setInvoiceInput] = useState('');
 
   useEffect(() => {
     fetchVenta();
@@ -61,18 +63,20 @@ export default function VentaDetalle() {
     }
   };
 
-  const handleSyncContabilidad = async () => {
-    const numero = window.prompt('Ingresa el Número de Factura Oficial (o déjalo en blanco si solo quieres marcar como sincronizado):', venta.numero_factura_externa || '');
-    
-    if (numero === null) return; // User cancelled
-    
+  const handleOpenInvoiceModal = () => {
+    setInvoiceInput(venta.numero_factura_externa || '');
+    setIsInvoiceModalOpen(true);
+  };
+
+  const handleSaveInvoice = async () => {
     try {
       const { error } = await supabase.from('ventas').update({ 
         sincronizado_contabilidad: true,
-        numero_factura_externa: numero || null
+        numero_factura_externa: invoiceInput.trim() || null
       }).eq('id', id);
       
       if (error) throw error;
+      setIsInvoiceModalOpen(false);
       fetchVenta();
     } catch (error) {
       console.error(error);
@@ -87,14 +91,17 @@ export default function VentaDetalle() {
   if (!venta) return <div className="p-12 text-center text-white">Venta no encontrada</div>;
 
   return (
-    <div className="min-h-screen bg-neutral-900 p-6 text-white">
+    <div className="min-h-screen bg-neutral-900 p-6 text-white print:bg-white print:p-0">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 print:hidden">
           <Link to="/ventas" className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors">
             <ArrowLeft className="h-4 w-4" /> Volver a Ventas
           </Link>
           <div className="flex gap-3">
-            <button className="px-4 py-2 bg-neutral-800 text-white font-medium rounded-lg hover:bg-neutral-700 transition-colors flex items-center gap-2">
+            <button 
+              onClick={() => window.print()}
+              className="px-4 py-2 bg-neutral-800 text-white font-medium rounded-lg hover:bg-neutral-700 transition-colors flex items-center gap-2"
+            >
               <Printer className="h-4 w-4" /> Imprimir Recibo
             </button>
             {venta.estado === 'borrador' && (
@@ -118,10 +125,15 @@ export default function VentaDetalle() {
               </div>
               <div className="text-right">
                 <h2 className="text-xl font-bold text-white print:text-black">Recibo de Venta</h2>
-                <p className="text-neutral-400 print:text-neutral-500 font-mono mt-1">{venta.codigo_venta}</p>
-                <div className="mt-2 flex flex-col items-end gap-2">
+                <p className="text-neutral-400 print:text-neutral-500 font-mono mt-1">Código: {venta.codigo_venta}</p>
+                {venta.numero_factura_externa && (
+                  <p className="text-amber-500 print:text-black font-mono mt-1 text-sm font-bold">
+                    Factura N°: {venta.numero_factura_externa}
+                  </p>
+                )}
+                <div className="mt-2 flex flex-col items-end gap-2 print:hidden">
                   {venta.estado === 'completado' ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/30 print:border-none print:bg-transparent print:text-black">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/30">
                       <CheckCircle2 className="h-4 w-4" /> COMPLETADO
                     </span>
                   ) : (
@@ -132,7 +144,7 @@ export default function VentaDetalle() {
 
                   {venta.sincronizado_contabilidad ? (
                     <button 
-                      onClick={handleSyncContabilidad}
+                      onClick={handleOpenInvoiceModal}
                       className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold border border-blue-500/30 hover:bg-blue-500/30 transition-colors"
                       title="Haz clic para editar el número de factura"
                     >
@@ -140,7 +152,7 @@ export default function VentaDetalle() {
                     </button>
                   ) : (
                     <button 
-                      onClick={handleSyncContabilidad}
+                      onClick={handleOpenInvoiceModal}
                       className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs font-bold border border-amber-500/30 hover:bg-amber-500/30 transition-colors"
                     >
                       PENDIENTE FACTURAR
@@ -221,12 +233,59 @@ export default function VentaDetalle() {
           
           {venta.notas && (
             <div className="p-8 border-t border-neutral-700 bg-neutral-800 print:bg-white print:border-neutral-200">
-              <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Notas</h3>
-              <p className="text-sm text-neutral-300 print:text-neutral-700">{venta.notas}</p>
+              <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-wider mb-2 print:text-neutral-400">Notas Adicionales</h3>
+              <p className="text-neutral-300 print:text-neutral-700 whitespace-pre-wrap">{venta.notas}</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Modal Ingresar Factura */}
+      {isInvoiceModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center p-6 border-b border-neutral-800">
+              <h2 className="text-xl font-bold text-white">Número de Factura Oficial</h2>
+              <button 
+                onClick={() => setIsInvoiceModalOpen(false)}
+                className="text-neutral-500 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <p className="text-neutral-400 text-sm mb-4">
+                Ingresa el número de factura física o electrónica (ej. 001-001-12345678). Si solo deseas marcar la venta como sincronizada sin número, déjalo en blanco.
+              </p>
+              
+              <input
+                type="text"
+                autoFocus
+                placeholder="001-001-0000000"
+                value={invoiceInput}
+                onChange={(e) => setInvoiceInput(e.target.value)}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-amber-500 text-lg font-mono text-center tracking-widest placeholder-neutral-600"
+              />
+            </div>
+            
+            <div className="p-4 bg-neutral-800 border-t border-neutral-700 flex justify-end gap-3">
+              <button 
+                onClick={() => setIsInvoiceModalOpen(false)}
+                className="px-4 py-2 text-neutral-400 hover:text-white font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleSaveInvoice}
+                className="px-5 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" /> Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

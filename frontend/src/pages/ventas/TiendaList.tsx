@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Package, Sprout, ShoppingBag, Loader2, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Package, Sprout, ShoppingBag, Loader2, Search, ShoppingCart } from 'lucide-react';
 
 export default function TiendaList() {
   const [productos, setProductos] = useState<any[]>([]);
@@ -107,6 +107,15 @@ export default function TiendaList() {
                     <span className="text-3xl font-black text-amber-500">{p.stock_actual}</span>
                     <span className="text-sm text-neutral-500 mb-1">{p.unidad_medida}</span>
                   </div>
+                  <div className="mt-4 pt-3 border-t border-neutral-700/50">
+                    <Link 
+                      to={`/ventas/nueva?item_id=${p.id}&item_tipo=producto_derivado`}
+                      className="w-full flex items-center justify-center gap-2 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black py-2 rounded-lg text-sm font-bold transition-colors"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Vender
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
@@ -140,6 +149,15 @@ export default function TiendaList() {
                     <span className="text-3xl font-black text-emerald-500">{c.stock_actual}</span>
                     <span className="text-sm text-neutral-500 mb-1">{c.unidad_medida}</span>
                   </div>
+                  <div className="mt-4 pt-3 border-t border-neutral-700/50">
+                    <Link 
+                      to={`/ventas/nueva?item_id=${c.id}&item_tipo=cacao_transferido`}
+                      className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-black py-2 rounded-lg text-sm font-bold transition-colors"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Vender
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
@@ -170,6 +188,15 @@ export default function TiendaList() {
                   <div className="flex justify-between items-end mt-2">
                     <span className="text-3xl font-black text-blue-400">{i.stock_disponible}</span>
                     <span className="text-sm text-neutral-500 mb-1">{i.unidad_medida}</span>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-neutral-700/50">
+                    <Link 
+                      to={`/ventas/nueva?item_id=${i.id}&item_tipo=insumo`}
+                      className="w-full flex items-center justify-center gap-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white py-2 rounded-lg text-sm font-bold transition-colors"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Vender
+                    </Link>
                   </div>
                 </div>
               ))}

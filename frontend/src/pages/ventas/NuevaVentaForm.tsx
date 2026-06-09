@@ -29,13 +29,7 @@ export default function NuevaVentaForm() {
   const [items, setItems] = useState<any[]>([]);
   const [searchClienteText, setSearchClienteText] = useState('');
 
-  useEffect(() => {
-    setItems([{ id: '1', tipo_item: 'producto_derivado', item_id: '', cantidad: 1, precio_unitario: 0, subtotal: 0 }]);
-  }, []);
-
-  useEffect(() => {
-    fetchCatalogos();
-  }, []);
+  // Items initialization is now handled after fetchCatalogos
 
   const fetchCatalogos = async () => {
     try {
@@ -65,28 +59,57 @@ export default function NuevaVentaForm() {
       }
       if (resInsumos.data) setInsumos(resInsumos.data);
       
-      return fetchedClientes;
+      return {
+        clientes: fetchedClientes,
+        productos: resProd.data || [],
+        insumos: resInsumos.data || []
+      };
     } catch (e) {
       console.error(e);
-      return [];
+      return { clientes: [], productos: [], insumos: [] };
     } finally {
       setFetching(false);
     }
   };
 
   useEffect(() => {
-    fetchCatalogos().then((fetchedClientes) => {
+    fetchCatalogos().then((data) => {
       const params = new URLSearchParams(location.search);
+      
       const clienteIdUrl = params.get('cliente_id');
       if (clienteIdUrl) {
         setFormData(prev => ({ ...prev, cliente_id: clienteIdUrl }));
-        const c = fetchedClientes.find((x: any) => x.id === clienteIdUrl);
+        const c = data.clientes.find((x: any) => x.id === clienteIdUrl);
         if (c) {
           setSearchClienteText(`${c.nombre_razon_social} (${c.identificacion || 'S/N'})`);
         }
       }
+
+      const itemId = params.get('item_id');
+      const itemTipo = params.get('item_tipo');
+
+      if (itemId && itemTipo) {
+        let precio = 0;
+        if (itemTipo === 'producto_derivado') {
+           const p = data.productos.find((x: any) => x.id === itemId);
+           if (p && p.precio_venta_sugerido) precio = p.precio_venta_sugerido;
+        } else if (itemTipo === 'insumo') {
+           const i = data.insumos.find((x: any) => x.id === itemId);
+           if (i && i.precio_unitario) precio = i.precio_unitario;
+        }
+        setItems([{ 
+          id: '1', 
+          tipo_item: itemTipo, 
+          item_id: itemId, 
+          cantidad: 1, 
+          precio_unitario: precio, 
+          subtotal: precio 
+        }]);
+      } else {
+        setItems([{ id: '1', tipo_item: 'producto_derivado', item_id: '', cantidad: 1, precio_unitario: 0, subtotal: 0 }]);
+      }
     });
-  }, []);
+  }, [location.search]);
 
   const addItem = () => {
     setItems([
@@ -134,9 +157,10 @@ export default function NuevaVentaForm() {
     setItems(newItems);
   };
 
-  const subtotalTotal = items.reduce((acc, curr) => acc + (curr.subtotal || 0), 0);
-  const descuentoNum = parseFloat(formData.descuento || '0');
-  const montoTotal = subtotalTotal - descuentoNum;
+  const subtotalTotal = items.reduce((acc, item) => acc + item.subtotal, 0);
+  const descuentoPorcentaje = parseFloat(formData.descuento) || 0;
+  const descuentoDolares = subtotalTotal * (descuentoPorcentaje / 100);
+  const montoTotal = subtotalTotal - descuentoDolares;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,7 +243,7 @@ export default function NuevaVentaForm() {
           codigo_venta: formData.codigo_venta,
           cliente_id: finalClienteId === 'consumidor_final' ? null : finalClienteId,
           subtotal: subtotalTotal,
-          descuento: descuentoNum,
+          descuento: descuentoDolares,
           monto_total: montoTotal,
           estado: 'borrador', // Debe completarse desde la lista para descontar inventario
           responsable_id: user?.id,
@@ -258,7 +282,7 @@ export default function NuevaVentaForm() {
       const { error: errDetalles } = await supabase.from('venta_detalles').insert(detallesToInsert);
       if (errDetalles) throw errDetalles;
       
-      navigate('/ventas');
+      navigate('/ventas/' + nuevaVenta.id);
     } catch (error: any) {
       console.error(error);
       alert(`Error registrando la venta: ${error.message || JSON.stringify(error)}`);
@@ -326,24 +350,25 @@ export default function NuevaVentaForm() {
                   setSearchClienteText(val);
                   
                   if (val === 'Consumidor Final (Sin Datos)') {
-                    setFormData(prev => ({...prev, cliente_id: 'consumidor_final'}));
+                    setFormData(prev => ({...prev, cliente_id: 'consumidor_final', descuento: '0'}));
                     return;
                   }
                   
                   const c = clientes.find(c => `${c.nombre_razon_social} (${c.identificacion || 'S/N'})` === val);
                   if (c) {
-                    setFormData(prev => ({...prev, cliente_id: c.id}));
+                    const isSocio = c.tipo_cliente === 'socio';
+                    setFormData(prev => ({...prev, cliente_id: c.id, descuento: isSocio ? '10' : '0'}));
                     return;
                   }
                   
                   const s = socios.find(s => `${s.nombres} ${s.apellidos} (${s.cedula}) - SOCIO` === val);
                   if (s) {
-                    setFormData(prev => ({...prev, cliente_id: `socio_${s.id}`}));
+                    setFormData(prev => ({...prev, cliente_id: `socio_${s.id}`, descuento: '10'}));
                     return;
                   }
                   
                   // Reset if not found
-                  setFormData(prev => ({...prev, cliente_id: ''}));
+                  setFormData(prev => ({...prev, cliente_id: '', descuento: '0'}));
                 }}
                 className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-4 py-3 text-white font-medium focus:outline-none focus:border-amber-500"
               />
@@ -480,11 +505,12 @@ export default function NuevaVentaForm() {
                 <span className="text-white font-medium">${subtotalTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-neutral-700">
-                <span className="text-neutral-400">Descuento Global ($)</span>
+                <span className="text-neutral-400">Descuento Global (%)</span>
                 <input
                   type="number"
-                  step="0.01"
+                  step="0.1"
                   min="0"
+                  max="100"
                   value={formData.descuento}
                   onChange={(e) => setFormData({...formData, descuento: e.target.value})}
                   className="w-24 bg-neutral-900 border border-neutral-700 rounded-md px-3 py-1 text-sm text-right text-white focus:outline-none focus:border-amber-500"
@@ -504,8 +530,7 @@ export default function NuevaVentaForm() {
               disabled={loading}
               className="px-8 py-3 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-50"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-              Guardar Venta (Borrador)
+              Continuar {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <span className="ml-1">→</span>}
             </button>
           </div>
         </form>
