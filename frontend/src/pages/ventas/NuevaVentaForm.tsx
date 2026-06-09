@@ -260,7 +260,12 @@ export default function NuevaVentaForm() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-amber-400 block mb-2">Cliente *</label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-amber-400">Cliente *</label>
+                <Link to="/ventas/clientes/nuevo" className="text-xs text-amber-500 hover:text-amber-400 font-medium bg-amber-500/10 hover:bg-amber-500/20 px-2 py-1 rounded transition-colors">
+                  + Nuevo Cliente
+                </Link>
+              </div>
               <select
                 required
                 value={formData.cliente_id}
