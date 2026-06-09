@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ArrowLeft, Save, Loader2, ShoppingCart, Plus, Trash2 } from 'lucide-react';
@@ -7,11 +7,13 @@ import { ArrowLeft, Save, Loader2, ShoppingCart, Plus, Trash2 } from 'lucide-rea
 export default function NuevaVentaForm() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   
   const [clientes, setClientes] = useState<any[]>([]);
+  const [socios, setSocios] = useState<any[]>([]);
   const [productos, setProductos] = useState<any[]>([]);
   const [lotes, setLotes] = useState<any[]>([]);
   const [insumos, setInsumos] = useState<any[]>([]);
@@ -24,9 +26,12 @@ export default function NuevaVentaForm() {
     numero_factura_externa: ''
   });
 
-  const [items, setItems] = useState<any[]>([
-    { id: '1', tipo_item: 'producto_derivado', item_id: '', cantidad: 1, precio_unitario: 0, subtotal: 0 }
-  ]);
+  const [items, setItems] = useState<any[]>([]);
+  const [searchClienteText, setSearchClienteText] = useState('');
+
+  useEffect(() => {
+    setItems([{ id: '1', tipo_item: 'producto_derivado', item_id: '', cantidad: 1, precio_unitario: 0, subtotal: 0 }]);
+  }, []);
 
   useEffect(() => {
     fetchCatalogos();
@@ -34,29 +39,54 @@ export default function NuevaVentaForm() {
 
   const fetchCatalogos = async () => {
     try {
-      const [resClientes, resProd, resLotes, resInsumos] = await Promise.all([
+      const [resClientes, resProd, resLotes, resInsumos, resSocios] = await Promise.all([
         supabase.from('clientes').select('*').eq('estado', 'activo'),
         supabase.from('productos_catalogo').select('*, lotes(codigo_lote)').gt('stock_actual', 0).order('nombre'),
         supabase.from('lotes').select('*').eq('estado', 'en_bodega').order('codigo_lote'),
-        supabase.from('insumos').select('*').in('categoria', ['fertilizante', 'herramienta', 'semilla', 'quimico']).gt('stock_disponible', 0).order('nombre')
+        supabase.from('insumos').select('*').in('categoria', ['fertilizante', 'herramienta', 'semilla', 'quimico']).gt('stock_disponible', 0).order('nombre'),
+        supabase.from('socios').select('id, nombres, apellidos, cedula').eq('estado', 'activo')
       ]);
       
-      if (resClientes.data) setClientes(resClientes.data);
+      let fetchedClientes = [];
+      if (resClientes.data) {
+        fetchedClientes = resClientes.data;
+        setClientes(fetchedClientes);
+      }
+      if (resSocios.data) {
+        const existingSocioIds = new Set(fetchedClientes.map(c => c.socio_id).filter(Boolean));
+        setSocios(resSocios.data.filter(s => !existingSocioIds.has(s.id)));
+      }
       if (resProd.data) {
         setProductos(resProd.data);
       }
       if (resLotes.data) {
-        // Filtrar solo los lotes que aún tienen peso disponible (Cacao en Acopio)
         const lotesDisponibles = resLotes.data.filter(l => l.peso_total - (l.peso_utilizado || 0) > 0);
         setLotes(lotesDisponibles);
       }
       if (resInsumos.data) setInsumos(resInsumos.data);
+      
+      return fetchedClientes;
     } catch (e) {
       console.error(e);
+      return [];
     } finally {
       setFetching(false);
     }
   };
+
+  useEffect(() => {
+    fetchCatalogos().then((fetchedClientes) => {
+      const params = new URLSearchParams(location.search);
+      const clienteIdUrl = params.get('cliente_id');
+      if (clienteIdUrl) {
+        setFormData(prev => ({ ...prev, cliente_id: clienteIdUrl }));
+        const c = fetchedClientes.find((x: any) => x.id === clienteIdUrl);
+        if (c) {
+          setSearchClienteText(`${c.nombre_razon_social} (${c.identificacion || 'S/N'})`);
+        }
+      }
+    });
+  }, []);
 
   const addItem = () => {
     setItems([
@@ -163,12 +193,31 @@ export default function NuevaVentaForm() {
     setLoading(true);
 
     try {
+      let finalClienteId = formData.cliente_id;
+      
+      // Auto-registrar socio como cliente si se seleccionó uno
+      if (finalClienteId && finalClienteId.startsWith('socio_')) {
+        const socioId = finalClienteId.replace('socio_', '');
+        const socio = socios.find(s => s.id === socioId);
+        if (socio) {
+          const { data: newCliente, error: errCli } = await supabase.from('clientes').insert([{
+            nombre_razon_social: `${socio.nombres} ${socio.apellidos}`,
+            identificacion: socio.cedula,
+            tipo_cliente: 'socio',
+            socio_id: socio.id,
+            estado: 'activo'
+          }]).select().single();
+          if (errCli) throw errCli;
+          finalClienteId = newCliente.id;
+        }
+      }
+
       // 1. Crear cabecera de venta
       const { data: nuevaVenta, error: errVenta } = await supabase
         .from('ventas')
         .insert([{
           codigo_venta: formData.codigo_venta,
-          cliente_id: formData.cliente_id === 'consumidor_final' ? null : formData.cliente_id,
+          cliente_id: finalClienteId === 'consumidor_final' ? null : finalClienteId,
           subtotal: subtotalTotal,
           descuento: descuentoNum,
           monto_total: montoTotal,
@@ -262,24 +311,51 @@ export default function NuevaVentaForm() {
             <div className="md:col-span-2">
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-amber-400">Cliente *</label>
-                <Link to="/ventas/clientes/nuevo" className="text-xs text-amber-500 hover:text-amber-400 font-medium bg-amber-500/10 hover:bg-amber-500/20 px-2 py-1 rounded transition-colors">
+                <Link to="/ventas/clientes/nuevo?returnTo=venta" className="text-xs text-amber-500 hover:text-amber-400 font-medium bg-amber-500/10 hover:bg-amber-500/20 px-2 py-1 rounded transition-colors">
                   + Nuevo Cliente
                 </Link>
               </div>
-              <select
+              <input
                 required
-                value={formData.cliente_id}
-                onChange={(e) => setFormData({...formData, cliente_id: e.target.value})}
+                type="text"
+                list="clientes-list"
+                placeholder="Busca por nombre, RUC o cédula..."
+                value={searchClienteText}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSearchClienteText(val);
+                  
+                  if (val === 'Consumidor Final (Sin Datos)') {
+                    setFormData(prev => ({...prev, cliente_id: 'consumidor_final'}));
+                    return;
+                  }
+                  
+                  const c = clientes.find(c => `${c.nombre_razon_social} (${c.identificacion || 'S/N'})` === val);
+                  if (c) {
+                    setFormData(prev => ({...prev, cliente_id: c.id}));
+                    return;
+                  }
+                  
+                  const s = socios.find(s => `${s.nombres} ${s.apellidos} (${s.cedula}) - SOCIO` === val);
+                  if (s) {
+                    setFormData(prev => ({...prev, cliente_id: `socio_${s.id}`}));
+                    return;
+                  }
+                  
+                  // Reset if not found
+                  setFormData(prev => ({...prev, cliente_id: ''}));
+                }}
                 className="w-full bg-neutral-900 border border-neutral-600 rounded-lg px-4 py-3 text-white font-medium focus:outline-none focus:border-amber-500"
-              >
-                <option value="">-- Seleccionar Cliente --</option>
-                <option value="consumidor_final" className="font-bold text-amber-500">Consumidor Final (Sin Datos)</option>
+              />
+              <datalist id="clientes-list">
+                <option value="Consumidor Final (Sin Datos)" />
                 {clientes.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre_razon_social} ({c.tipo_cliente})
-                  </option>
+                  <option key={c.id} value={`${c.nombre_razon_social} (${c.identificacion || 'S/N'})`} />
                 ))}
-              </select>
+                {socios.map(s => (
+                  <option key={s.id} value={`${s.nombres} ${s.apellidos} (${s.cedula}) - SOCIO`} />
+                ))}
+              </datalist>
             </div>
           </div>
 

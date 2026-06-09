@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Save, Loader2, User } from 'lucide-react';
 
 export default function ClienteForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEdit = Boolean(id);
   
   const [loading, setLoading] = useState(false);
@@ -105,13 +106,21 @@ export default function ClienteForm() {
         estado: formData.estado
       };
 
+      let newId = id;
       if (isEdit) {
         await supabase.from('clientes').update(payload).eq('id', id);
       } else {
-        await supabase.from('clientes').insert([payload]);
+        const { data, error: insertErr } = await supabase.from('clientes').insert([payload]).select().single();
+        if (insertErr) throw insertErr;
+        newId = data.id;
       }
       
-      navigate('/ventas/clientes');
+      const params = new URLSearchParams(location.search);
+      if (params.get('returnTo') === 'venta') {
+        navigate(`/ventas/nueva?cliente_id=${newId}`);
+      } else {
+        navigate('/ventas/clientes');
+      }
     } catch (error: any) {
       console.error(error);
       alert('Error guardando el cliente.');
@@ -125,8 +134,8 @@ export default function ClienteForm() {
   return (
     <div className="min-h-screen bg-neutral-900 p-6 text-white">
       <div className="max-w-3xl mx-auto">
-        <Link to="/ventas/clientes" className="inline-flex items-center gap-2 text-neutral-400 hover:text-white mb-6 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Volver al Directorio
+        <Link to={new URLSearchParams(location.search).get('returnTo') === 'venta' ? "/ventas/nueva" : "/ventas/clientes"} className="inline-flex items-center gap-2 text-neutral-400 hover:text-white mb-6 transition-colors">
+          <ArrowLeft className="h-4 w-4" /> {new URLSearchParams(location.search).get('returnTo') === 'venta' ? 'Volver a Nueva Venta' : 'Volver al Directorio'}
         </Link>
         
         <div className="mb-8">
