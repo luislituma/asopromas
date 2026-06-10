@@ -22,6 +22,13 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
+  // CERCO DE SEGURIDAD: Si es el invitado, NO puede acceder al backend administrativo.
+  // Lo rebotamos inmediatamente a la página pública de directorio.
+  const isGuest = session.user?.email?.toLowerCase().trim() === 'invitado@asopromas.com';
+  if (isGuest) {
+    return <Navigate to="/socios" replace />;
+  }
+
   // Si hay roles permitidos y el rol del usuario no está incluido
   if (allowedRoles && role && !allowedRoles.includes(role)) {
     // Redirigir al dashboard base si no tiene permisos
