@@ -16,7 +16,6 @@ import ComingSoon from './pages/ComingSoon';
 // App Pages
 import Login from './pages/auth/Login';
 import Profile from './pages/auth/Profile';
-import ResetPassword from './pages/auth/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import ListaSocios from './pages/socios/ListaSocios';
 import RegistroSocio from './pages/socios/RegistroSocio';

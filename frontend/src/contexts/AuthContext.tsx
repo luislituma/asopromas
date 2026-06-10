@@ -3,7 +3,7 @@ import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
 // Definimos el tipo de rol basado en nuestra base de datos
-export type AppRole = 'admin' | 'tecnico' | 'socio' | null;
+export type AppRole = 'admin' | 'tecnico' | 'socio' | 'acopio' | 'procesamiento' | null;
 
 interface AuthContextType {
   user: User | null;
