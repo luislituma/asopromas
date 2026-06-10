@@ -111,15 +111,19 @@ export default function SociosDirectorio() {
           }
         }
         
-        // El código puede estar vacío y la bd acepta nulos, pero "cedula" era requerido en BD
-        let ced = row['CÉDULA']?.toString().trim() || row['CEDULA']?.toString().trim() || row['IDENTIFICACION']?.toString().trim() || null;
-        if (!ced) {
-           ced = "S/N-" + Math.floor(Math.random() * 1000000);
-        }
-
+        // Extraer nombres primero para poder usarlos como llave de caché secundaria
         const nombresStr = row['NOMBRES']?.toString().trim() || '-';
         const apellidosStr = row['APELLIDOS']?.toString().trim() || '-';
-        
+        const fullNameKey = (nombresStr + " " + apellidosStr).toUpperCase();
+
+        // El código puede estar vacío y la bd acepta nulos, pero "cedula" era requerido en BD
+        let ced = row['CÉDULA']?.toString().trim() || row['CEDULA']?.toString().trim() || row['IDENTIFICACION']?.toString().trim() || null;
+        if (ced) {
+          // Si es una cédula de relleno como "S/N", "0", "NA", la tratamos como nula
+          const fakeCedulas = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-'];
+          if (fakeCedulas.includes(ced.toUpperCase())) ced = null;
+        }
+
         let generoVal = row['GÉNERO']?.toString().trim() || row['GENERO']?.toString().trim() || null;
         if (generoVal) {
           const gLower = generoVal.toLowerCase();
@@ -131,24 +135,34 @@ export default function SociosDirectorio() {
         }
 
         const cod = row['CÓDIGO']?.toString().trim() || row['CODIGO']?.toString().trim() || null;
-        let socioId = sociosCache[ced] || (cod ? sociosCache[cod] : undefined);
+        
+        let socioId = (ced && sociosCache[ced]) || (cod && sociosCache[cod]) || sociosCache[fullNameKey];
 
         if (!socioId) {
-          // Revisamos en la base de datos oficial si este socio ya existe por cédula o por código
+          // Revisamos en la base de datos oficial si este socio ya existe
           let query = supabase.from('socios').select('id');
-          if (cod) {
+          if (ced && cod) {
             query = query.or(`cedula.eq.${ced},codigo_socio.eq.${cod}`);
-          } else {
+          } else if (ced) {
             query = query.eq('cedula', ced);
+          } else if (cod) {
+            query = query.eq('codigo_socio', cod);
+          } else {
+            // Buscamos por nombre si no hay cédula ni código (para no crear duplicados)
+            query = query.eq('nombres', nombresStr).eq('apellidos', apellidosStr);
           }
           
           const { data: existingSocio } = await query.maybeSingle();
           
           if (existingSocio && existingSocio.id) {
              socioId = existingSocio.id;
-             sociosCache[ced] = socioId;
+             if (ced) sociosCache[ced] = socioId;
              if (cod) sociosCache[cod] = socioId;
+             sociosCache[fullNameKey] = socioId;
           } else {
+             // Generar cédula aleatoria SOLO si no se encontró en la BD
+             if (!ced) ced = "S/N-" + Math.floor(Math.random() * 1000000);
+
              const { data: newSocio, error: errS } = await supabase.from('socios').insert([{
                codigo_socio: cod,
                cedula: ced,
@@ -168,8 +182,9 @@ export default function SociosDirectorio() {
              }
              if (newSocio) {
                socioId = newSocio.id;
-               sociosCache[ced] = socioId;
+               if (ced) sociosCache[ced] = socioId;
                if (cod) sociosCache[cod] = socioId;
+               sociosCache[fullNameKey] = socioId;
              }
           }
         }
