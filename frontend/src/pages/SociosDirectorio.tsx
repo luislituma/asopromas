@@ -221,24 +221,49 @@ export default function SociosDirectorio() {
            const z = cleanNum(row['COORDENADA Z'] || row['Z']);
            
            if (fincaNombre) {
-             const { data: newFinca } = await supabase.from('fincas').insert([{
-               socio_id: socioId,
-               nombre: fincaNombre,
-               hectareas_totales: !isNaN(hasTotal) && hasTotal !== 0 ? hasTotal : null,
-               hectareas_cacao: !isNaN(hasCacao) && hasCacao !== 0 ? hasCacao : null,
-               hectareas_bosque: !isNaN(hasBosque) && hasBosque !== 0 ? hasBosque : null
-             }]).select().single();
+             // 1. Verificamos si la finca ya existe para este socio (idempotencia)
+             let { data: existingFinca } = await supabase.from('fincas')
+                .select('id')
+                .eq('socio_id', socioId)
+                .eq('nombre', fincaNombre)
+                .maybeSingle();
+                
+             let fincaId = existingFinca?.id;
+
+             // 2. Si no existe, la creamos
+             if (!fincaId) {
+               const { data: newFinca } = await supabase.from('fincas').insert([{
+                 socio_id: socioId,
+                 nombre: fincaNombre,
+                 hectareas_totales: !isNaN(hasTotal) && hasTotal !== 0 ? hasTotal : null,
+                 hectareas_cacao: !isNaN(hasCacao) && hasCacao !== 0 ? hasCacao : null,
+                 hectareas_bosque: !isNaN(hasBosque) && hasBosque !== 0 ? hasBosque : null
+               }]).select().single();
+               
+               if (newFinca) fincaId = newFinca.id;
+             }
              
-             if (newFinca && newFinca.id && (x !== 0 || y !== 0)) {
-               const { error: errLote } = await supabase.from('lotes_finca').insert([{
-                 finca_id: newFinca.id,
-                 nombre_lote: 'Lote Principal',
-                 coord_x: x,
-                 coord_y: y,
-                 coord_z: z !== 0 ? z : null
-               }]);
-               if (errLote) {
-                 throw new Error("Error creando Lote para finca " + fincaNombre + ": " + errLote.message + " Detalles: " + errLote.details);
+             // 3. Verificamos y creamos el Lote si hay coordenadas
+             if (fincaId && (x !== 0 || y !== 0)) {
+               // Idempotencia para el lote
+               let { data: existingLote } = await supabase.from('lotes_finca')
+                 .select('id')
+                 .eq('finca_id', fincaId)
+                 .eq('coord_x', x)
+                 .eq('coord_y', y)
+                 .maybeSingle();
+
+               if (!existingLote) {
+                 const { error: errLote } = await supabase.from('lotes_finca').insert([{
+                   finca_id: fincaId,
+                   nombre_lote: 'Lote Principal',
+                   coord_x: x,
+                   coord_y: y,
+                   coord_z: z !== 0 ? z : null
+                 }]);
+                 if (errLote) {
+                   throw new Error("Error creando Lote para finca " + fincaNombre + ": " + errLote.message + " Detalles: " + errLote.details);
+                 }
                }
              }
            }
@@ -373,6 +398,7 @@ export default function SociosDirectorio() {
         
         setData(flatData);
         setHeaders(loadedHeaders);
+        console.log("DEBUG: First 5 rows of flatData:", JSON.stringify(flatData.slice(0, 5), null, 2));
       }
       setIsLoadingData(false);
     };
