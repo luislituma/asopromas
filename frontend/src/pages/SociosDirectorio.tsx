@@ -226,6 +226,7 @@ export default function SociosDirectorio() {
                 .select('id')
                 .eq('socio_id', socioId)
                 .eq('nombre', fincaNombre)
+                .limit(1)
                 .maybeSingle();
                 
              let fincaId = existingFinca?.id;
@@ -251,6 +252,7 @@ export default function SociosDirectorio() {
                  .eq('finca_id', fincaId)
                  .eq('coord_x', x)
                  .eq('coord_y', y)
+                 .limit(1)
                  .maybeSingle();
 
                if (!existingLote) {
