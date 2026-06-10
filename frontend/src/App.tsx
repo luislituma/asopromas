@@ -90,6 +90,9 @@ import CocoaNibs from './pages/products/CocoaNibs';
 import CocoaLiqueur from './pages/products/CacaoLiqueur';
 import CocoaCocktail from './pages/products/CacaoCocktail';
 
+// Temp Internal Route
+import SociosDirectorio from './pages/SociosDirectorio';
+
 // Configuración: cambiar a false cuando quieras mostrar el sitio completo
 const COMING_SOON_MODE = SITE_CONFIG.COMING_SOON_MODE;
 
@@ -105,6 +108,7 @@ const App: FC = () => {
       <ScrollToTop />
       <Routes>
         {/* Rutas Públicas (App Web) */}
+        <Route path="/socios" element={<SociosDirectorio />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Landing />} />
           <Route path="cacao-origin" element={<CacaoOrigin />} />

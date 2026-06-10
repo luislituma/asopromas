@@ -1,16 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const rawUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Reemplaza estos valores con tu URL y ANON KEY reales de Supabase
+// (Los encuentras en Supabase > Project Settings > API)
+const supabaseUrl = 'https://sdsaghkgzejayzwgajbt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc2FnaGtnemVqYXl6d2dhamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDY4ODgsImV4cCI6MjA5NTkyMjg4OH0.vAEjm7x7vNx8_hCSuRVaN1ISqGCe_AjTCubOyVYh-6E';
 
-const supabaseUrl = rawUrl.trim().replace(/['"]/g, '');
-const supabaseAnonKey = rawKey.trim().replace(/['"]/g, '');
-
-if (!supabaseUrl || !supabaseAnonKey || !supabaseUrl.startsWith('http')) {
-  console.warn('Faltan las variables de entorno de Supabase o la URL es inválida. Asegúrate de configurarlas correctamente en frontend/.env');
-}
-
-export const supabase = createClient(
-  supabaseUrl.startsWith('http') ? supabaseUrl : 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder'
-);
+export const supabase = createClient(supabaseUrl, supabaseKey);
