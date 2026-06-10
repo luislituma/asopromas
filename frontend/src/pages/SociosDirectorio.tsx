@@ -55,7 +55,6 @@ export default function SociosDirectorio() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check auth session on load
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
@@ -68,6 +67,174 @@ export default function SociosDirectorio() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const [isMigrating, setIsMigrating] = useState(false);
+
+  const migrateToSupabase = async () => {
+    if (!window.confirm('¿Seguro que deseas migrar todos estos datos a las tablas oficiales de Supabase? Asegúrate de haber ejecutado el SQL de limpieza antes.')) return;
+    setIsMigrating(true);
+    
+    try {
+      const gruposCache: Record<string, string> = {}; 
+      const sociosCache: Record<string, string> = {}; // cedula -> socioId
+      
+      for (const row of data) {
+        const comunidadRaw = (row['COMUNIDAD'] || '').toString().trim();
+        let grupoId = null;
+        
+        if (comunidadRaw) {
+          if (gruposCache[comunidadRaw]) {
+            grupoId = gruposCache[comunidadRaw];
+          } else {
+             const { data: gData } = await supabase.from('grupos_base').select('id').ilike('comunidad', comunidadRaw).maybeSingle();
+             if (gData) {
+               grupoId = gData.id;
+             } else {
+               const { data: newG, error: errG } = await supabase.from('grupos_base').insert([{
+                 nombre: comunidadRaw,
+                 comunidad: comunidadRaw,
+                 parroquia: row['PARROQUIA']?.toString().trim() || null,
+                 canton: row['CANTON']?.toString().trim() || row['CANTÓN']?.toString().trim() || null,
+                 provincia: row['PROVINCIA']?.toString().trim() || null
+               }]).select().single();
+               
+               if (errG) {
+                 throw new Error("Error creando Grupo Base: " + errG.message + " Detalles: " + errG.details);
+               }
+               if (newG) grupoId = newG.id;
+             }
+             if (grupoId) gruposCache[comunidadRaw] = grupoId;
+          }
+        }
+        
+        // El código puede estar vacío y la bd acepta nulos, pero "cedula" era requerido en BD
+        let ced = row['CÉDULA']?.toString().trim() || row['CEDULA']?.toString().trim() || row['IDENTIFICACION']?.toString().trim() || null;
+        if (!ced) {
+           ced = "S/N-" + Math.floor(Math.random() * 1000000);
+        }
+
+        const nombresStr = row['NOMBRES']?.toString().trim() || '-';
+        const apellidosStr = row['APELLIDOS']?.toString().trim() || '-';
+        
+        let generoVal = row['GÉNERO']?.toString().trim() || row['GENERO']?.toString().trim() || null;
+        if (generoVal) {
+          const gLower = generoVal.toLowerCase();
+          if (gLower.includes('masc')) generoVal = 'Masculino';
+          else if (gLower.includes('fem')) generoVal = 'Femenino';
+          else if (gLower.includes('otr')) generoVal = 'Otro';
+          else if (gLower.includes('pref')) generoVal = 'Prefiero no decirlo';
+          else generoVal = 'Otro'; // fallback si tiene basura
+        }
+
+        const cod = row['CÓDIGO']?.toString().trim() || row['CODIGO']?.toString().trim() || null;
+        let socioId = sociosCache[ced] || (cod ? sociosCache[cod] : undefined);
+
+        if (!socioId) {
+          // Revisamos en la base de datos oficial si este socio ya existe por cédula o por código
+          let query = supabase.from('socios').select('id');
+          if (cod) {
+            query = query.or(`cedula.eq.${ced},codigo_socio.eq.${cod}`);
+          } else {
+            query = query.eq('cedula', ced);
+          }
+          
+          const { data: existingSocio } = await query.maybeSingle();
+          
+          if (existingSocio && existingSocio.id) {
+             socioId = existingSocio.id;
+             sociosCache[ced] = socioId;
+             if (cod) sociosCache[cod] = socioId;
+          } else {
+             const { data: newSocio, error: errS } = await supabase.from('socios').insert([{
+               codigo_socio: cod,
+               cedula: ced,
+               nombres: nombresStr,
+               apellidos: apellidosStr,
+               telefono: row['TELÉFONO']?.toString().trim() || row['TELEFONO']?.toString().trim() || null,
+               email: row['EMAIL']?.toString().trim() || null,
+               direccion: null,
+               genero: generoVal,
+               banco_nombre: row['BANCO']?.toString().trim() || null,
+               banco_cuenta: row['CUENTA']?.toString().trim() || null,
+               grupo_id: grupoId
+             }]).select().single();
+             
+             if (errS) {
+                throw new Error("Error creando Socio (" + nombresStr + " " + apellidosStr + "): " + errS.message + " Detalles: " + errS.details);
+             }
+             if (newSocio) {
+               socioId = newSocio.id;
+               sociosCache[ced] = socioId;
+               if (cod) sociosCache[cod] = socioId;
+             }
+          }
+        }
+        
+        if (socioId) {
+           const fincaNombre = row['FINCA']?.toString().trim() || row['NOMBRE DE LA FINCA']?.toString().trim() || 'Finca Principal';
+           
+           let hasTotal = 0;
+           let hasCacao = 0;
+           let hasBosque = 0;
+           
+           Object.keys(row).forEach(k => {
+             const keyName = k.toUpperCase().trim();
+             if (keyName.includes('HAS') && keyName.includes('FINCA') && !keyName.includes('CACAO')) {
+               hasTotal = parseFloat(row[k] || '0');
+             } else if (keyName.includes('HAS') && keyName.includes('CACAO')) {
+               hasCacao = parseFloat(row[k] || '0');
+             } else if (keyName.includes('HAS') && keyName.includes('BOSQUE')) {
+               hasBosque = parseFloat(row[k] || '0');
+             } else if (keyName === 'HAS. TOTAL') {
+               if (hasTotal === 0) hasTotal = parseFloat(row[k] || '0');
+             }
+           });
+           
+           // Limpieza de coordenadas para evitar NaN por comas
+           const cleanNum = (val: any) => {
+             if (!val) return 0;
+             const str = val.toString().replace(/,/g, '').trim();
+             return parseFloat(str) || 0;
+           };
+
+           const x = cleanNum(row['COORDENADA X'] || row['X']);
+           const y = cleanNum(row['COORDENADA Y'] || row['Y']);
+           const z = cleanNum(row['COORDENADA Z'] || row['Z']);
+           
+           if (fincaNombre) {
+             const { data: newFinca } = await supabase.from('fincas').insert([{
+               socio_id: socioId,
+               nombre: fincaNombre,
+               hectareas_totales: !isNaN(hasTotal) && hasTotal !== 0 ? hasTotal : null,
+               hectareas_cacao: !isNaN(hasCacao) && hasCacao !== 0 ? hasCacao : null,
+               hectareas_bosque: !isNaN(hasBosque) && hasBosque !== 0 ? hasBosque : null
+             }]).select().single();
+             
+             if (newFinca && newFinca.id && (x !== 0 || y !== 0)) {
+               const { error: errLote } = await supabase.from('lotes_finca').insert([{
+                 finca_id: newFinca.id,
+                 nombre_lote: 'Lote Principal',
+                 coord_x: x,
+                 coord_y: y,
+                 coord_z: z !== 0 ? z : null
+               }]);
+               if (errLote) {
+                 throw new Error("Error creando Lote para finca " + fincaNombre + ": " + errLote.message + " Detalles: " + errLote.details);
+               }
+             }
+           }
+        }
+      }
+      
+      alert("¡Migración Completada!");
+      
+    } catch (e: any) {
+      alert("Error en migración: " + e.message);
+      console.error(e);
+    } finally {
+      setIsMigrating(false);
+    }
+  };
 
   // Helper para poner la columna "codigo" al principio
   const reorderHeaders = (headerList: string[]) => {
@@ -117,25 +284,76 @@ export default function SociosDirectorio() {
 
     const fetchData = async () => {
       setIsLoadingData(true);
-      const { data: dbData, error } = await supabase
-        .from('directorio_temporal')
-        .select('*')
-        .eq('id', 1)
-        .single();
+      const { data: sociosRaw, error } = await supabase
+        .from('socios')
+        .select(`
+          *,
+          grupos_base!grupo_id ( nombre, comunidad, parroquia, canton, provincia ),
+          fincas ( 
+            nombre, hectareas_totales, hectareas_cacao, hectareas_bosque, 
+            lotes_finca ( coord_x, coord_y, coord_z, area_hectareas )
+          )
+        `)
+        .order('nombres', { ascending: true });
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error("Error cargando de Supabase:", error);
-      } else if (dbData) {
-        let loadedHeaders = dbData.headers || [];
-        const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
-        newCols.forEach(col => {
-          if (!loadedHeaders.find((h: string) => h.toUpperCase() === col)) {
-            loadedHeaders.push(col);
+      } else if (sociosRaw) {
+        const flatData: any[] = [];
+        sociosRaw.forEach(s => {
+          const baseRow = {
+            'CÓDIGO': s.codigo_socio || '',
+            'CÉDULA': s.cedula || '',
+            'NOMBRES': s.nombres || '',
+            'APELLIDOS': s.apellidos || '',
+            'TELÉFONO': s.telefono || '',
+            'GÉNERO': s.genero || '',
+            'EMAIL': s.email || '',
+            'BANCO': s.banco_nombre || '',
+            'CUENTA': s.banco_cuenta || '',
+            'COMUNIDAD': s.grupos_base?.comunidad || '',
+            'PARROQUIA': s.grupos_base?.parroquia || '',
+            'CANTÓN': s.grupos_base?.canton || '',
+            'PROVINCIA': s.grupos_base?.provincia || ''
+          };
+
+          if (!s.fincas || s.fincas.length === 0) {
+            flatData.push(baseRow);
+          } else {
+            s.fincas.forEach((f: any) => {
+              const fincaRow = {
+                ...baseRow,
+                'FINCA': f.nombre || '',
+                'HAS. TOTAL DE FINCA': f.hectareas_totales || '',
+                'HAS. TOTAL DE CACAO': f.hectareas_cacao || '',
+                'HAS. BOSQUE': f.hectareas_bosque || ''
+              };
+
+              if (!f.lotes_finca || f.lotes_finca.length === 0) {
+                flatData.push(fincaRow);
+              } else {
+                f.lotes_finca.forEach((l: any) => {
+                  flatData.push({
+                    ...fincaRow,
+                    'COORDENADA X': l.coord_x || '',
+                    'COORDENADA Y': l.coord_y || '',
+                    'COORDENADA Z': l.coord_z || ''
+                  });
+                });
+              }
+            });
           }
         });
+
+        const loadedHeaders = [
+          'CÓDIGO', 'CÉDULA', 'NOMBRES', 'APELLIDOS', 'TELÉFONO', 'GÉNERO', 'EMAIL', 'BANCO', 'CUENTA',
+          'COMUNIDAD', 'PARROQUIA', 'CANTÓN', 'PROVINCIA',
+          'FINCA', 'HAS. TOTAL DE FINCA', 'HAS. TOTAL DE CACAO', 'HAS. BOSQUE',
+          'COORDENADA X', 'COORDENADA Y', 'COORDENADA Z'
+        ];
         
-        setData(dbData.socios_data || []);
-        setHeaders(reorderHeaders(loadedHeaders));
+        setData(flatData);
+        setHeaders(loadedHeaders);
       }
       setIsLoadingData(false);
     };
@@ -510,29 +728,11 @@ export default function SociosDirectorio() {
   };
 
   const saveData = async (newData: any[], newHeaders: string[]) => {
+    // La app ya no guarda en el excel temporal, ahora es solo de vista relacional.
+    // Los datos se guardan mediante los formularios FincaForm, ClienteForm, etc.
     const processed = calculateAges(newData, newHeaders);
-    const finalData = processed.data;
-    const finalHeaders = processed.headers;
-
-    setData(finalData);
-    setHeaders(finalHeaders);
-    setIsSaving(true);
-
-    const { error } = await supabase
-      .from('directorio_temporal')
-      .update({
-        socios_data: finalData,
-        headers: finalHeaders,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', 1);
-
-    if (error) {
-      alert("Error guardando en la nube: " + error.message);
-      console.error(error);
-    }
-
-    setIsSaving(false);
+    setData(processed.data);
+    setHeaders(processed.headers);
   };
 
   const sanitizeImportData = (parsedData: any[], rawHeaders: string[]) => {
@@ -601,46 +801,6 @@ export default function SociosDirectorio() {
           const { sanitizedData, sanitizedHeaders } = sanitizeImportData([...data], [...headers]);
           saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
         }, 1000);
-      }
-
-      const migrationLotesKey = 'migration_lotes_fincas_v2';
-      if (!localStorage.getItem(migrationLotesKey)) {
-        localStorage.setItem(migrationLotesKey, 'true');
-        setTimeout(async () => {
-          const lotesToInsert: any[] = [];
-          data.forEach(socio => {
-            const x = socio['COORDENADA X'] || socio['X'];
-            const y = socio['COORDENADA Y'] || socio['Y'];
-            const z = socio['COORDENADA Z'] || socio['Z'] || 0;
-            const codigo = socio['CÓDIGO'] || socio['CODIGO'];
-
-            if (x && y && codigo) {
-              const parsedX = parseFloat(x.toString().replace(/,/g, '').trim());
-              const parsedY = parseFloat(y.toString().replace(/,/g, '').trim());
-              const parsedZ = parseFloat(z.toString().replace(/,/g, '').trim()) || 0;
-              
-              if (!isNaN(parsedX) && !isNaN(parsedY)) {
-                lotesToInsert.push({
-                  socio_codigo: codigo.toString().trim(),
-                  nombre_lote: 'Lote 1 (Principal)',
-                  coord_x: parsedX,
-                  coord_y: parsedY,
-                  coord_z: parsedZ
-                });
-              }
-            }
-          });
-
-          if (lotesToInsert.length > 0) {
-            const { error } = await supabase.from('lotes_fincas').insert(lotesToInsert);
-            if (error) {
-              console.error("Error migrando lotes:", error);
-              localStorage.removeItem(migrationLotesKey);
-            } else {
-              console.log("Migración de lotes exitosa!", lotesToInsert.length, "lotes insertados.");
-            }
-          }
-        }, 3000);
       }
     }
   }, [data, headers, isLoadingData]);
@@ -1329,32 +1489,6 @@ export default function SociosDirectorio() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {user?.email?.toLowerCase().trim() !== 'invitado@asopromas.com' && (
-                <>
-                  <input
-                    type="file"
-                    accept=".csv, .xlsx, .xls"
-                    className="hidden"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-colors"
-                  >
-                    <Upload className="h-4 w-4" /> Importar Datos
-                  </button>
-
-                  <button
-                    onClick={() => setIsFieldsModalOpen(true)}
-                    disabled={data.length === 0}
-                    className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
-                  >
-                    <Settings className="h-4 w-4" /> Administrar Campos
-                  </button>
-                </>
-              )}
-
               <button
                 onClick={handleExportExcel}
                 disabled={data.length === 0}
