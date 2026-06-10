@@ -125,8 +125,8 @@ export default function SociosDirectorio() {
         // El código puede estar vacío y la bd acepta nulos, pero "cedula" era requerido en BD
         let ced = row['CÉDULA']?.toString().trim() || row['CEDULA']?.toString().trim() || row['IDENTIFICACION']?.toString().trim() || null;
         if (ced) {
-          // Si es una cédula de relleno como "S/N", "0", "NA", la tratamos como nula
-          const fakeCedulas = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-'];
+          // Si es una cédula de relleno como "S/N", "0", "NA", "_", la tratamos como nula
+          const fakeCedulas = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-', '_'];
           if (fakeCedulas.includes(ced.toUpperCase())) ced = null;
         }
 
@@ -137,10 +137,14 @@ export default function SociosDirectorio() {
           else if (gLower.includes('fem')) generoVal = 'Femenino';
           else if (gLower.includes('otr')) generoVal = 'Otro';
           else if (gLower.includes('pref')) generoVal = 'Prefiero no decirlo';
-          else generoVal = 'Otro'; // fallback si tiene basura
+          else generoVal = 'Otro'; 
         }
 
-        const cod = row['CÓDIGO']?.toString().trim() || row['CODIGO']?.toString().trim() || null;
+        let cod = row['CÓDIGO']?.toString().trim() || row['CODIGO']?.toString().trim() || null;
+        if (cod) {
+          const fakeCodigos = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-', '_'];
+          if (fakeCodigos.includes(cod.toUpperCase())) cod = null;
+        }
         
         let socioId = (ced && sociosCache[ced]) || (cod && sociosCache[cod]) || sociosCache[fullNameKey];
 
