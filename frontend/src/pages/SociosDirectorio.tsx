@@ -387,28 +387,28 @@ export default function SociosDirectorio() {
           if (!s.fincas || s.fincas.length === 0) {
             flatData.push(baseRow);
           } else {
-            s.fincas.forEach((f: any) => {
-              const fincaRow = {
-                ...baseRow,
-                'FINCA': f.nombre || '',
-                'HAS. TOTAL DE FINCA': f.hectareas_totales || '',
-                'HAS. TOTAL DE CACAO': f.hectareas_cacao || '',
-                'HAS. BOSQUE': f.hectareas_bosque || ''
-              };
+            // Solo tomamos la primera finca y el primer lote para la tabla principal
+            // (Si tienen más, las pueden ver en el Modal de Detalles)
+            const f = s.fincas[0];
+            const fincaRow = {
+              ...baseRow,
+              'FINCA': f.nombre || '',
+              'HAS. TOTAL DE FINCA': f.hectareas_totales || '',
+              'HAS. TOTAL DE CACAO': f.hectareas_cacao || '',
+              'HAS. BOSQUE': f.hectareas_bosque || ''
+            };
 
-              if (!f.lotes_finca || f.lotes_finca.length === 0) {
-                flatData.push(fincaRow);
-              } else {
-                f.lotes_finca.forEach((l: any) => {
-                  flatData.push({
-                    ...fincaRow,
-                    'COORDENADA X': l.coord_x || '',
-                    'COORDENADA Y': l.coord_y || '',
-                    'COORDENADA Z': l.coord_z || ''
-                  });
-                });
-              }
-            });
+            if (!f.lotes_finca || f.lotes_finca.length === 0) {
+              flatData.push(fincaRow);
+            } else {
+              const l = f.lotes_finca[0];
+              flatData.push({
+                ...fincaRow,
+                'COORDENADA X': l.coord_x || '',
+                'COORDENADA Y': l.coord_y || '',
+                'COORDENADA Z': l.coord_z || ''
+              });
+            }
           }
         });
 
