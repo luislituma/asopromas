@@ -82,7 +82,13 @@ export default function SociosDirectorio() {
       const gruposCache: Record<string, string> = {}; 
       const sociosCache: Record<string, string> = {}; // cedula -> socioId
       
-      for (const row of data) {
+      let successCount = 0;
+      let errorCount = 0;
+      let errorDetails: string[] = [];
+
+      for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        try {
         const comunidadRaw = (row['COMUNIDAD'] || '').toString().trim();
         let grupoId = null;
         
@@ -270,9 +276,20 @@ export default function SociosDirectorio() {
              }
            }
         }
+          successCount++;
+        } catch (innerError: any) {
+          console.error(`Fila ${i + 1} falló:`, innerError);
+          errorCount++;
+          errorDetails.push(`Fila ${i + 1}: ${innerError.message}`);
+        }
       }
       
-      alert("¡Migración Completada!");
+      if (errorCount > 0) {
+        alert(`¡Migración finalizada con ${errorCount} errores!\nSe migraron ${successCount} filas exitosamente.\n\nRevisa la consola para más detalles.`);
+        console.error("ERRORES DETALLADOS:", errorDetails);
+      } else {
+        alert(`¡Migración Completada Perfectamente! (${successCount} filas)`);
+      }
       
     } catch (e: any) {
       alert("Error en migración: " + e.message);
