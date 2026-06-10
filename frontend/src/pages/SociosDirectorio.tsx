@@ -1532,6 +1532,14 @@ export default function SociosDirectorio() {
         </a>
       </div>
 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept=".csv, .xlsx, .xls"
+        className="hidden"
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
