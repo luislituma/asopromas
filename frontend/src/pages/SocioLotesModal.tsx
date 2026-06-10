@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, MapPin, Loader2, Save } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import proj4 from 'proj4';
@@ -277,20 +277,38 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
               <MapContainer 
                 center={[mapMarkers[0]?.lat || -1.8312, mapMarkers[0]?.lng || -78.1834]} 
                 zoom={13} 
-                className="w-full h-full"
+                className="w-full h-full z-0"
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+                <LayersControl position="topright">
+                  <LayersControl.BaseLayer name="Mapa de Calles (OSM)">
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                  </LayersControl.BaseLayer>
+                  
+                  <LayersControl.BaseLayer checked name="Satelital (Esri)">
+                    <TileLayer
+                      attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    />
+                  </LayersControl.BaseLayer>
+                </LayersControl>
+
                 <MapBounds lotes={mapMarkers} />
                 {mapMarkers.map((marker: any) => (
                   <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customMarkerIcon}>
                     <Popup>
-                      <div className="font-sans">
-                        {marker.nombre_finca && <strong className="block text-sm">{marker.nombre_finca}</strong>}
-                        <span className={`block ${marker.nombre_finca ? 'text-xs text-slate-600 font-medium mt-0.5' : 'text-sm font-bold'}`}>{marker.nombre_lote}</span>
-                        <span className="text-xs text-slate-500 block mt-1">Z: {marker.coord_z} m.s.n.m</span>
+                      <div className="font-sans min-w-[200px]">
+                        <h4 className="font-bold text-slate-800 text-sm border-b border-slate-200 pb-1.5 mb-2">
+                          {marker.nombre_finca ? `${marker.nombre_finca} - ` : ''}{marker.nombre_lote}
+                        </h4>
+                        <div className="space-y-1 text-xs text-slate-600">
+                          <p><span className="font-semibold text-slate-700">Socio:</span> {socioNombre}</p>
+                          <p><span className="font-semibold text-slate-700">UTM X:</span> {marker.coord_x}</p>
+                          <p><span className="font-semibold text-slate-700">UTM Y:</span> {marker.coord_y}</p>
+                          <p><span className="font-semibold text-slate-700">Altitud:</span> {marker.coord_z} m</p>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
