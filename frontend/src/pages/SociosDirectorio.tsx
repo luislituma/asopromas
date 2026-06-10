@@ -1552,11 +1552,18 @@ export default function SociosDirectorio() {
 
             <div className="flex flex-wrap gap-3">
               <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 bg-orange-100 text-orange-800 hover:bg-orange-200 px-4 py-2.5 rounded-xl font-medium transition-colors"
+              >
+                <Upload className="h-4 w-4" /> Subir CSV
+              </button>
+
+              <button
                 onClick={handleExportExcel}
                 disabled={data.length === 0}
                 className="flex items-center gap-2 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-4 py-2.5 rounded-xl font-medium transition-colors disabled:opacity-50"
               >
-                <Download className="h-4 w-4" /> Excel
+                <Download className="h-4 w-4" /> Descargar Excel
               </button>
 
               <button
