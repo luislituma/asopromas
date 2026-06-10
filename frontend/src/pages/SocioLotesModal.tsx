@@ -75,7 +75,7 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
   const fetchLotes = async () => {
     setIsLoading(true);
     const { data, error } = await supabase
-      .from('lotes_fincas')
+      .from('lotes_finca')
       .select('*')
       .eq('socio_codigo', socioCodigo)
       .order('created_at', { ascending: true });
@@ -103,7 +103,7 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
     };
 
     const { data, error } = await supabase
-      .from('lotes_fincas')
+      .from('lotes_finca')
       .insert([insertData])
       .select()
       .single();
@@ -119,7 +119,7 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
     if (!confirm('¿Seguro que deseas eliminar este lote?')) return;
     
     const { error } = await supabase
-      .from('lotes_fincas')
+      .from('lotes_finca')
       .delete()
       .eq('id', id);
 
