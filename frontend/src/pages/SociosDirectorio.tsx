@@ -19,6 +19,9 @@ export default function SociosDirectorio() {
   const [headers, setHeaders] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchColumn, setSearchColumn] = useState('all');
+  const [filterProvincia, setFilterProvincia] = useState('');
+  const [filterCanton, setFilterCanton] = useState('');
+  const [filterComunidad, setFilterComunidad] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
@@ -511,6 +514,12 @@ export default function SociosDirectorio() {
   }, [data, headers, isLoadingData]);
 
   const filteredData = data.filter(row => {
+    // 1. Filtros Geográficos
+    if (filterProvincia && row['PROVINCIA'] !== filterProvincia) return false;
+    if (filterCanton && row['CANTÓN'] !== filterCanton && row['CANTON'] !== filterCanton) return false;
+    if (filterComunidad && row['COMUNIDAD'] !== filterComunidad) return false;
+
+    // 2. Búsqueda de Texto
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     const searchTerms = term.split(' ').filter(t => t.trim() !== '');
@@ -550,6 +559,17 @@ export default function SociosDirectorio() {
     }
     setSortConfig({ key, direction });
   };
+
+  // Computed geographic filters
+  const uniqueProvincias = Array.from(new Set(data.map(r => r['PROVINCIA']).filter(Boolean))).sort();
+  const uniqueCantones = Array.from(new Set(
+    data.filter(r => !filterProvincia || r['PROVINCIA'] === filterProvincia)
+        .map(r => r['CANTÓN'] || r['CANTON']).filter(Boolean)
+  )).sort();
+  const uniqueComunidades = Array.from(new Set(
+    data.filter(r => (!filterProvincia || r['PROVINCIA'] === filterProvincia) && (!filterCanton || r['CANTÓN'] === filterCanton || r['CANTON'] === filterCanton))
+        .map(r => r['COMUNIDAD']).filter(Boolean)
+  )).sort();
 
   // Generar filtros rápidos dinámicos si es una columna geográfica
   const isGeoColumn = searchColumn.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/);
@@ -1616,6 +1636,47 @@ export default function SociosDirectorio() {
                   >
                     <Plus className="h-5 w-5" /> Agregar Socio
                   </button>
+                </div>
+
+                {/* Geographics Filters */}
+                <div className="w-full mt-3 mb-2 flex flex-col md:flex-row gap-3 items-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <span className="text-sm font-bold text-slate-500 flex items-center min-w-[140px]"><MapPin className="w-4 h-4 mr-1" /> Filtros por Zona:</span>
+                  
+                  <select
+                    value={filterProvincia}
+                    onChange={(e) => {
+                      setFilterProvincia(e.target.value);
+                      setFilterCanton('');
+                      setFilterComunidad('');
+                    }}
+                    className="flex-1 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm font-medium w-full min-w-[150px]"
+                  >
+                    <option value="">Todas las Provincias</option>
+                    {uniqueProvincias.map((p: any, i) => <option key={i} value={p}>{p}</option>)}
+                  </select>
+
+                  <select
+                    value={filterCanton}
+                    onChange={(e) => {
+                      setFilterCanton(e.target.value);
+                      setFilterComunidad('');
+                    }}
+                    disabled={!filterProvincia && uniqueCantones.length > 20}
+                    className="flex-1 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm font-medium disabled:bg-slate-100 disabled:text-slate-400 w-full min-w-[150px]"
+                  >
+                    <option value="">Todos los Cantones</option>
+                    {uniqueCantones.map((c: any, i) => <option key={i} value={c}>{c}</option>)}
+                  </select>
+
+                  <select
+                    value={filterComunidad}
+                    onChange={(e) => setFilterComunidad(e.target.value)}
+                    disabled={!filterCanton && uniqueComunidades.length > 30}
+                    className="flex-1 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm font-medium disabled:bg-slate-100 disabled:text-slate-400 w-full min-w-[150px]"
+                  >
+                    <option value="">Todas las Comunidades</option>
+                    {uniqueComunidades.map((c: any, i) => <option key={i} value={c}>{c}</option>)}
+                  </select>
                 </div>
 
                 {/* Filtros Rápidos Dinámicos */}
