@@ -90,7 +90,7 @@ export default function SociosDirectorio() {
           if (gruposCache[comunidadRaw]) {
             grupoId = gruposCache[comunidadRaw];
           } else {
-             const { data: gData } = await supabase.from('grupos_base').select('id').ilike('comunidad', comunidadRaw).maybeSingle();
+             const { data: gData } = await supabase.from('grupos_base').select('id').ilike('comunidad', comunidadRaw).limit(1).maybeSingle();
              if (gData) {
                grupoId = gData.id;
              } else {
@@ -152,7 +152,7 @@ export default function SociosDirectorio() {
             query = query.eq('nombres', nombresStr).eq('apellidos', apellidosStr);
           }
           
-          const { data: existingSocio } = await query.maybeSingle();
+          const { data: existingSocio } = await query.limit(1).maybeSingle();
           
           if (existingSocio && existingSocio.id) {
              socioId = existingSocio.id;
