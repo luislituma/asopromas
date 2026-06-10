@@ -369,6 +369,7 @@ export default function SociosDirectorio() {
         const flatData: any[] = [];
         sociosRaw.forEach(s => {
           const baseRow = {
+            '_id': s.id,
             'CÓDIGO': s.codigo_socio || '',
             'CÉDULA': s.cedula || '',
             'NOMBRES': s.nombres || '',
@@ -2255,6 +2256,7 @@ export default function SociosDirectorio() {
       <SocioLotesModal 
         isOpen={isLotesModalOpen}
         onClose={() => setIsLotesModalOpen(false)}
+        socioId={editingRow?.['_id']?.toString() || ''}
         socioCodigo={(editingRow?.['CÓDIGO'] || editingRow?.['CODIGO'] || '').toString()}
         socioNombre={`${editingRow?.['NOMBRES'] || ''} ${editingRow?.['APELLIDOS'] || ''}`.trim()}
         socioFinca={(editingRow?.['NOMBRE DE LA FINCA'] || editingRow?.['FINCA'] || '').toString().trim()}

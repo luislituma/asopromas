@@ -34,6 +34,7 @@ interface Lote {
 interface SocioLotesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  socioId: string;
   socioCodigo: string;
   socioNombre: string;
   socioFinca?: string;
@@ -51,7 +52,7 @@ function MapBounds({ lotes }: { lotes: any[] }) {
   return null;
 }
 
-export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNombre, socioFinca }: SocioLotesModalProps) {
+export default function SocioLotesModal({ isOpen, onClose, socioId, socioCodigo, socioNombre, socioFinca }: SocioLotesModalProps) {
   const [lotes, setLotes] = useState<Lote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -66,24 +67,37 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
   });
 
   useEffect(() => {
-    if (isOpen && socioCodigo) {
+    if (isOpen && socioId) {
       setNewLote(prev => ({ ...prev, nombre_finca: socioFinca || '' }));
       fetchLotes();
     }
-  }, [isOpen, socioCodigo, socioFinca]);
+  }, [isOpen, socioId, socioFinca]);
 
   const fetchLotes = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from('lotes_finca')
-      .select('*')
-      .eq('socio_codigo', socioCodigo)
-      .order('created_at', { ascending: true });
+    // Buscamos todas las fincas de este socio_id, y dentro sus lotes_finca
+    const { data: fincasData, error } = await supabase
+      .from('fincas')
+      .select('id, nombre, lotes_finca(*)')
+      .eq('socio_id', socioId);
 
     if (error) {
       console.error('Error fetching lotes:', error);
-    } else {
-      setLotes(data || []);
+      setLotes([]);
+    } else if (fincasData) {
+      // Aplanamos los lotes de todas las fincas para mostrarlos juntos
+      const allLotes: any[] = [];
+      fincasData.forEach(f => {
+        if (f.lotes_finca) {
+          f.lotes_finca.forEach((l: any) => {
+            allLotes.push({
+              ...l,
+              nombre_finca: f.nombre // Le adjuntamos el nombre de su finca padre
+            });
+          });
+        }
+      });
+      setLotes(allLotes);
     }
     setIsLoading(false);
   };
@@ -93,13 +107,44 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
     if (!newLote.nombre_lote || !newLote.coord_x || !newLote.coord_y) return;
 
     setIsSaving(true);
+    
+    // 1. Encontrar o crear la Finca primero (el lote debe pertenecer a una finca)
+    let fincaId = null;
+    const fincaNombre = newLote.nombre_finca || 'Finca Principal';
+    
+    const { data: existingFinca } = await supabase
+      .from('fincas')
+      .select('id')
+      .eq('socio_id', socioId)
+      .eq('nombre', fincaNombre)
+      .limit(1)
+      .maybeSingle();
+      
+    if (existingFinca) {
+      fincaId = existingFinca.id;
+    } else {
+      const { data: newFinca, error: errFinca } = await supabase
+        .from('fincas')
+        .insert([{ socio_id: socioId, nombre: fincaNombre }])
+        .select()
+        .single();
+        
+      if (!errFinca && newFinca) fincaId = newFinca.id;
+    }
+
+    if (!fincaId) {
+      alert("Error: No se pudo enlazar o crear la finca.");
+      setIsSaving(false);
+      return;
+    }
+
+    // 2. Insertar el lote asociado a esa Finca
     const insertData = {
-      socio_codigo: socioCodigo,
-      nombre_finca: newLote.nombre_finca,
+      finca_id: fincaId,
       nombre_lote: newLote.nombre_lote,
       coord_x: parseFloat(newLote.coord_x),
       coord_y: parseFloat(newLote.coord_y),
-      coord_z: newLote.coord_z ? parseFloat(newLote.coord_z) : 0
+      coord_z: newLote.coord_z ? parseFloat(newLote.coord_z) : null
     };
 
     const { data, error } = await supabase
@@ -109,8 +154,12 @@ export default function SocioLotesModal({ isOpen, onClose, socioCodigo, socioNom
       .single();
 
     if (!error && data) {
-      setLotes([...lotes, data]);
+      // Agregamos a la tabla de la interfaz
+      setLotes([...lotes, { ...data, nombre_finca: fincaNombre }]);
       setNewLote({ nombre_finca: socioFinca || '', nombre_lote: '', coord_x: '', coord_y: '', coord_z: '' });
+    } else if (error) {
+      console.error("Error guardando lote:", error);
+      alert("Error guardando lote");
     }
     setIsSaving(false);
   };
