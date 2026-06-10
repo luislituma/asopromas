@@ -2236,6 +2236,27 @@ export default function SociosDirectorio() {
         socioNombre={`${editingRow?.['NOMBRES'] || ''} ${editingRow?.['APELLIDOS'] || ''}`.trim()}
         socioFinca={(editingRow?.['NOMBRE DE LA FINCA'] || editingRow?.['FINCA'] || '').toString().trim()}
       />
+
+      {/* Floating Action Button for Migration (Admin Only) */}
+      {data.length > 0 && (
+        <button
+          onClick={migrateToSupabase}
+          disabled={isMigrating}
+          className="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-50 flex items-center justify-center group"
+          title="Migrar datos a base de datos relacional"
+        >
+          {isMigrating ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+          ) : (
+            <>
+              <Database className="h-6 w-6 group-hover:scale-110 transition-transform" />
+              <span className="max-w-0 overflow-hidden group-hover:max-w-[200px] transition-all duration-300 ease-in-out whitespace-nowrap group-hover:ml-2 font-bold">
+                Migrar a Supabase
+              </span>
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }
