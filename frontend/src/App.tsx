@@ -17,7 +17,7 @@ import ComingSoon from './pages/ComingSoon';
 import Login from './pages/auth/Login';
 import Profile from './pages/auth/Profile';
 import Dashboard from './pages/Dashboard';
-import ListaSocios from './pages/socios/ListaSocios';
+
 import RegistroSocio from './pages/socios/RegistroSocio';
 import EditarSocio from './pages/socios/EditarSocio';
 import VerSocio from './pages/socios/VerSocio';
@@ -107,7 +107,7 @@ const App: FC = () => {
       <ScrollToTop />
       <Routes>
         {/* Rutas Públicas (App Web) */}
-        <Route path="/socios" element={<SociosDirectorio />} />
+        {/* La ruta de socios ahora está dentro del dashboard */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Landing />} />
           <Route path="cacao-origin" element={<CacaoOrigin />} />
@@ -143,7 +143,7 @@ const App: FC = () => {
           
           {/* Rutas Protegidas */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'tecnico', 'acopio', 'procesamiento']} />}>
-            <Route path="/socios" element={<ListaSocios />} />
+            <Route path="/socios" element={<SociosDirectorio />} />
             <Route path="/socios/nuevo" element={<RegistroSocio />} />
             <Route path="/socios/editar/:id" element={<EditarSocio />} />
             <Route path="/socios/ver/:id" element={<VerSocio />} />

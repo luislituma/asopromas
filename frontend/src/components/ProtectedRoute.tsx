@@ -22,11 +22,19 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
-  // CERCO DE SEGURIDAD: Si es el invitado, NO puede acceder al backend administrativo.
-  // Lo rebotamos inmediatamente a la página pública de directorio.
+  // CERCO DE SEGURIDAD: Invitado
   const isGuest = session.user?.email?.toLowerCase().trim() === 'invitado@asopromas.com';
   if (isGuest) {
-    return <Navigate to="/socios" replace />;
+    const currentPath = window.location.pathname.toLowerCase();
+    const allowedPaths = ['/socios', '/fincas', '/lotes', '/grupos', '/perfil', '/login'];
+    const isAllowed = allowedPaths.some(p => currentPath === p || currentPath.startsWith(p + '/'));
+    
+    if (!isAllowed) {
+      return <Navigate to="/socios" replace />;
+    }
+    
+    // Si es invitado y la ruta está permitida, bypass de roles
+    return <Outlet />;
   }
 
   // Si hay roles permitidos y el rol del usuario no está incluido

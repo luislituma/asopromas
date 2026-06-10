@@ -23,6 +23,7 @@ export default function RegistroSocio() {
     etnia: '',
     banco_nombre: '',
     banco_cuenta: '',
+    tipo_cuenta: '',
     tipo_cacao: '',
     grupo_id: '',
     enlace_documentos: ''
@@ -69,6 +70,7 @@ export default function RegistroSocio() {
           etnia: formData.etnia || null,
           banco_nombre: formData.banco_nombre || null,
           banco_cuenta: formData.banco_cuenta || null,
+          tipo_cuenta: formData.tipo_cuenta || null,
           tipo_cacao: formData.tipo_cacao || null,
           grupo_id: formData.grupo_id || null,
           enlace_documentos: formData.enlace_documentos || null
@@ -288,6 +290,20 @@ export default function RegistroSocio() {
                     onChange={handleChange}
                     className="w-full bg-neutral-700 border border-neutral-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
+                </div>
+                
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-neutral-300 mb-2">Tipo de Cuenta</label>
+                  <select
+                    name="tipo_cuenta"
+                    value={formData.tipo_cuenta}
+                    onChange={handleChange}
+                    className="w-full bg-neutral-700 border border-neutral-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="">-- Seleccionar --</option>
+                    <option value="Ahorros">Ahorros</option>
+                    <option value="Corriente">Corriente</option>
+                  </select>
                 </div>
                 
                 <div className="md:col-span-2">

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2, MapPin, Database } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2, MapPin, Database, User as UserIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
@@ -10,6 +11,7 @@ import { saveAs } from 'file-saver';
 import SocioLotesModal from './SocioLotesModal';
 
 export default function SociosDirectorio() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [email, setEmail] = useState('');
@@ -18,7 +20,7 @@ export default function SociosDirectorio() {
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchColumn, setSearchColumn] = useState('all');
+  const [currentView, setCurrentView] = useState<'DATOS_BASICOS' | 'TODOS' | 'DATOS_BANCARIOS' | 'CERTIFICACION'>('DATOS_BASICOS');
   const [filterProvincia, setFilterProvincia] = useState('');
   const [filterCanton, setFilterCanton] = useState('');
   const [filterComunidad, setFilterComunidad] = useState('');
@@ -57,7 +59,7 @@ export default function SociosDirectorio() {
   const [hasDragged, setHasDragged] = useState(false);
   const [draggedCol, setDraggedCol] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,236 +74,7 @@ export default function SociosDirectorio() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const [isMigrating, setIsMigrating] = useState(false);
 
-  const migrateToSupabase = async () => {
-    if (!window.confirm('¿Seguro que deseas migrar todos estos datos a las tablas oficiales de Supabase? Asegúrate de haber ejecutado el SQL de limpieza antes.')) return;
-    setIsMigrating(true);
-    
-    try {
-      const gruposCache: Record<string, string> = {}; 
-      const sociosCache: Record<string, string> = {}; // cedula -> socioId
-      
-      let successCount = 0;
-      let errorCount = 0;
-      let errorDetails: string[] = [];
-
-      for (let i = 0; i < data.length; i++) {
-        const row = data[i];
-        try {
-        const comunidadRaw = (row['COMUNIDAD'] || '').toString().trim();
-        let grupoId = null;
-        
-        if (comunidadRaw) {
-          if (gruposCache[comunidadRaw]) {
-            grupoId = gruposCache[comunidadRaw];
-          } else {
-             const { data: gData } = await supabase.from('grupos_base').select('id').ilike('comunidad', comunidadRaw).limit(1).maybeSingle();
-             if (gData) {
-               grupoId = gData.id;
-             } else {
-               const { data: newG, error: errG } = await supabase.from('grupos_base').insert([{
-                 nombre: comunidadRaw,
-                 comunidad: comunidadRaw,
-                 parroquia: row['PARROQUIA']?.toString().trim() || null,
-                 canton: row['CANTON']?.toString().trim() || row['CANTÓN']?.toString().trim() || null,
-                 provincia: row['PROVINCIA']?.toString().trim() || null
-               }]).select().single();
-               
-               if (errG) {
-                 throw new Error("Error creando Grupo Base: " + errG.message + " Detalles: " + errG.details);
-               }
-               if (newG) grupoId = newG.id;
-             }
-             if (grupoId) gruposCache[comunidadRaw] = grupoId;
-          }
-        }
-        
-        // Extraer nombres primero para poder usarlos como llave de caché secundaria
-        const nombresStr = row['NOMBRES']?.toString().trim() || '-';
-        const apellidosStr = row['APELLIDOS']?.toString().trim() || '-';
-        const fullNameKey = (nombresStr + " " + apellidosStr).toUpperCase();
-
-        // El código puede estar vacío y la bd acepta nulos, pero "cedula" era requerido en BD
-        let ced = row['CÉDULA']?.toString().trim() || row['CEDULA']?.toString().trim() || row['IDENTIFICACION']?.toString().trim() || null;
-        if (ced) {
-          // Si es una cédula de relleno como "S/N", "0", "NA", "_", la tratamos como nula
-          const fakeCedulas = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-', '_'];
-          if (fakeCedulas.includes(ced.toUpperCase())) ced = null;
-        }
-
-        let generoVal = row['GÉNERO']?.toString().trim() || row['GENERO']?.toString().trim() || null;
-        if (generoVal) {
-          const gLower = generoVal.toLowerCase();
-          if (gLower.includes('masc')) generoVal = 'Masculino';
-          else if (gLower.includes('fem')) generoVal = 'Femenino';
-          else if (gLower.includes('otr')) generoVal = 'Otro';
-          else if (gLower.includes('pref')) generoVal = 'Prefiero no decirlo';
-          else generoVal = 'Otro'; 
-        }
-
-        let cod = row['CÓDIGO']?.toString().trim() || row['CODIGO']?.toString().trim() || null;
-        if (cod) {
-          const fakeCodigos = ['S/N', 'SN', '0', 'N/A', 'NA', 'NO TIENE', 'NINGUNO', '-', '_'];
-          if (fakeCodigos.includes(cod.toUpperCase())) cod = null;
-        }
-        
-        let socioId = (ced && sociosCache[ced]) || (cod && sociosCache[cod]) || sociosCache[fullNameKey];
-
-        if (!socioId) {
-          // Revisamos en la base de datos oficial si este socio ya existe
-          let query = supabase.from('socios').select('id');
-          if (ced && cod) {
-            query = query.or(`cedula.eq.${ced},codigo_socio.eq.${cod}`);
-          } else if (ced) {
-            query = query.eq('cedula', ced);
-          } else if (cod) {
-            query = query.eq('codigo_socio', cod);
-          } else {
-            // Buscamos por nombre si no hay cédula ni código (para no crear duplicados)
-            query = query.eq('nombres', nombresStr).eq('apellidos', apellidosStr);
-          }
-          
-          const { data: existingSocio } = await query.limit(1).maybeSingle();
-          
-          if (existingSocio && existingSocio.id) {
-             socioId = existingSocio.id;
-             if (ced) sociosCache[ced] = socioId;
-             if (cod) sociosCache[cod] = socioId;
-             sociosCache[fullNameKey] = socioId;
-          } else {
-             // Generar cédula aleatoria SOLO si no se encontró en la BD
-             if (!ced) ced = "S/N-" + Math.floor(Math.random() * 1000000);
-
-             const { data: newSocio, error: errS } = await supabase.from('socios').insert([{
-               codigo_socio: cod,
-               cedula: ced,
-               nombres: nombresStr,
-               apellidos: apellidosStr,
-               telefono: row['TELÉFONO']?.toString().trim() || row['TELEFONO']?.toString().trim() || null,
-               email: row['EMAIL']?.toString().trim() || null,
-               direccion: null,
-               genero: generoVal,
-               banco_nombre: row['BANCO']?.toString().trim() || null,
-               banco_cuenta: row['CUENTA']?.toString().trim() || null,
-               grupo_id: grupoId
-             }]).select().single();
-             
-             if (errS) {
-                throw new Error("Error creando Socio (" + nombresStr + " " + apellidosStr + "): " + errS.message + " Detalles: " + errS.details);
-             }
-             if (newSocio) {
-               socioId = newSocio.id;
-               if (ced) sociosCache[ced] = socioId;
-               if (cod) sociosCache[cod] = socioId;
-               sociosCache[fullNameKey] = socioId;
-             }
-          }
-        }
-        
-        if (socioId) {
-           const fincaNombre = row['FINCA']?.toString().trim() || row['NOMBRE DE LA FINCA']?.toString().trim() || 'Finca Principal';
-           
-           let hasTotal = 0;
-           let hasCacao = 0;
-           let hasBosque = 0;
-           
-           Object.keys(row).forEach(k => {
-             const keyName = k.toUpperCase().trim();
-             if (keyName.includes('HAS') && keyName.includes('FINCA') && !keyName.includes('CACAO')) {
-               hasTotal = parseFloat(row[k] || '0');
-             } else if (keyName.includes('HAS') && keyName.includes('CACAO')) {
-               hasCacao = parseFloat(row[k] || '0');
-             } else if (keyName.includes('HAS') && keyName.includes('BOSQUE')) {
-               hasBosque = parseFloat(row[k] || '0');
-             } else if (keyName === 'HAS. TOTAL') {
-               if (hasTotal === 0) hasTotal = parseFloat(row[k] || '0');
-             }
-           });
-           
-           // Limpieza de coordenadas para evitar NaN por comas
-           const cleanNum = (val: any) => {
-             if (!val) return 0;
-             const str = val.toString().replace(/,/g, '').trim();
-             return parseFloat(str) || 0;
-           };
-
-           const x = cleanNum(row['COORDENADA X'] || row['X']);
-           const y = cleanNum(row['COORDENADA Y'] || row['Y']);
-           const z = cleanNum(row['COORDENADA Z'] || row['Z']);
-           
-           if (fincaNombre) {
-             // 1. Verificamos si la finca ya existe para este socio (idempotencia)
-             let { data: existingFinca } = await supabase.from('fincas')
-                .select('id')
-                .eq('socio_id', socioId)
-                .eq('nombre', fincaNombre)
-                .limit(1)
-                .maybeSingle();
-                
-             let fincaId = existingFinca?.id;
-
-             // 2. Si no existe, la creamos
-             if (!fincaId) {
-               const { data: newFinca } = await supabase.from('fincas').insert([{
-                 socio_id: socioId,
-                 nombre: fincaNombre,
-                 hectareas_totales: !isNaN(hasTotal) && hasTotal !== 0 ? hasTotal : null,
-                 hectareas_cacao: !isNaN(hasCacao) && hasCacao !== 0 ? hasCacao : null,
-                 hectareas_bosque: !isNaN(hasBosque) && hasBosque !== 0 ? hasBosque : null
-               }]).select().single();
-               
-               if (newFinca) fincaId = newFinca.id;
-             }
-             
-             // 3. Verificamos y creamos el Lote si hay coordenadas
-             if (fincaId && (x !== 0 || y !== 0)) {
-               // Idempotencia para el lote
-               let { data: existingLote } = await supabase.from('lotes_finca')
-                 .select('id')
-                 .eq('finca_id', fincaId)
-                 .eq('coord_x', x)
-                 .eq('coord_y', y)
-                 .limit(1)
-                 .maybeSingle();
-
-               if (!existingLote) {
-                 const { error: errLote } = await supabase.from('lotes_finca').insert([{
-                   finca_id: fincaId,
-                   nombre_lote: 'Lote Principal',
-                   coord_x: x,
-                   coord_y: y,
-                   coord_z: z !== 0 ? z : null
-                 }]);
-                 if (errLote) {
-                   throw new Error("Error creando Lote para finca " + fincaNombre + ": " + errLote.message + " Detalles: " + errLote.details);
-                 }
-               }
-             }
-           }
-        }
-          successCount++;
-        } catch (innerError: any) {
-          console.error(`Fila ${i + 1} falló:`, innerError);
-          errorCount++;
-          errorDetails.push(`Fila ${i + 1}: ${innerError.message}`);
-        }
-      }
-      
-      if (errorCount > 0) {
-        alert(`¡Migración finalizada con ${errorCount} errores!\nSe migraron ${successCount} filas exitosamente.\n\nRevisa la consola para más detalles.`);
-        console.error("ERRORES DETALLADOS:", errorDetails);
-      } else {
-        alert(`¡Migración Completada Perfectamente! (${successCount} filas)`);
-      }
-      
-    } catch (e: any) {
-      alert("Error en migración: " + e.message);
-      console.error(e);
-    } finally {
-      setIsMigrating(false);
-    }
-  };
 
   // Helper para poner la columna "codigo" al principio
   const reorderHeaders = (headerList: string[]) => {
@@ -357,8 +130,8 @@ export default function SociosDirectorio() {
           *,
           grupos_base!grupo_id ( nombre, comunidad, parroquia, canton, provincia ),
           fincas ( 
-            nombre, hectareas_totales, hectareas_cacao, hectareas_bosque, 
-            lotes_finca ( coord_x, coord_y, coord_z, area_hectareas )
+            nombre, hectareas_totales, hectareas_cacao, hectareas_bosque, certificada, certificaciones,
+            lotes_finca ( coord_x, coord_y, coord_z, area_hectareas, variedad_cacao )
           )
         `)
         .order('nombres', { ascending: true });
@@ -378,6 +151,7 @@ export default function SociosDirectorio() {
             'GÉNERO': s.genero || '',
             'EMAIL': s.email || '',
             'BANCO': s.banco_nombre || '',
+            'TIPO CUENTA': s.tipo_cuenta || '',
             'CUENTA': s.banco_cuenta || '',
             'COMUNIDAD': s.grupos_base?.comunidad || '',
             'PARROQUIA': s.grupos_base?.parroquia || '',
@@ -386,38 +160,56 @@ export default function SociosDirectorio() {
           };
 
           if (!s.fincas || s.fincas.length === 0) {
-            flatData.push(baseRow);
-          } else {
-            // Solo tomamos la primera finca y el primer lote para la tabla principal
-            // (Si tienen más, las pueden ver en el Modal de Detalles)
-            const f = s.fincas[0];
-            const fincaRow = {
+            flatData.push({
               ...baseRow,
-              'FINCA': f.nombre || '',
-              'HAS. TOTAL DE FINCA': f.hectareas_totales || '',
-              'HAS. TOTAL DE CACAO': f.hectareas_cacao || '',
-              'HAS. BOSQUE': f.hectareas_bosque || ''
-            };
+              'TOTAL FINCAS': '0',
+              'TOTAL LOTES': '0',
+              'TOTAL HAS. FINCAS': '0',
+              'TOTAL HAS. CACAO': '0',
+              'TOTAL HAS. BOSQUE': '0',
+              'CERTIFICADA': 'NO',
+              'CERTIFICACIONES': ''
+            });
+          } else {
+            let totalHasFinca = 0;
+            let totalHasCacao = 0;
+            let totalHasBosque = 0;
+            let totalLotes = 0;
+            let isCertificada = false;
+            let certificacionesSet = new Set<string>();
 
-            if (!f.lotes_finca || f.lotes_finca.length === 0) {
-              flatData.push(fincaRow);
-            } else {
-              const l = f.lotes_finca[0];
-              flatData.push({
-                ...fincaRow,
-                'COORDENADA X': l.coord_x || '',
-                'COORDENADA Y': l.coord_y || '',
-                'COORDENADA Z': l.coord_z || ''
-              });
-            }
+            s.fincas.forEach((f: any) => {
+              totalHasFinca += Number(f.hectareas_totales) || 0;
+              totalHasCacao += Number(f.hectareas_cacao) || 0;
+              totalHasBosque += Number(f.hectareas_bosque) || 0;
+              if (f.lotes_finca) {
+                totalLotes += f.lotes_finca.length;
+                // Rule: If any lot has coordinates, it's certified organic
+                const hasCoords = f.lotes_finca.some((l: any) => l.coord_x || l.coord_y);
+                if (hasCoords) {
+                  isCertificada = true;
+                  certificacionesSet.add('Certificación Orgánica');
+                }
+              }
+            });
+
+            flatData.push({
+              ...baseRow,
+              'TOTAL FINCAS': s.fincas.length.toString(),
+              'TOTAL LOTES': totalLotes.toString(),
+              'TOTAL HAS. FINCAS': totalHasFinca > 0 ? totalHasFinca.toFixed(2) : '0',
+              'TOTAL HAS. CACAO': totalHasCacao > 0 ? totalHasCacao.toFixed(2) : '0',
+              'TOTAL HAS. BOSQUE': totalHasBosque > 0 ? totalHasBosque.toFixed(2) : '0',
+              'CERTIFICADA': isCertificada ? 'SÍ' : 'NO',
+              'CERTIFICACIONES': Array.from(certificacionesSet).join(', ')
+            });
           }
         });
 
         const loadedHeaders = [
-          'CÓDIGO', 'CÉDULA', 'NOMBRES', 'APELLIDOS', 'TELÉFONO', 'GÉNERO', 'EMAIL', 'BANCO', 'CUENTA',
+          'CÓDIGO', 'CÉDULA', 'NOMBRES', 'APELLIDOS', 'TELÉFONO', 'GÉNERO', 'EMAIL', 'BANCO', 'TIPO CUENTA', 'CUENTA',
           'COMUNIDAD', 'PARROQUIA', 'CANTÓN', 'PROVINCIA',
-          'FINCA', 'HAS. TOTAL DE FINCA', 'HAS. TOTAL DE CACAO', 'HAS. BOSQUE',
-          'COORDENADA X', 'COORDENADA Y', 'COORDENADA Z'
+          'TOTAL FINCAS', 'TOTAL LOTES', 'TOTAL HAS. FINCAS', 'TOTAL HAS. CACAO', 'TOTAL HAS. BOSQUE', 'CERTIFICADA', 'CERTIFICACIONES'
         ];
         
         setData(flatData);
@@ -589,7 +381,7 @@ export default function SociosDirectorio() {
     const term = searchTerm.toLowerCase();
     const searchTerms = term.split(' ').filter(t => t.trim() !== '');
 
-    if (searchColumn === 'DATOS_BANCARIOS') {
+    if (currentView === 'DATOS_BANCARIOS') {
       let rowString = '';
       Object.entries(row).forEach(([key, val]) => {
         const up = key.toUpperCase();
@@ -598,11 +390,6 @@ export default function SociosDirectorio() {
         }
       });
       return searchTerms.every(t => rowString.includes(t));
-    }
-
-    if (searchColumn !== 'all') {
-      const val = row[searchColumn] ? row[searchColumn].toString().toLowerCase() : '';
-      return searchTerms.every(t => val.includes(t));
     }
 
     const allString = Object.values(row).map(v => v ? v.toString().toLowerCase() : '').join(' ');
@@ -636,17 +423,53 @@ export default function SociosDirectorio() {
         .map(r => r['COMUNIDAD']).filter(Boolean)
   )).sort();
 
-  // Generar filtros rápidos dinámicos si es una columna geográfica
-  const isGeoColumn = searchColumn.toLowerCase().match(/provincia|canton|cantón|parroquia|comunidad/);
-  const quickFilters = isGeoColumn ? Array.from(new Set(data.map(row => row[searchColumn]).filter(Boolean))).sort() : [];
+  const displayedHeaders = headers.filter(h => {
+    const up = h.toUpperCase();
+    
+    // Código es indispensable en cualquier vista
+    if (up === 'CÓDIGO' || up === 'CODIGO' || up.includes('CÓDIGO') || up.includes('CODIGO')) {
+      return true;
+    }
 
-  const isBankView = searchColumn === 'DATOS_BANCARIOS';
-  const displayedHeaders = isBankView 
-    ? headers.filter(h => {
-        const up = h.toUpperCase();
-        return up.includes('APELLIDO') || up.includes('NOMBRE') || up.includes('IDENTIFICACION') || up.includes('CÉDULA') || up.includes('CEDULA') || up === 'EMAIL' || up === 'BANCO' || up === 'TIPO DE CUENTA' || up === 'CUENTA';
-      })
-    : headers;
+    if (currentView === 'DATOS_BASICOS') {
+       return up.includes('APELLIDO') || 
+              up.includes('NOMBRE') || 
+              up.includes('IDENTIFICACION') || 
+              up.includes('CÉDULA') || 
+              up.includes('CEDULA') || 
+              up.includes('GÉNERO') || 
+              up.includes('GENERO') || 
+              up === 'EMAIL' || 
+              up.includes('TELÉFONO') || 
+              up.includes('TELEFONO');
+    }
+    if (currentView === 'DATOS_BANCARIOS') {
+       return up.includes('APELLIDO') || 
+              up.includes('NOMBRE') || 
+              up.includes('IDENTIFICACION') || 
+              up.includes('CÉDULA') || 
+              up.includes('CEDULA') || 
+              up === 'EMAIL' || 
+              up === 'BANCO' || 
+              up.includes('TIPO CUENTA') ||
+              up.includes('TIPO DE CUENTA') || 
+              up === 'CUENTA';
+    }
+    if (currentView === 'CERTIFICACION') {
+       return up.includes('APELLIDO') || 
+              up.includes('NOMBRE') || 
+              up.includes('IDENTIFICACION') || 
+              up.includes('CÉDULA') || 
+              up.includes('CEDULA') || 
+              up === 'EMAIL' ||
+              up.includes('TOTAL FINCAS') ||
+              up.includes('TOTAL LOTES') ||
+              up.includes('HAS.') ||
+              up.includes('CERTIFICADA') ||
+              up.includes('CERTIFICACIONES');
+    }
+    return true; // TODOS
+  });
 
   // Filtrar columnas de numeración del CSV para que no aparezcan en el PDF (ya que el PDF genera su propio '#')
   const pdfAvailableHeaders = displayedHeaders.filter(h => !/^(n°|nro\.?|no\.?|número|numero|#)$/i.test(h.trim()));
@@ -821,179 +644,7 @@ export default function SociosDirectorio() {
     setHeaders(processed.headers);
   };
 
-  const sanitizeImportData = (parsedData: any[], rawHeaders: string[]) => {
-    const correoKeyIndex = rawHeaders.findIndex(h => h.toLowerCase().includes('correo'));
-    const emailKeyIndex = rawHeaders.findIndex(h => h.toUpperCase() === 'EMAIL');
-    
-    let finalEmailKey = emailKeyIndex >= 0 ? rawHeaders[emailKeyIndex] : 'EMAIL';
-    let correoKey = correoKeyIndex >= 0 ? rawHeaders[correoKeyIndex] : null;
 
-    if (!rawHeaders.includes(finalEmailKey)) {
-      rawHeaders.push(finalEmailKey);
-    }
-
-    parsedData.forEach(row => {
-      let emailVal = row[finalEmailKey]?.toString().trim() || '';
-      
-      if (correoKey && correoKey !== finalEmailKey) {
-        const correoVal = row[correoKey]?.toString().trim() || '';
-        if (correoVal) {
-          if (!emailVal || emailVal === '-' || emailVal.toLowerCase() === 'n/a' || !emailVal.includes('@')) {
-            emailVal = correoVal;
-          }
-        }
-        delete row[correoKey];
-      }
-
-      if (emailVal) {
-        emailVal = emailVal.toLowerCase().replace(/\s/g, '');
-        if (!emailVal.includes('@') || !emailVal.includes('.')) {
-          emailVal = '';
-        }
-      }
-      
-      row[finalEmailKey] = emailVal;
-    });
-
-    if (correoKey && correoKey !== finalEmailKey) {
-      rawHeaders = rawHeaders.filter(h => h !== correoKey);
-    }
-
-    const newCols = ['EMAIL', 'BANCO', 'TIPO DE CUENTA', 'CUENTA'];
-    newCols.forEach(col => {
-      if (!rawHeaders.find(h => h.toUpperCase() === col)) {
-        rawHeaders.push(col);
-      }
-    });
-
-    const upperHeaders = rawHeaders.map(h => h.toUpperCase());
-    const upperData = parsedData.map(row => {
-      const newRow: any = {};
-      Object.keys(row).forEach(k => {
-        if (k) newRow[k.toUpperCase()] = row[k];
-      });
-      return newRow;
-    });
-
-    return { sanitizedData: upperData, sanitizedHeaders: upperHeaders };
-  };
-
-  useEffect(() => {
-    if (data.length > 0 && headers.length > 0 && !isLoadingData) {
-      const migrationKey = 'migration_v3_uppercase_correo';
-      if (!localStorage.getItem(migrationKey)) {
-        localStorage.setItem(migrationKey, 'true');
-        setTimeout(() => {
-          const { sanitizedData, sanitizedHeaders } = sanitizeImportData([...data], [...headers]);
-          saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
-        }, 1000);
-      }
-    }
-  }, [data, headers, isLoadingData]);
-
-  // Simple CSV Parser
-  const parseCSV = (text: string) => {
-    const lines = text.split('\n');
-    if (lines.length === 0) return;
-
-    let rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    let parsedData: any[] = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-      const row: any = {};
-      rawHeaders.forEach((h, index) => {
-        row[h] = values[index] || '';
-      });
-      parsedData.push(row);
-    }
-
-    const { sanitizedData, sanitizedHeaders } = sanitizeImportData(parsedData, rawHeaders);
-    saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
-  };
-
-  const parseExcel = async (arrayBuffer: ArrayBuffer) => {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(arrayBuffer);
-    const worksheet = workbook.worksheets[0];
-    
-    if (!worksheet) return;
-
-    let rawHeaders: string[] = [];
-    let headerRowNumber = 0;
-    const parsedData: any[] = [];
-
-    worksheet.eachRow((row, rowNumber) => {
-      if (headerRowNumber === 0) {
-        let isHeader = false;
-        row.eachCell((cell) => {
-          const val = cell.value ? cell.value.toString().toUpperCase().trim() : '';
-          if (['#', 'NOMBRES', 'NOMBRE', 'CÓDIGO', 'CODIGO', 'APELLIDOS', 'APELLIDO', 'PROVINCIA', 'CEDULA', 'CÉDULA', 'IDENTIFICACION', 'IDENTIFICACIÓN'].includes(val)) {
-            isHeader = true;
-          }
-        });
-        
-        if (isHeader) {
-          headerRowNumber = rowNumber;
-          row.eachCell((cell, colNumber) => {
-            rawHeaders[colNumber - 1] = cell.value ? cell.value.toString().trim() : `Column${colNumber}`;
-          });
-          rawHeaders = Array.from(rawHeaders || []).map(h => h || '');
-        }
-      } else if (headerRowNumber > 0 && rowNumber > headerRowNumber) {
-        const rowData: any = {};
-        let hasData = false;
-        rawHeaders.forEach((h, index) => {
-          if (!h) return;
-          const cell = row.getCell(index + 1);
-          let val = cell.value;
-          if (val instanceof Date) {
-            val = val.toISOString().split('T')[0];
-          } else if (val && typeof val === 'object' && 'richText' in val) {
-             val = (val as any).richText.map((t: any) => t.text).join('');
-          }
-          const finalVal = val !== null && val !== undefined ? val.toString().trim() : '';
-          rowData[h] = finalVal;
-          if (finalVal) hasData = true;
-        });
-        if (hasData) parsedData.push(rowData);
-      }
-    });
-
-    if (rawHeaders.length > 0 && rawHeaders[0] === '#') {
-       rawHeaders.shift();
-       parsedData.forEach(row => delete row['#']);
-    }
-
-    const { sanitizedData, sanitizedHeaders } = sanitizeImportData(parsedData, rawHeaders);
-    saveData(sanitizedData, reorderHeaders(sanitizedHeaders));
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const fileName = file.name.toLowerCase();
-
-    if (fileName.endsWith('.csv')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        parseCSV(text);
-      };
-      reader.readAsText(file);
-    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-      const arrayBuffer = await file.arrayBuffer();
-      await parseExcel(arrayBuffer);
-    } else {
-      alert('Formato de archivo no soportado. Por favor sube un archivo .csv o .xlsx');
-    }
-
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
 
   const handleAddField = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1547,7 +1198,7 @@ export default function SociosDirectorio() {
   // PANTALLA PRINCIPAL (LOGUEADO)
   // ==========================================
   return (
-    <div className="min-h-screen bg-[#FDF9F3] pb-8 font-sans">
+    <div className="min-h-screen bg-[#FDF9F3] pb-8 font-sans text-slate-800">
 
       {/* Minimalist Header */}
       <div className="bg-white border-b border-orange-100 shadow-sm px-6 py-4 mb-8 sticky top-0 z-50 flex items-center justify-center md:justify-start">
@@ -1556,13 +1207,7 @@ export default function SociosDirectorio() {
         </a>
       </div>
 
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileUpload}
-        accept=".csv, .xlsx, .xls"
-        className="hidden"
-      />
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -1583,13 +1228,6 @@ export default function SociosDirectorio() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 bg-orange-100 text-orange-800 hover:bg-orange-200 px-4 py-2.5 rounded-xl font-medium transition-colors"
-              >
-                <Upload className="h-4 w-4" /> Subir CSV
-              </button>
-
               <button
                 onClick={handleExportExcel}
                 disabled={data.length === 0}
@@ -1680,29 +1318,11 @@ export default function SociosDirectorio() {
               <div className="mb-6">
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
                   <div className="flex flex-col md:flex-row gap-3 flex-1 max-w-2xl">
-                    <select
-                      value={searchColumn}
-                      onChange={(e) => {
-                        setSearchColumn(e.target.value);
-                        setSearchTerm(''); // Limpiar búsqueda al cambiar columna
-                      }}
-                      className="bg-white border border-slate-200 px-4 py-3 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-700 min-w-[200px]"
-                    >
-                      <option value="all">Todos los campos</option>
-                      {headers.filter(h => {
-                         const up = h.toUpperCase();
-                         return up !== 'BANCO' && up !== 'TIPO DE CUENTA' && up !== 'CUENTA';
-                      }).map((h, i) => (
-                        <option key={i} value={h}>{h}</option>
-                      ))}
-                      <option value="DATOS_BANCARIOS" className="font-bold text-orange-600">Vista: Datos Bancarios</option>
-                    </select>
-
                     <div className="relative flex-1">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <input
                         type="text"
-                        placeholder={searchColumn === 'all' ? "Buscar por cualquier campo..." : searchColumn === 'DATOS_BANCARIOS' ? "Buscar socio para transferencia..." : `Buscar en ${searchColumn}...`}
+                        placeholder="Buscar por nombres, cédula o cualquier dato..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white border border-slate-200 pl-11 pr-4 py-3 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
@@ -1710,9 +1330,36 @@ export default function SociosDirectorio() {
                     </div>
                   </div>
 
+                  <div className="flex gap-2 bg-slate-100 p-1 rounded-xl items-center border border-slate-200 h-[50px] self-start md:self-auto overflow-x-auto hide-scrollbar max-w-full">
+                    <button 
+                      onClick={() => setCurrentView('DATOS_BASICOS')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${currentView === 'DATOS_BASICOS' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                    >
+                      Datos Básicos
+                    </button>
+                    <button 
+                      onClick={() => setCurrentView('CERTIFICACION')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${currentView === 'CERTIFICACION' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                    >
+                      Certificación
+                    </button>
+                    <button 
+                      onClick={() => setCurrentView('DATOS_BANCARIOS')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${currentView === 'DATOS_BANCARIOS' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                    >
+                      Bancarios
+                    </button>
+                    <button 
+                      onClick={() => setCurrentView('TODOS')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${currentView === 'TODOS' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                    >
+                      Todos
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => openModal()}
-                    className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:shadow transition-all whitespace-nowrap h-[50px]"
+                    className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:shadow transition-all whitespace-nowrap h-[50px] mt-4 sm:mt-0"
                   >
                     <Plus className="h-5 w-5" /> Agregar Socio
                   </button>
@@ -1758,34 +1405,6 @@ export default function SociosDirectorio() {
                     {uniqueComunidades.map((c: any, i) => <option key={i} value={c}>{c}</option>)}
                   </select>
                 </div>
-
-                {/* Filtros Rápidos Dinámicos */}
-                {quickFilters.length > 0 && (
-                  <div className="w-full mt-3 flex flex-wrap gap-2 items-center bg-slate-50/80 p-3 rounded-xl border border-slate-200 animate-in fade-in slide-in-from-top-2">
-                    <span className="text-sm font-bold text-slate-500 mr-2 flex items-center"><FileText className="w-4 h-4 mr-1" />Filtro Rápido ({searchColumn}):</span>
-                    <button
-                      onClick={() => setSearchTerm('')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${searchTerm === ''
-                        ? 'bg-slate-800 text-white shadow-sm'
-                        : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100 hover:border-slate-400'
-                        }`}
-                    >
-                      Mostrar Todos
-                    </button>
-                    {quickFilters.map((qf: any, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSearchTerm(qf)}
-                        className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all ${searchTerm === qf
-                          ? 'bg-orange-600 text-white shadow-md scale-105'
-                          : 'bg-white text-slate-600 border border-orange-200 hover:bg-orange-50 hover:border-orange-300'
-                          }`}
-                      >
-                        {qf}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
 
@@ -1856,13 +1475,14 @@ export default function SociosDirectorio() {
                           key={rowIndex}
                           onClick={() => {
                             if (hasDragged) return;
-                            openModal(row, data.indexOf(row));
+                            navigate(`/socios/ver/${row['_id']}`);
                           }}
                           className="odd:bg-white even:bg-slate-50/80 hover:bg-orange-100/60 transition-colors cursor-pointer group"
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-center font-bold text-slate-400 border-r border-slate-100/50 group-hover:bg-orange-200/40 transition-colors">
                             {rowIndex + 1}
                           </td>
+
                           {displayedHeaders.map((h, colIndex) => (
                             <td key={colIndex} className="px-6 py-4 whitespace-nowrap">
                               {renderCellContent(h, row[h])}
@@ -1872,7 +1492,7 @@ export default function SociosDirectorio() {
                       ))}
                       {filteredData.length === 0 && (
                         <tr>
-                          <td colSpan={headers.length} className="px-6 py-12 text-center text-slate-500">
+                          <td colSpan={headers.length + 2} className="px-6 py-12 text-center text-slate-500">
                             No se encontraron resultados para "{searchTerm}"
                           </td>
                         </tr>
@@ -2262,26 +1882,7 @@ export default function SociosDirectorio() {
         socioFinca={(editingRow?.['NOMBRE DE LA FINCA'] || editingRow?.['FINCA'] || '').toString().trim()}
       />
 
-      {/* Floating Action Button for Migration (Admin Only) */}
-      {data.length > 0 && (
-        <button
-          onClick={migrateToSupabase}
-          disabled={isMigrating}
-          className="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-50 flex items-center justify-center group"
-          title="Migrar datos a base de datos relacional"
-        >
-          {isMigrating ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
-          ) : (
-            <>
-              <Database className="h-6 w-6 group-hover:scale-110 transition-transform" />
-              <span className="max-w-0 overflow-hidden group-hover:max-w-[200px] transition-all duration-300 ease-in-out whitespace-nowrap group-hover:ml-2 font-bold">
-                Migrar a Supabase
-              </span>
-            </>
-          )}
-        </button>
-      )}
+
     </div>
   );
 }

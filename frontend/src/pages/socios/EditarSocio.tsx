@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, Map, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, Link as LinkIcon } from 'lucide-react';
 
 export default function EditarSocio() {
   const { id } = useParams();
@@ -10,7 +10,6 @@ export default function EditarSocio() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [fincasSocio, setFincasSocio] = useState<any[]>([]);
   const [grupos, setGrupos] = useState<any[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
@@ -28,6 +27,7 @@ export default function EditarSocio() {
     etnia: '',
     banco_nombre: '',
     banco_cuenta: '',
+    tipo_cuenta: '',
     tipo_cacao: '',
     grupo_id: '',
     enlace_documentos: ''
@@ -62,14 +62,11 @@ export default function EditarSocio() {
             etnia: data.etnia || '',
             banco_nombre: data.banco_nombre || '',
             banco_cuenta: data.banco_cuenta || '',
+            tipo_cuenta: data.tipo_cuenta || '',
             tipo_cacao: data.tipo_cacao || '',
             grupo_id: data.grupo_id || '',
             enlace_documentos: data.enlace_documentos || ''
           });
-          
-          // Cargar fincas del socio
-          const { data: fincasData } = await supabase.from('fincas').select('*').eq('socio_id', id);
-          if (fincasData) setFincasSocio(fincasData);
         }
       } catch (err) {
         setError('No se pudo cargar la información del socio.');
@@ -108,6 +105,7 @@ export default function EditarSocio() {
           etnia: formData.etnia || null,
           banco_nombre: formData.banco_nombre || null,
           banco_cuenta: formData.banco_cuenta || null,
+          tipo_cuenta: formData.tipo_cuenta || null,
           tipo_cacao: formData.tipo_cacao || null,
           grupo_id: formData.grupo_id || null,
           enlace_documentos: formData.enlace_documentos || null
@@ -117,7 +115,7 @@ export default function EditarSocio() {
       if (updateError) throw updateError;
 
       setSuccess(true);
-      setTimeout(() => navigate('/socios'), 1500);
+      setTimeout(() => navigate(`/socios/ver/${id}`), 1500);
       
     } catch (err: any) {
       console.error(err);
@@ -275,6 +273,15 @@ export default function EditarSocio() {
                 </div>
                 
                 <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-neutral-300 mb-2">Tipo de Cuenta</label>
+                  <select name="tipo_cuenta" value={formData.tipo_cuenta} onChange={handleChange} className="w-full bg-neutral-700 border border-neutral-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="Ahorros">Ahorros</option>
+                    <option value="Corriente">Corriente</option>
+                  </select>
+                </div>
+                
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-neutral-300 mb-2">Tipo de Cacao Principal (Perfil)</label>
                   <select name="tipo_cacao" value={formData.tipo_cacao} onChange={handleChange} className="w-full bg-neutral-700 border border-neutral-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
                     <option value="">-- Seleccionar --</option>
@@ -298,7 +305,7 @@ export default function EditarSocio() {
             </div>
 
             <div className="flex justify-end pt-4 border-t border-neutral-700">
-              <button type="button" onClick={() => navigate('/socios')} className="px-6 py-2 border border-neutral-600 text-neutral-300 rounded-md hover:bg-neutral-700 transition-colors mr-4">
+              <button type="button" onClick={() => navigate(`/socios/ver/${id}`)} className="px-6 py-2 border border-neutral-600 text-neutral-300 rounded-md hover:bg-neutral-700 transition-colors mr-4">
                 Cancelar
               </button>
               <button type="submit" disabled={loading} className="flex items-center gap-2 px-6 py-2 bg-amber-500 text-black font-medium rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50">
@@ -309,35 +316,7 @@ export default function EditarSocio() {
           </form>
         </div>
         
-        {/* SECCIÓN FINCAS DEL SOCIO */}
-        <div className="mt-8 bg-neutral-800 rounded-xl border border-neutral-700 p-6 md:p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Map className="h-5 w-5 text-emerald-500" /> Fincas Registradas
-            </h2>
-            <Link to="/fincas/nuevo" className="text-sm px-4 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-md transition-colors">
-              Añadir Finca
-            </Link>
-          </div>
-          
-          {fincasSocio.length === 0 ? (
-            <p className="text-neutral-400 text-sm">Este socio no tiene fincas registradas aún.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {fincasSocio.map(finca => (
-                <Link key={finca.id} to={`/fincas/editar/${finca.id}`} className="block p-4 border border-neutral-700 rounded-lg hover:border-emerald-500 transition-colors bg-neutral-900/50">
-                  <h3 className="font-bold text-white">{finca.nombre}</h3>
-                  <p className="text-sm text-neutral-400 mt-1">{finca.hectareas_totales || 0} hectáreas totales</p>
-                  {finca.certificada && (
-                    <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">
-                      Certificada
-                    </span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* SECCIÓN FINCAS DEL SOCIO REMOVIDA: AHORA SE GESTIONA EN VER SOCIO */}
 
         {/* Zona de Peligro */}
         <div className="mt-8 bg-red-900/10 border border-red-900/50 rounded-xl p-6 md:p-8">

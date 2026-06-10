@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardLayout() {
-  const { signOut } = useAuth();
+  const { signOut, session } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -121,6 +121,9 @@ export default function DashboardLayout() {
     }
   ];
 
+  const isGuest = session?.user?.email?.toLowerCase().trim() === 'invitado@asopromas.com';
+  const displayedMenuGroups = isGuest ? menuGroups.filter(m => m.id === 'socios') : menuGroups;
+
   return (
     <div className="min-h-screen bg-neutral-900 flex text-white overflow-hidden">
 
@@ -166,7 +169,7 @@ export default function DashboardLayout() {
 
             <div className="my-4 border-t border-neutral-800/50"></div>
 
-            {menuGroups.map((group) => {
+            {displayedMenuGroups.map((group) => {
               const isActive = group.items.some(item => location.pathname.startsWith(item.path));
               const isOpen = openMenus[group.id] || isActive;
 
