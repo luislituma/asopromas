@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Loader2, Leaf, Map as MapIcon, Upload, Trash2 } from 'lucide-react';
+import { X, Save, Loader2, Leaf, Map as MapIcon, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { parseKMLToGeoJSON } from '../../lib/kmlParser';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
