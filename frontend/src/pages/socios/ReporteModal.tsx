@@ -5,6 +5,8 @@ export interface ReporteOptions {
   fincasYLotes: boolean;
   financiero: boolean;
   acopio: boolean;
+  selectedLoteId?: string | 'all';
+  showMapLabels?: boolean;
 }
 
 interface ReporteModalProps {
@@ -13,9 +15,10 @@ interface ReporteModalProps {
   onPrint: (options: ReporteOptions) => void;
   options: ReporteOptions;
   setOptions: (options: ReporteOptions) => void;
+  lotesDisponibles?: any[];
 }
 
-export default function ReporteModal({ isOpen, onClose, onPrint, options, setOptions }: ReporteModalProps) {
+export default function ReporteModal({ isOpen, onClose, onPrint, options, setOptions, lotesDisponibles = [] }: ReporteModalProps) {
   if (!isOpen) return null;
 
   const toggleOption = (key: keyof ReporteOptions) => {
@@ -57,19 +60,48 @@ export default function ReporteModal({ isOpen, onClose, onPrint, options, setOpt
             </label>
 
             {/* Opción: Fincas y Lotes */}
-            <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-              <input
-                type="checkbox"
-                checked={options.fincasYLotes}
-                onChange={() => toggleOption('fincasYLotes')}
-                className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 accent-orange-600"
-              />
-              <Map className={`h-5 w-5 ${options.fincasYLotes ? 'text-emerald-500' : 'text-slate-400'}`} />
-              <div className="flex-1">
-                <span className={`font-bold block ${options.fincasYLotes ? 'text-slate-800' : 'text-slate-500'}`}>Patrimonio Agrícola</span>
-                <span className="text-xs text-slate-500">Fincas, lotes, variedades y coordenadas.</span>
-              </div>
-            </label>
+            <div className="space-y-2">
+              <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
+                <input
+                  type="checkbox"
+                  checked={options.fincasYLotes}
+                  onChange={() => toggleOption('fincasYLotes')}
+                  className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 accent-orange-600"
+                />
+                <Map className={`h-5 w-5 ${options.fincasYLotes ? 'text-emerald-500' : 'text-slate-400'}`} />
+                <div className="flex-1">
+                  <span className={`font-bold block ${options.fincasYLotes ? 'text-slate-800' : 'text-slate-500'}`}>Patrimonio Agrícola</span>
+                  <span className="text-xs text-slate-500">Fincas, lotes, variedades y coordenadas.</span>
+                </div>
+              </label>
+
+              {options.fincasYLotes && lotesDisponibles.length > 0 && (
+                <div className="ml-11 p-3 bg-emerald-50/50 rounded-lg border border-emerald-100 space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-emerald-800 mb-1">Seleccionar Lote a imprimir:</label>
+                    <select 
+                      value={options.selectedLoteId || 'all'}
+                      onChange={(e) => setOptions({...options, selectedLoteId: e.target.value})}
+                      className="w-full text-sm border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                    >
+                      <option value="all">Todos los lotes (Mapa completo)</option>
+                      {lotesDisponibles.map(l => (
+                        <option key={l.id} value={l.id}>Lote: {l.nombre_lote} ({l.hectareas_lote} ha)</option>
+                      ))}
+                    </select>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={options.showMapLabels !== false} 
+                      onChange={(e) => setOptions({...options, showMapLabels: e.target.checked})}
+                      className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 accent-emerald-600"
+                    />
+                    <span className="text-sm font-medium text-emerald-800">Mostrar tarjetas informativas sobre los lotes</span>
+                  </label>
+                </div>
+              )}
+            </div>
 
             {/* Opción: Financiero */}
             <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">

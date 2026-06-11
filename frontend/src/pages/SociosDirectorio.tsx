@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2, MapPin, Database, User as UserIcon } from 'lucide-react';
+import { Upload, Download, Search, Plus, Trash2, Save, X, FileText, LogIn, Loader2, LogOut, Settings, ExternalLink, Edit2, MapPin, Database, User as UserIcon, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import jsPDF from 'jspdf';
@@ -1143,14 +1143,6 @@ export default function SociosDirectorio() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDF9F3]">
-        <Loader2 className="h-10 w-10 text-orange-500 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDF9F3] p-4 font-sans">
         <div className="bg-white max-w-md w-full rounded-3xl shadow-xl p-8 border border-orange-100">
           <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
@@ -1172,6 +1164,7 @@ export default function SociosDirectorio() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
+
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Contraseña</label>
               <input
