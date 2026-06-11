@@ -61,9 +61,10 @@ function PrintMapBounds({ fincas }: { fincas: any[] }) {
         });
       });
 
-      if (bounds && bounds.isValid()) {
+      const finalBounds = bounds as L.LatLngBounds | null;
+      if (finalBounds && finalBounds.isValid()) {
         // Reducido a [20, 20] para que los lotes ocupen casi toda la imagen
-        map.fitBounds(bounds, { padding: [20, 20], maxZoom: 18 });
+        map.fitBounds(finalBounds, { padding: [20, 20], maxZoom: 18 });
       }
     } catch(e) {}
   }, [fincas, map]);

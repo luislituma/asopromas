@@ -11,36 +11,7 @@ import {
   CreditCard, Building2, Phone, Mail, MapPin, Edit, 
   FileText, Plus, Loader2, AlertCircle, Trash2, Printer
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import proj4 from 'proj4';
-
-const customMarkerIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const wgs84 = '+proj=longlat +datum=WGS84 +no_defs';
-const utm17s = '+proj=utm +zone=17 +south +datum=WGS84 +units=m +no_defs';
-
-function MapBounds({ lotes }: { lotes: any[] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (lotes.length > 0) {
-      const bounds = L.latLngBounds(lotes.map(l => [l.lat, l.lng]));
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-      }
-    }
-  }, [lotes, map]);
-  return null;
-}
 
 export default function VerSocio() {
   const { id } = useParams();
@@ -158,9 +129,6 @@ export default function VerSocio() {
       }
       
       // Refresh data
-      if (selectedFincaId === fincaToDelete) {
-        setSelectedFincaId(null);
-      }
       setIsDeleteModalOpen(false);
       setFincaToDelete(null);
       await loadFincasData();
@@ -234,27 +202,7 @@ export default function VerSocio() {
     return 'bg-orange-100 text-orange-800 border-orange-200';
   };
 
-  const allLotes = fincas.flatMap(f => (f.lotes_finca || []).map((l: any) => ({...l, nombre_finca: f.nombre, finca_id: f.id})));
-  
-  const mapMarkers = allLotes.map(lote => {
-    const x = Number(lote.coord_x);
-    const y = Number(lote.coord_y);
-    let lat = null;
-    let lng = null;
-    if (x && y) {
-      if (Math.abs(y) > 90) { 
-        try {
-          const [lonConv, latConv] = proj4(utm17s, wgs84, [x, y]);
-          lat = latConv;
-          lng = lonConv;
-        } catch(e) {}
-      } else {
-        lat = x;
-        lng = y;
-      }
-    }
-    return { ...lote, lat, lng };
-  }).filter(l => l.lat !== null && l.lng !== null);
+
 
   return (
     <div className="min-h-screen bg-[#FDF9F3] text-slate-800 font-sans pb-12">
