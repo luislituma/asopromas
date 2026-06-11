@@ -276,10 +276,10 @@ export default function LoteModal({ isOpen, onClose, onSave, fincaId, loteEdit }
                       <Trash2 className="h-3 w-3" /> Quitar Polígono
                     </button>
                   ) : (
-                    <label className="cursor-pointer bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors">
-                      {parsingKML ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
-                      {parsingKML ? 'Procesando...' : 'Subir Archivo KML'}
-                      <input type="file" accept=".kml" onChange={handleKmlUpload} className="hidden" />
+                    <label className="cursor-pointer bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                      {parsingKML ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapIcon className="w-4 h-4" />}
+                      <span>{parsingKML ? 'Procesando...' : formData.poligono ? 'Cambiar KML/KMZ' : 'Subir Polígono (KML/KMZ)'}</span>
+                      <input type="file" accept=".kml,.kmz" onChange={handleKmlUpload} className="hidden" />
                     </label>
                   )}
                 </div>
