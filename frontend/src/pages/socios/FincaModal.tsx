@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Loader2, MapPin, Upload, Map as MapIcon, Trash2 } from 'lucide-react';
+import { X, Save, Loader2, MapPin, Map as MapIcon, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { parseKMLToGeoJSON } from '../../lib/kmlParser';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
@@ -19,7 +19,6 @@ interface FincaModalProps {
 
 export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit }: FincaModalProps) {
   const [loading, setLoading] = useState(false);
-  const [parsingKML, setParsingKML] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     ubicacion_sector: '',
@@ -81,7 +80,6 @@ export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setParsingKML(true);
     try {
       const geojson = await parseKMLToGeoJSON(file);
       
@@ -107,9 +105,9 @@ export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit
       
       setFormData(prev => ({ ...prev, poligono: geojson }));
     } catch (err: any) {
-      alert("Error leyendo KML: " + err.message);
+      console.error(err);
+      alert('Error procesando KML/KMZ');
     } finally {
-      setParsingKML(false);
       e.target.value = ''; // Reset input
     }
   };
@@ -283,7 +281,7 @@ export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit
                     </button>
                   ) : (
                     <label className="cursor-pointer bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                      <Map className="w-4 h-4" />
+                      <MapIcon className="w-4 h-4" />
                       <span>{formData.poligono ? 'Cambiar KML/KMZ' : 'Subir Polígono (KML/KMZ)'}</span>
                       <input type="file" accept=".kml,.kmz" onChange={handleKmlUpload} className="hidden" />
                     </label>

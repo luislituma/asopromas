@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import proj4 from 'proj4';
-import { Edit, Trash2, MapPin, Leaf, Plus, ChevronDown, ChevronUp, Layers, AlertCircle } from 'lucide-react';
+import { Edit, Trash2, MapPin, Leaf, Plus, ChevronDown, ChevronUp, Layers, AlertCircle, Image as ImageIcon } from 'lucide-react';
 
 const wgs84 = '+proj=longlat +datum=WGS84 +no_defs';
 const utm17s = '+proj=utm +zone=17 +south +datum=WGS84 +units=m +no_defs';
@@ -107,6 +107,7 @@ function FincaMapSectionInner({
   onToggle, 
   onEditFinca, 
   onDeleteFinca, 
+  onExportFinca,
   onEditLote, 
   onDeleteLote,
   onAddLote
@@ -225,10 +226,17 @@ function FincaMapSectionInner({
         </div>
         <div className="flex items-center gap-4">
           <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-            <button onClick={() => onEditFinca(finca)} className="p-2 text-slate-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-slate-200 rounded-lg transition-colors">
+            <button 
+              onClick={() => onExportFinca && onExportFinca()} 
+              className="p-2 text-slate-400 hover:text-emerald-600 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg transition-colors"
+              title="Exportar Mapa a Imagen"
+            >
+              <ImageIcon className="h-4 w-4" />
+            </button>
+            <button onClick={() => onEditFinca(finca)} className="p-2 text-slate-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-slate-200 rounded-lg transition-colors" title="Editar Finca">
               <Edit className="h-4 w-4" />
             </button>
-            <button onClick={() => onDeleteFinca(finca.id)} className="p-2 text-slate-400 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 rounded-lg transition-colors">
+            <button onClick={() => onDeleteFinca(finca.id)} className="p-2 text-slate-400 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 rounded-lg transition-colors" title="Eliminar Finca">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
