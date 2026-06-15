@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import FincaModal from './FincaModal';
 import LoteModal from './LoteModal';
 import FincaMapSection from './FincaMapSection';
+import FincaExportModal from './FincaExportModal';
 import ReporteModal, { type ReporteOptions } from './ReporteModal';
 import SocioPrintView from './SocioPrintView';
 import { 
@@ -30,7 +31,11 @@ export default function VerSocio() {
   
   const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
   const [loteEdit, setLoteEdit] = useState<any>(null);
-  const [fincaIdForLote, setFincaIdForLote] = useState<string>('');
+  const [fincaIdForLote, setFincaIdForLote] = useState<string | null>(null);
+
+  // States for Finca Export
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [fincaToExport, setFincaToExport] = useState<any>(null);
 
   // Delete Finca Modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -451,6 +456,7 @@ export default function VerSocio() {
                     onToggle={() => setExpandedFincaId(expandedFincaId === finca.id ? null : finca.id)}
                     onEditFinca={() => { setFincaEdit(finca); setIsFincaModalOpen(true); }}
                     onDeleteFinca={() => { setFincaToDelete(finca.id); setIsDeleteModalOpen(true); }}
+                    onExportFinca={() => { setFincaToExport(finca); setIsExportModalOpen(true); }}
                     onEditLote={(lote: any, fId: string) => { setFincaIdForLote(fId); setLoteEdit(lote); setIsLoteModalOpen(true); }}
                     onDeleteLote={(loteId: string) => { setLoteToDelete(loteId); setIsDeleteLoteModalOpen(true); }}
                     onAddLote={(fId: string) => { setFincaIdForLote(fId); setLoteEdit(null); setIsLoteModalOpen(true); }}
@@ -494,13 +500,32 @@ export default function VerSocio() {
         fincaEdit={fincaEdit} 
       />
 
-      <LoteModal 
-        isOpen={isLoteModalOpen} 
-        onClose={() => setIsLoteModalOpen(false)} 
-        onSave={loadFincasData} 
-        fincaId={fincaIdForLote} 
-        loteEdit={loteEdit} 
-      />
+      {isLoteModalOpen && fincaIdForLote && (
+        <LoteModal
+          isOpen={isLoteModalOpen}
+          onClose={() => {
+            setIsLoteModalOpen(false);
+            setLoteEdit(null);
+            setFincaIdForLote(null);
+          }}
+          onSave={loadFincasData}
+          fincaId={fincaIdForLote}
+          loteEdit={loteEdit}
+        />
+      )}
+
+      {/* MODAL DE EXPORTACIÓN A IMAGEN */}
+      {isExportModalOpen && fincaToExport && (
+        <FincaExportModal
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            setIsExportModalOpen(false);
+            setFincaToExport(null);
+          }}
+          finca={fincaToExport}
+          socioName={`${socio.nombres} ${socio.apellidos}`}
+        />
+      )}
 
       {/* Delete Finca Confirmation Modal */}
       {/* Modal Confirmar Eliminación Finca */}

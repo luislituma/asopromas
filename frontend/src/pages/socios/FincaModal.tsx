@@ -17,7 +17,6 @@ interface FincaModalProps {
   fincaEdit?: any; // Si existe, es modo edición
 }
 
-export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit }: FincaModalProps) {
   const [loading, setLoading] = useState(false);
   const [parsingKML, setParsingKML] = useState(false);
   const [formData, setFormData] = useState({
@@ -80,7 +79,6 @@ export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit
   const handleKmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setParsingKML(true);
     try {
       const geojson = await parseKMLToGeoJSON(file);
@@ -107,7 +105,8 @@ export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit
       
       setFormData(prev => ({ ...prev, poligono: geojson }));
     } catch (err: any) {
-      alert("Error leyendo KML: " + err.message);
+      console.error(err);
+      alert('Error procesando KML/KMZ');
     } finally {
       setParsingKML(false);
       e.target.value = ''; // Reset input
