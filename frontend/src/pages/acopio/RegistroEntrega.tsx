@@ -1,321 +1,502 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Loader2, Weight, Search, AlertCircle } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, UserSearch, Scale, DollarSign, Map, Save, Loader2, PackageOpen } from 'lucide-react';
 
 export default function RegistroEntrega() {
-  const { id } = useParams(); // ID del acopio
+  const { id, entregaId } = useParams(); // ID del lote_acopio y opcionalmente de la entrega a editar
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [acopio, setAcopio] = useState<any>(null);
-  
-  // Para buscar socios
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sociosResult, setSociosResult] = useState<any[]>([]);
-  const [socio, setSocio] = useState<any>(null);
-  const [fincas, setFincas] = useState<any[]>([]);
-  const [searchError, setSearchError] = useState('');
-  const [creandoFinca, setCreandoFinca] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [oldWeights, setOldWeights] = useState({ kg: 0, lbs: 0 });
 
+  // Estados de carga de datos
+  const [socios, setSocios] = useState<any[]>([]);
+  const [fincas, setFincas] = useState<any[]>([]);
+  const [lotesFinca, setLotesFinca] = useState<any[]>([]);
+
+  // Búsqueda de socio
+  const [searchSocio, setSearchSocio] = useState('');
+  const [selectedSocio, setSelectedSocio] = useState<any>(null);
+
+  // Formulario principal
   const [formData, setFormData] = useState({
+    unidad_medida: 'lbs',
+    peso_bruto: '',
+    tara: '0',
+    merma: '0',
+    precio_unidad: '',
+    estado_pago: 'Pendiente',
     finca_id: '',
-    peso_kg: '',
-    calidad: 'estandar',
-    notas: ''
+    lote_finca_id: '',
+    notas_calidad: ''
   });
 
+  // Cálculos dinámicos
+  const pesoNeto = Math.max(0, (Number(formData.peso_bruto) || 0) - (Number(formData.tara) || 0) - (Number(formData.merma) || 0));
+  const totalPagar = pesoNeto * (Number(formData.precio_unidad) || 0);
+  const pesoNetoKg = formData.unidad_medida === 'kg' ? pesoNeto : pesoNeto * 0.453592;
+  const pesoNetoLbs = formData.unidad_medida === 'lbs' ? pesoNeto : pesoNeto * 2.20462;
+
+  // Cargar Socios al iniciar
   useEffect(() => {
-    async function loadAcopio() {
-      if (!id) return;
-      const { data } = await supabase.from('acopios').select('*').eq('id', id).single();
-      if (data) setAcopio(data);
+    async function loadSocios() {
+      const { data } = await supabase.from('socios').select('id, nombres, apellidos, cedula').order('apellidos');
+      if (data) setSocios(data);
     }
-    loadAcopio();
-  }, [id]);
+    loadSocios();
+  }, []);
 
-  const handleSearchSocio = async () => {
-    if (!searchQuery.trim()) return;
-    setSearchError('');
-    setSociosResult([]);
-    setSocio(null);
-    setFincas([]);
+  // Cargar datos de la entrega si estamos editando
+  useEffect(() => {
+    async function loadEntregaToEdit() {
+      if (!entregaId) return;
+      setIsEditing(true);
+      setLoading(true);
+      try {
+        const { data: entrega, error } = await supabase
+          .from('entregas_acopio')
+          .select(`
+            *,
+            socios (id, nombres, apellidos, cedula),
+            entregas_lotes_origen (finca_id, lote_finca_id)
+          `)
+          .eq('id', entregaId)
+          .single();
 
-    try {
-      const q = `%${searchQuery.trim()}%`;
-      const { data, error } = await supabase
-        .from('socios')
-        .select('*')
-        .or(`cedula.ilike.${q},nombres.ilike.${q},apellidos.ilike.${q}`)
-        .limit(5);
+        if (error) throw error;
+        if (entrega) {
+          setSelectedSocio(entrega.socios);
+          setFormData({
+            unidad_medida: entrega.unidad_medida,
+            peso_bruto: entrega.peso_bruto.toString(),
+            tara: entrega.tara.toString(),
+            merma: entrega.merma.toString(),
+            precio_unidad: entrega.precio_unidad.toString(),
+            estado_pago: entrega.estado_pago,
+            notas_calidad: entrega.notas_calidad || '',
+            finca_id: entrega.entregas_lotes_origen?.[0]?.finca_id || '',
+            lote_finca_id: entrega.entregas_lotes_origen?.[0]?.lote_finca_id || ''
+          });
+          setOldWeights({
+            kg: Number(entrega.peso_neto_estandar_kg || 0),
+            lbs: Number(entrega.peso_neto_estandar_kg || 0) * 2.20462 // Approx, real is in lote
+          });
+        }
+      } catch (err) {
+        console.error("Error loading entrega:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadEntregaToEdit();
+  }, [entregaId]);
 
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        setSearchError('No se encontró ningún socio con ese dato.');
+  // Cargar Fincas cuando se selecciona un socio
+  useEffect(() => {
+    async function loadFincas() {
+      if (!selectedSocio) {
+        setFincas([]);
+        setLotesFinca([]);
         return;
       }
-      
-      if (data.length === 1) {
-        seleccionarSocio(data[0]);
-      } else {
-        setSociosResult(data);
-      }
-    } catch (error) {
-      console.error(error);
-      setSearchError('Error al buscar el socio.');
+      const { data } = await supabase.from('fincas').select('id, nombre, hectareas_totales').eq('socio_id', selectedSocio.id);
+      setFincas(data || []);
+      setFormData(prev => ({ ...prev, finca_id: '', lote_finca_id: '' }));
     }
-  };
+    loadFincas();
+  }, [selectedSocio]);
 
-  const seleccionarSocio = async (s: any) => {
-    setSocio(s);
-    setSociosResult([]);
-    
-    // Cargar sus fincas
-    const { data: fincasData } = await supabase
-      .from('fincas')
-      .select('*')
-      .eq('socio_id', s.id);
-      
-    if (fincasData) {
-      setFincas(fincasData);
-      if (fincasData.length === 1) {
-        setFormData(prev => ({ ...prev, finca_id: fincasData[0].id }));
+  // Cargar Lotes cuando se selecciona una finca
+  useEffect(() => {
+    async function loadLotes() {
+      if (!formData.finca_id) {
+        setLotesFinca([]);
+        return;
       }
+      const { data } = await supabase.from('lotes_finca').select('id, nombre_lote, hectareas_lote').eq('finca_id', formData.finca_id);
+      setLotesFinca(data || []);
     }
-  };
-
-  const handleCrearFincaRapida = async () => {
-    if (!socio) return;
-    setCreandoFinca(true);
-    try {
-      const { data, error } = await supabase
-        .from('fincas')
-        .insert([{ nombre: 'Finca Principal', socio_id: socio.id }])
-        .select()
-        .single();
-      if (error) throw error;
-      
-      const newFincas = [...fincas, data];
-      setFincas(newFincas);
-      setFormData(prev => ({ ...prev, finca_id: data.id }));
-    } catch (err) {
-      alert('Error creando finca');
-    } finally {
-      setCreandoFinca(false);
-    }
-  };
+    loadLotes();
+  }, [formData.finca_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!socio || !formData.finca_id || !formData.peso_kg) return;
+    if (!selectedSocio) {
+      alert('Debes seleccionar un socio.');
+      return;
+    }
+    if (pesoNeto <= 0) {
+      alert('El peso neto debe ser mayor a 0.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const peso = parseFloat(formData.peso_kg);
-      const precioUnitario = Number(acopio.precio_dia_kg);
-      
-      // Bonus por calidad (simulación: +5% si es premium)
-      const multiplicador = formData.calidad === 'premium' ? 1.05 : formData.calidad === 'rechazado' ? 0 : 1;
-      const precioFinal = precioUnitario * multiplicador;
-      const montoTotal = peso * precioFinal;
+      if (isEditing) {
+        // 1. Actualizar la Entrega
+        const { error: entregaError } = await supabase
+          .from('entregas_acopio')
+          .update({
+            socio_id: selectedSocio.id,
+            unidad_medida: formData.unidad_medida,
+            peso_bruto: Number(formData.peso_bruto),
+            tara: Number(formData.tara),
+            merma: Number(formData.merma),
+            peso_neto: pesoNeto,
+            peso_neto_estandar_kg: pesoNetoKg,
+            precio_unidad: Number(formData.precio_unidad),
+            total_pagar: totalPagar,
+            estado_pago: formData.estado_pago,
+            notas_calidad: formData.notas_calidad
+          })
+          .eq('id', entregaId);
 
-      const { error } = await supabase
-        .from('entregas_cacao')
-        .insert([{
-          acopio_id: id,
-          socio_id: socio.id,
-          finca_id: formData.finca_id,
-          peso_kg: peso,
-          precio_por_kg: precioFinal,
-          monto_total: montoTotal,
-          calidad: formData.calidad,
-          notas: formData.notas
-        }]);
+        if (entregaError) throw entregaError;
 
-      if (error) throw error;
-      
-      // Volver al detalle del acopio
+        // 2. Actualizar Trazabilidad
+        // Primero borramos la existente
+        await supabase.from('entregas_lotes_origen').delete().eq('entrega_id', entregaId);
+        
+        if (formData.finca_id || formData.lote_finca_id) {
+          const { error: trazabilidadError } = await supabase
+            .from('entregas_lotes_origen')
+            .insert([{
+              entrega_id: entregaId,
+              finca_id: formData.finca_id || null,
+              lote_finca_id: formData.lote_finca_id || null,
+              porcentaje: 100
+            }]);
+          if (trazabilidadError) throw trazabilidadError;
+        }
+
+        // 3. Ajustar los totales del lote_acopio (restando lo viejo y sumando lo nuevo)
+        const diffKg = pesoNetoKg - oldWeights.kg;
+        const diffLbs = pesoNetoLbs - oldWeights.lbs;
+        
+        const { data: loteData } = await supabase.from('lotes_acopio').select('peso_total_kg, peso_total_lbs').eq('id', id).single();
+        if (loteData) {
+          await supabase.from('lotes_acopio').update({
+            peso_total_kg: Math.max(0, Number(loteData.peso_total_kg) + diffKg),
+            peso_total_lbs: Math.max(0, Number(loteData.peso_total_lbs) + diffLbs)
+          }).eq('id', id);
+        }
+
+      } else {
+        // 1. Insertar la Entrega Nueva
+        const { data: entregaData, error: entregaError } = await supabase
+          .from('entregas_acopio')
+          .insert([{
+            lote_acopio_id: id,
+            socio_id: selectedSocio.id,
+            unidad_medida: formData.unidad_medida,
+            peso_bruto: Number(formData.peso_bruto),
+            tara: Number(formData.tara),
+            merma: Number(formData.merma),
+            peso_neto: pesoNeto,
+            peso_neto_estandar_kg: pesoNetoKg,
+            precio_unidad: Number(formData.precio_unidad),
+            total_pagar: totalPagar,
+            estado_pago: formData.estado_pago,
+            notas_calidad: formData.notas_calidad
+          }])
+          .select()
+          .single();
+
+        if (entregaError) throw entregaError;
+
+        // 2. Insertar Trazabilidad (Si se seleccionó finca o lote)
+        if (formData.finca_id || formData.lote_finca_id) {
+          const { error: trazabilidadError } = await supabase
+            .from('entregas_lotes_origen')
+            .insert([{
+              entrega_id: entregaData.id,
+              finca_id: formData.finca_id || null,
+              lote_finca_id: formData.lote_finca_id || null,
+              porcentaje: 100
+            }]);
+          if (trazabilidadError) throw trazabilidadError;
+        }
+
+        // 3. Actualizar los totales del lote_acopio
+        const { data: loteData } = await supabase.from('lotes_acopio').select('peso_total_kg, peso_total_lbs').eq('id', id).single();
+        if (loteData) {
+          await supabase.from('lotes_acopio').update({
+            peso_total_kg: Number(loteData.peso_total_kg) + pesoNetoKg,
+            peso_total_lbs: Number(loteData.peso_total_lbs) + pesoNetoLbs
+          }).eq('id', id);
+        }
+      }
+
       navigate(`/acopio/${id}`);
-    } catch (error) {
-      console.error('Error guardando entrega:', error);
-      alert('Error al registrar la entrega. Revisa la consola.');
+    } catch (error: any) {
+      console.error('Error registrando entrega:', error);
+      alert('Error: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const filteredSocios = socios.filter(s => 
+    `${s.nombres} ${s.apellidos} ${s.cedula}`.toLowerCase().includes(searchSocio.toLowerCase())
+  ).slice(0, 5); // Mostrar máximo 5 para no saturar
+
   return (
-    <div className="min-h-screen bg-neutral-900 p-6">
-      <div className="max-w-2xl mx-auto">
-        <Link to={`/acopio/${id}`} className="inline-flex items-center gap-2 text-neutral-400 hover:text-white mb-6 transition-colors">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 pb-24">
+      <div className="max-w-4xl mx-auto">
+        <Link to={`/acopio/${id}`} className="inline-flex items-center gap-2 text-slate-500 hover:text-emerald-600 mb-6 transition-colors font-medium">
           <ArrowLeft className="h-4 w-4" />
-          Volver al Acopio
+          Volver al Lote
         </Link>
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Registrar Entrega de Cacao</h1>
-          {acopio && (
-            <p className="text-neutral-400 mt-1">Jornada: {new Date(acopio.fecha).toLocaleDateString()} | Precio Base: ${acopio.precio_dia_kg}</p>
-          )}
+          <h1 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
+            <PackageOpen className="w-8 h-8 text-emerald-600" />
+            {isEditing ? 'Editar Recepción' : 'Recepción de Cacao'}
+          </h1>
+          <p className="text-slate-500 mt-2">
+            {isEditing ? 'Modifica los datos de la entrega seleccionada.' : 'Registra el pesaje, asocia el productor y genera el pago.'}
+          </p>
         </div>
 
-        {/* Búsqueda de Socio */}
-        <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6 mb-6">
-          <label className="text-sm font-medium text-neutral-300 block mb-2">
-            Buscar Socio (Cédula o Nombre)
-          </label>
-          <div className="flex gap-3">
-            <input
-              type="text"
-              placeholder="Ej: Juan Perez o 1101234567"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearchSocio()}
-              className="flex-1 bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-            />
-            <button
-              onClick={handleSearchSocio}
-              type="button"
-              className="px-6 py-2.5 bg-neutral-700 text-white font-medium rounded-lg hover:bg-neutral-600 transition-colors flex items-center gap-2"
-            >
-              <Search className="h-4 w-4" />
-              Buscar
-            </button>
-          </div>
-          {searchError && (
-            <p className="text-red-400 text-sm mt-2 flex items-center gap-1">
-              <AlertCircle className="h-4 w-4" /> {searchError}
-            </p>
-          )}
+        <form onSubmit={handleSubmit} className="space-y-6">
           
-          {sociosResult.length > 0 && (
-            <div className="mt-4 bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden">
-              <p className="text-xs text-neutral-500 p-2 bg-neutral-800">Resultados ({sociosResult.length}):</p>
-              <ul className="divide-y divide-neutral-700">
-                {sociosResult.map(s => (
-                  <li key={s.id}>
-                    <button 
-                      type="button" 
-                      onClick={() => seleccionarSocio(s)}
-                      className="w-full text-left p-3 hover:bg-neutral-800 transition-colors flex justify-between items-center"
-                    >
-                      <span><span className="font-medium text-white">{s.nombres} {s.apellidos}</span> - <span className="text-neutral-400 text-sm">{s.cedula}</span></span>
-                      <span className="text-amber-500 text-xs">Seleccionar</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Formulario principal (solo visible si hay socio) */}
-        {socio && (
-          <form onSubmit={handleSubmit} className="bg-neutral-800 border border-amber-500/50 rounded-xl p-6 space-y-6">
+          {/* 1. Selección del Socio */}
+          <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
+              <UserSearch className="w-5 h-5 text-emerald-600" />
+              1. Identificación del Socio
+            </h2>
             
-            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-              <p className="text-sm text-neutral-400">Socio Identificado:</p>
-              <p className="text-lg font-medium text-white">{socio.nombres} {socio.apellidos}</p>
-            </div>
-
-            <div className="space-y-4">
-              {/* Selección de Finca */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300">¿De qué finca proviene el cacao? *</label>
-                <select
-                  required
-                  value={formData.finca_id}
-                  onChange={(e) => setFormData({...formData, finca_id: e.target.value})}
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-                >
-                  <option value="">-- Seleccionar Finca --</option>
-                  {fincas.map(f => (
-                    <option key={f.id} value={f.id}>{f.nombre} ({f.ubicacion || 'Sin ubicación'})</option>
-                  ))}
-                </select>
-                {fincas.length === 0 && (
-                  <div className="mt-2 p-3 bg-red-500/10 border border-red-500/20 rounded-md">
-                    <p className="text-red-400 text-sm flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Este socio no tiene fincas registradas.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleCrearFincaRapida}
-                      disabled={creandoFinca}
-                      className="mt-2 px-3 py-1.5 bg-neutral-800 text-amber-500 text-sm rounded hover:bg-neutral-700 transition-colors"
-                    >
-                      {creandoFinca ? 'Creando...' : 'Crear Finca Principal automáticamente'}
-                    </button>
+            {!selectedSocio ? (
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, apellido o cédula..."
+                  value={searchSocio}
+                  onChange={(e) => setSearchSocio(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-black focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                />
+                {searchSocio && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 shadow-lg rounded-xl overflow-hidden z-10">
+                    {filteredSocios.map(socio => (
+                      <button
+                        key={socio.id}
+                        type="button"
+                        onClick={() => { setSelectedSocio(socio); setSearchSocio(''); }}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0"
+                      >
+                        <div className="font-bold text-slate-800">{socio.apellidos} {socio.nombres}</div>
+                        <div className="text-xs text-slate-500">C.I: {socio.cedula}</div>
+                      </button>
+                    ))}
+                    {filteredSocios.length === 0 && (
+                      <div className="px-4 py-3 text-sm text-slate-500">No se encontraron socios.</div>
+                    )}
                   </div>
                 )}
               </div>
-
-              {/* Peso en KG */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300 flex items-center gap-2">
-                  <Weight className="h-4 w-4 text-amber-500" />
-                  Peso Neto Recibido (kg) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  step="0.01"
-                  min="0.01"
-                  placeholder="Ej: 150.5"
-                  value={formData.peso_kg}
-                  onChange={(e) => setFormData({...formData, peso_kg: e.target.value})}
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white text-xl font-bold focus:outline-none focus:border-amber-500 text-amber-500"
-                />
+            ) : (
+              <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                <div>
+                  <div className="text-xs font-bold text-emerald-600 mb-1">SOCIO SELECCIONADO</div>
+                  <div className="font-bold text-slate-800 text-lg">{selectedSocio.apellidos} {selectedSocio.nombres}</div>
+                  <div className="text-sm text-slate-500">C.I: {selectedSocio.cedula}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSocio(null)}
+                  className="px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-bold"
+                >
+                  Cambiar
+                </button>
               </div>
+            )}
+          </div>
 
-              {/* Calidad */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300">Calidad e Inspección *</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {['estandar', 'premium', 'rechazado'].map((cal) => (
-                    <button
-                      key={cal}
-                      type="button"
-                      onClick={() => setFormData({...formData, calidad: cal})}
-                      className={`py-2 px-3 rounded-md text-sm font-medium uppercase border transition-all ${
-                        formData.calidad === cal 
-                          ? cal === 'premium' ? 'bg-purple-500/20 border-purple-500 text-purple-400'
-                          : cal === 'rechazado' ? 'bg-red-500/20 border-red-500 text-red-400'
-                          : 'bg-amber-500/20 border-amber-500 text-amber-400'
-                          : 'bg-neutral-900 border-neutral-700 text-neutral-500 hover:border-neutral-500'
-                      }`}
+          {/* 2. Trazabilidad (Opcional) */}
+          {selectedSocio && (
+            <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Map className="w-5 h-5 text-emerald-600" />
+                  2. Origen del Cacao <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Opcional</span>
+                </h2>
+              </div>
+              <p className="text-sm text-slate-500 mb-4">
+                Si conoces de qué finca o lote específico viene este cacao, selecciónalo aquí para mejorar la trazabilidad del código QR.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Finca de Origen</label>
+                  <select
+                    name="finca_id"
+                    value={formData.finca_id}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 text-slate-800"
+                  >
+                    <option value="">-- No especificar finca --</option>
+                    {fincas.map(f => (
+                      <option key={f.id} value={f.id}>{f.nombre} ({f.hectareas_totales} ha)</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {formData.finca_id && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Lote Específico</label>
+                    <select
+                      name="lote_finca_id"
+                      value={formData.lote_finca_id}
+                      onChange={handleChange}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-slate-800"
                     >
-                      {cal}
-                    </button>
-                  ))}
+                      <option value="">-- Todo el cacao de la finca --</option>
+                      {lotesFinca.map(l => (
+                        <option key={l.id} value={l.id}>{l.nombre_lote} ({l.hectareas_lote} ha)</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+              {fincas.length === 0 && (
+                <div className="mt-3 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                  Este socio no tiene fincas registradas en el sistema. Puedes continuar sin especificar el origen.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 3. Pesaje y Liquidación */}
+          {selectedSocio && (
+            <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+                <Scale className="w-5 h-5 text-emerald-600" />
+                3. Pesaje y Liquidación
+              </h2>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="col-span-2 md:col-span-1 space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Unidad de Medida</label>
+                  <select
+                    name="unidad_medida"
+                    value={formData.unidad_medida}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-emerald-700 focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="lbs">Libras (Lbs)</option>
+                    <option value="kg">Kilos (Kg)</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Peso Bruto</label>
+                  <input
+                    type="number" step="0.01" name="peso_bruto" required
+                    value={formData.peso_bruto} onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-emerald-500 text-right font-medium"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Tara (Sacos)</label>
+                  <input
+                    type="number" step="0.01" name="tara" required
+                    value={formData.tara} onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-right text-amber-600 font-medium"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Merma (Hum/Imp)</label>
+                  <input
+                    type="number" step="0.01" name="merma" required
+                    value={formData.merma} onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-right text-amber-600 font-medium"
+                  />
                 </div>
               </div>
 
-              {/* Notas */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300">Notas Adicionales</label>
-                <textarea
-                  rows={2}
-                  value={formData.notas}
-                  onChange={(e) => setFormData({...formData, notas: e.target.value})}
-                  placeholder="Humedad, tipo de fermentación..."
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-                ></textarea>
+              <div className="bg-slate-800 text-white p-6 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div className="text-center md:text-left">
+                  <div className="text-slate-400 text-sm font-bold mb-1">PESO NETO ({formData.unidad_medida.toUpperCase()})</div>
+                  <div className="text-4xl font-black text-emerald-400">{pesoNeto.toFixed(2)}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-300 flex items-center justify-center md:justify-start gap-1">
+                    <DollarSign className="w-4 h-4" /> Precio por {formData.unidad_medida}
+                  </label>
+                  <input
+                    type="number" step="0.01" name="precio_unidad" required
+                    value={formData.precio_unidad} onChange={handleChange}
+                    placeholder="0.00"
+                    className="w-full bg-slate-700 border-none rounded-xl px-4 py-3 text-white text-center md:text-right font-bold focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div className="text-center md:text-right">
+                  <div className="text-slate-400 text-sm font-bold mb-1">TOTAL A PAGAR</div>
+                  <div className="text-4xl font-black text-white">${totalPagar.toFixed(2)}</div>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Estado del Pago</label>
+                  <select
+                    name="estado_pago"
+                    value={formData.estado_pago}
+                    onChange={handleChange}
+                    className={`w-full border rounded-xl px-4 py-3 font-bold focus:outline-none ${
+                      formData.estado_pago === 'Pendiente' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    }`}
+                  >
+                    <option value="Pendiente">Pendiente de Pago</option>
+                    <option value="Pagado">Pagado en Efectivo</option>
+                  </select>
+                  {formData.estado_pago === 'Pendiente' && (
+                    <p className="text-xs text-amber-600 mt-1">El área de contabilidad realizará la transferencia posteriormente.</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Notas Adicionales</label>
+                  <textarea
+                    name="notas_calidad"
+                    rows={2}
+                    placeholder="Observaciones sobre la calidad, etc."
+                    value={formData.notas_calidad}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500"
+                  ></textarea>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="pt-6 border-t border-neutral-700 flex justify-end">
-              <button
-                type="submit"
-                disabled={loading || fincas.length === 0}
-                className="px-6 py-3 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                Procesar Entrega
-              </button>
-            </div>
-          </form>
-        )}
+          {/* Acciones */}
+          <div className="pt-4 flex justify-end gap-3">
+            <Link 
+              to={`/acopio/${id}`}
+              className="px-8 py-4 rounded-xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              Cancelar
+            </Link>
+            <button
+              type="submit"
+              disabled={loading || !selectedSocio || pesoNeto <= 0 || !formData.precio_unidad}
+              className="px-8 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+            >
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Save className="h-6 w-6" />}
+              {isEditing ? 'Guardar Cambios' : 'Registrar Entrega'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

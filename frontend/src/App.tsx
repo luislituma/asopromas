@@ -179,6 +179,7 @@ const App: FC = () => {
             <Route path="/acopio/nuevo" element={<AcopioForm />} />
             <Route path="/acopio/:id" element={<AcopioDetalle />} />
             <Route path="/acopio/:id/entrega" element={<RegistroEntrega />} />
+            <Route path="/acopio/:id/entrega/:entregaId" element={<RegistroEntrega />} />
             <Route path="/lotes" element={<LotesList />} />
             <Route path="/lotes/:id" element={<LoteDetalle />} />
             <Route path="/lotes/editar/:id" element={<EditarLote />} />
