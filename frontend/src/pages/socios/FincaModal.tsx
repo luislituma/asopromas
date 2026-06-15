@@ -16,7 +16,7 @@ interface FincaModalProps {
   socioId: string;
   fincaEdit?: any; // Si existe, es modo edición
 }
-
+export default function FincaModal({ isOpen, onClose, onSave, socioId, fincaEdit }: FincaModalProps) {
   const [loading, setLoading] = useState(false);
   const [parsingKML, setParsingKML] = useState(false);
   const [formData, setFormData] = useState({
