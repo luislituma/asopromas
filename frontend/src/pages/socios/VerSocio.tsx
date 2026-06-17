@@ -7,6 +7,7 @@ import FincaMapSection from './FincaMapSection';
 import FincaExportModal from './FincaExportModal';
 import ReporteModal, { type ReporteOptions } from './ReporteModal';
 import SocioPrintView from './SocioPrintView';
+import HistorialEntregas from './HistorialEntregas';
 import { 
   ArrowLeft, User, Map, Leaf, ShoppingCart, Scale, 
   CreditCard, Building2, Phone, Mail, MapPin, Edit, 
@@ -471,11 +472,7 @@ export default function VerSocio() {
             TAB: ACOPIO (Próximamente)
         ========================================================= */}
         {activeTab === 'acopio' && (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
-            <Scale className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-700 mb-2">Historial de Acopio</h3>
-            <p className="text-slate-500 max-w-md mx-auto">Próximamente verás aquí las gráficas de entrega de cacao de este socio por mes y año, vinculadas a la tabla de recepciones.</p>
-          </div>
+          <HistorialEntregas socioId={id || ''} />
         )}
 
         {/* =========================================================
