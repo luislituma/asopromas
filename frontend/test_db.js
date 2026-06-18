@@ -1,17 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const supabaseUrl = 'https://sdsaghkgzejayzwgajbt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc2FnaGtnemVqYXl6d2dhamJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDY4ODgsImV4cCI6MjA5NTkyMjg4OH0.vAEjm7x7vNx8_hCSuRVaN1ISqGCe_AjTCubOyVYh-6E';
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("Missing env vars");
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function main() {
-  const { data: lotes, error } = await supabase.from('lotes_finca').select('*').limit(1);
+async function check() {
+  console.log("Checking entregas_lotes_origen...");
+  const { data, error } = await supabase.from('entregas_lotes_origen').select('*').limit(5);
   if (error) {
-    console.error(error);
-  } else if (lotes && lotes.length > 0) {
-    console.log(Object.keys(lotes[0]));
+    console.error("Error reading:", error);
+  } else {
+    console.log("Data:", data);
   }
 }
-
-main();
+check();

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, UserSearch, Scale, DollarSign, Map, Save, Loader2, PackageOpen } from 'lucide-react';
+import ReceiptSuccessModal from '../../components/ui/ReceiptSuccessModal';
+import PDFPreviewModal from '../../components/ui/PDFPreviewModal';
+import { generateEntregaReceiptPDF } from '../../lib/pdfGenerator';
 
 export default function RegistroEntrega() {
   const { id, entregaId } = useParams(); // ID del lote_acopio y opcionalmente de la entrega a editar
@@ -9,6 +12,10 @@ export default function RegistroEntrega() {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [oldWeights, setOldWeights] = useState({ kg: 0, lbs: 0 });
+  
+  // Estado para el modal de éxito
+  const [successData, setSuccessData] = useState<any>(null);
+  const [previewPdfData, setPreviewPdfData] = useState<{ isOpen: boolean; url: string; filename: string } | null>(null);
 
   // Estados de carga de datos
   const [socios, setSocios] = useState<any[]>([]);
@@ -41,7 +48,7 @@ export default function RegistroEntrega() {
   // Cargar Socios al iniciar
   useEffect(() => {
     async function loadSocios() {
-      const { data } = await supabase.from('socios').select('id, nombres, apellidos, cedula').order('apellidos');
+      const { data } = await supabase.from('socios').select('id, nombres, apellidos, cedula, email').order('apellidos');
       if (data) setSocios(data);
     }
     loadSocios();
@@ -58,7 +65,7 @@ export default function RegistroEntrega() {
           .from('entregas_acopio')
           .select(`
             *,
-            socios (id, nombres, apellidos, cedula),
+            socios (id, nombres, apellidos, cedula, email),
             entregas_lotes_origen (finca_id, lote_finca_id)
           `)
           .eq('id', entregaId)
@@ -80,7 +87,7 @@ export default function RegistroEntrega() {
           });
           setOldWeights({
             kg: Number(entrega.peso_neto_estandar_kg || 0),
-            lbs: Number(entrega.peso_neto_estandar_kg || 0) * 2.20462 // Approx, real is in lote
+            lbs: Number(entrega.peso_neto_estandar_kg || 0) * 2.20462
           });
         }
       } catch (err) {
@@ -102,7 +109,6 @@ export default function RegistroEntrega() {
       }
       const { data } = await supabase.from('fincas').select('id, nombre, hectareas_totales').eq('socio_id', selectedSocio.id);
       setFincas(data || []);
-      setFormData(prev => ({ ...prev, finca_id: '', lote_finca_id: '' }));
     }
     loadFincas();
   }, [selectedSocio]);
@@ -135,7 +141,6 @@ export default function RegistroEntrega() {
 
     try {
       if (isEditing) {
-        // 1. Actualizar la Entrega
         const { error: entregaError } = await supabase
           .from('entregas_acopio')
           .update({
@@ -155,12 +160,10 @@ export default function RegistroEntrega() {
 
         if (entregaError) throw entregaError;
 
-        // 2. Actualizar Trazabilidad
-        // Primero borramos la existente
         await supabase.from('entregas_lotes_origen').delete().eq('entrega_id', entregaId);
         
         if (formData.finca_id || formData.lote_finca_id) {
-          const { error: trazabilidadError } = await supabase
+          await supabase
             .from('entregas_lotes_origen')
             .insert([{
               entrega_id: entregaId,
@@ -168,10 +171,8 @@ export default function RegistroEntrega() {
               lote_finca_id: formData.lote_finca_id || null,
               porcentaje: 100
             }]);
-          if (trazabilidadError) throw trazabilidadError;
         }
 
-        // 3. Ajustar los totales del lote_acopio (restando lo viejo y sumando lo nuevo)
         const diffKg = pesoNetoKg - oldWeights.kg;
         const diffLbs = pesoNetoLbs - oldWeights.lbs;
         
@@ -184,7 +185,6 @@ export default function RegistroEntrega() {
         }
 
       } else {
-        // 1. Insertar la Entrega Nueva
         const { data: entregaData, error: entregaError } = await supabase
           .from('entregas_acopio')
           .insert([{
@@ -206,9 +206,8 @@ export default function RegistroEntrega() {
 
         if (entregaError) throw entregaError;
 
-        // 2. Insertar Trazabilidad (Si se seleccionó finca o lote)
         if (formData.finca_id || formData.lote_finca_id) {
-          const { error: trazabilidadError } = await supabase
+          await supabase
             .from('entregas_lotes_origen')
             .insert([{
               entrega_id: entregaData.id,
@@ -216,10 +215,8 @@ export default function RegistroEntrega() {
               lote_finca_id: formData.lote_finca_id || null,
               porcentaje: 100
             }]);
-          if (trazabilidadError) throw trazabilidadError;
         }
 
-        // 3. Actualizar los totales del lote_acopio
         const { data: loteData } = await supabase.from('lotes_acopio').select('peso_total_kg, peso_total_lbs').eq('id', id).single();
         if (loteData) {
           await supabase.from('lotes_acopio').update({
@@ -229,7 +226,21 @@ export default function RegistroEntrega() {
         }
       }
 
-      navigate(`/acopio/${id}`);
+      const receiptData = {
+        socioNombre: selectedSocio?.nombres ? `${selectedSocio.nombres} ${selectedSocio.apellidos || ''}` : '',
+        socioIdentificacion: selectedSocio?.cedula || '',
+        fincaNombre: fincas.find(f => f.id === formData.finca_id)?.nombre || '',
+        fecha_entrega: new Date().toISOString(),
+        variedad: 'Por definir',
+        estado_cacao: 'Recibido',
+        peso_bruto_kg: formData.unidad_medida === 'kg' ? Number(formData.peso_bruto) : Number(formData.peso_bruto) * 0.453592,
+        merma_kg: formData.unidad_medida === 'kg' ? Number(formData.merma) : Number(formData.merma) * 0.453592,
+        precio_base: Number(formData.precio_unidad),
+        valor_total: totalPagar
+      };
+
+      setSuccessData(receiptData);
+
     } catch (error: any) {
       console.error('Error registrando entrega:', error);
       alert('Error: ' + error.message);
@@ -244,7 +255,7 @@ export default function RegistroEntrega() {
 
   const filteredSocios = socios.filter(s => 
     `${s.nombres} ${s.apellidos} ${s.cedula}`.toLowerCase().includes(searchSocio.toLowerCase())
-  ).slice(0, 5); // Mostrar máximo 5 para no saturar
+  ).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 pb-24">
@@ -266,7 +277,6 @@ export default function RegistroEntrega() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* 1. Selección del Socio */}
           <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
               <UserSearch className="w-5 h-5 text-emerald-600" />
@@ -288,7 +298,11 @@ export default function RegistroEntrega() {
                       <button
                         key={socio.id}
                         type="button"
-                        onClick={() => { setSelectedSocio(socio); setSearchSocio(''); }}
+                        onClick={() => { 
+                          setSelectedSocio(socio); 
+                          setSearchSocio(''); 
+                          setFormData(prev => ({ ...prev, finca_id: '', lote_finca_id: '' }));
+                        }}
                         className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0"
                       >
                         <div className="font-bold text-slate-800">{socio.apellidos} {socio.nombres}</div>
@@ -310,7 +324,10 @@ export default function RegistroEntrega() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setSelectedSocio(null)}
+                  onClick={() => {
+                    setSelectedSocio(null);
+                    setFormData(prev => ({ ...prev, finca_id: '', lote_finca_id: '' }));
+                  }}
                   className="px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm font-bold"
                 >
                   Cambiar
@@ -319,7 +336,6 @@ export default function RegistroEntrega() {
             )}
           </div>
 
-          {/* 2. Trazabilidad (Opcional) */}
           {selectedSocio && (
             <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -328,10 +344,6 @@ export default function RegistroEntrega() {
                   2. Origen del Cacao <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Opcional</span>
                 </h2>
               </div>
-              <p className="text-sm text-slate-500 mb-4">
-                Si conoces de qué finca o lote específico viene este cacao, selecciónalo aquí para mejorar la trazabilidad del código QR.
-              </p>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700">Finca de Origen</label>
@@ -365,15 +377,9 @@ export default function RegistroEntrega() {
                   </div>
                 )}
               </div>
-              {fincas.length === 0 && (
-                <div className="mt-3 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-100">
-                  Este socio no tiene fincas registradas en el sistema. Puedes continuar sin especificar el origen.
-                </div>
-              )}
             </div>
           )}
 
-          {/* 3. Pesaje y Liquidación */}
           {selectedSocio && (
             <div className="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
               <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
@@ -459,9 +465,6 @@ export default function RegistroEntrega() {
                     <option value="Pendiente">Pendiente de Pago</option>
                     <option value="Pagado">Pagado en Efectivo</option>
                   </select>
-                  {formData.estado_pago === 'Pendiente' && (
-                    <p className="text-xs text-amber-600 mt-1">El área de contabilidad realizará la transferencia posteriormente.</p>
-                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -479,7 +482,6 @@ export default function RegistroEntrega() {
             </div>
           )}
 
-          {/* Acciones */}
           <div className="pt-4 flex justify-end gap-3">
             <Link 
               to={`/acopio/${id}`}
@@ -498,6 +500,39 @@ export default function RegistroEntrega() {
           </div>
         </form>
       </div>
+      
+      {successData && !previewPdfData?.isOpen && (
+        <ReceiptSuccessModal
+          isOpen={true}
+          onClose={() => navigate(`/acopio/${id}`)}
+          onNavigateNext={() => navigate(`/acopio/${id}`)}
+          onDownload={() => {
+            const result = generateEntregaReceiptPDF(successData, true);
+            if (result && result.url) {
+              setPreviewPdfData({ isOpen: true, url: result.url, filename: result.filename });
+            }
+          }}
+          title={isEditing ? '¡Entrega Actualizada!' : '¡Entrega Registrada!'}
+          subtitle={`Se ha guardado correctamente la entrega de cacao de ${successData.socioNombre}.`}
+          emailData={{
+            recipientRole: 'Socio',
+            defaultEmail: selectedSocio?.email || '',
+            documentName: `Recibo_Entrega_${successData.socioNombre.replace(/\s+/g, '_')}.pdf`
+          }}
+        />
+      )}
+
+      {previewPdfData?.isOpen && (
+        <PDFPreviewModal
+          isOpen={true}
+          onClose={() => setPreviewPdfData(null)}
+          pdfUrl={previewPdfData.url}
+          fileName={previewPdfData.filename}
+          onSendEmail={() => {
+            // Se asume que el modal de éxito sigue atrás, pero al cerrar este modal podríamos querer ir a inicio
+          }}
+        />
+      )}
     </div>
   );
 }
