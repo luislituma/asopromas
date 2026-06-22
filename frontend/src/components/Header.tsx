@@ -138,9 +138,9 @@ const HeaderComponent: FC = () => {
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 grid grid-cols-3 items-center">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between relative">
 
-                    {/* Logo — columna izquierda */}
+                    {/* Logo — izquierda */}
                     <Link
                         to="/"
                         className="relative z-50 flex-shrink-0 flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
@@ -155,41 +155,43 @@ const HeaderComponent: FC = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Nav — columna central, perfectamente centrada */}
-                    <nav className="hidden lg:flex items-center justify-center gap-7">
-                        {navLinks.map((link) => {
-                            const isProducts = link.text === 'Productos';
-                            const isAbout = link.text === 'Nosotros';
+                    {/* Desktop Nav — absolute inset-0, centrado en ambos ejes, pointer-events-none en el wrapper */}
+                    <nav className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
+                        <div className="flex items-center gap-7 pointer-events-auto">
+                            {navLinks.map((link) => {
+                                const isProducts = link.text === 'Productos';
+                                const isAbout = link.text === 'Nosotros';
 
-                            return (
-                                <div
-                                    key={link.to}
-                                    className="flex items-center"
-                                    onMouseEnter={() => {
-                                        if (isProducts) setActiveMegaMenu('products');
-                                        else if (isAbout) setActiveMegaMenu('about');
-                                        else setActiveMegaMenu(null);
-                                    }}
-                                >
-                                    <NavLink
-                                        to={link.to}
-                                        className={({ isActive }) =>
-                                            `text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
-                                                isActive || location.pathname.startsWith(link.to)
-                                                    ? 'text-chocolate-950 font-medium'
-                                                    : 'text-stone-500 hover:text-stone-900 font-normal'
-                                            }`
-                                        }
+                                return (
+                                    <div
+                                        key={link.to}
+                                        className="flex items-center"
+                                        onMouseEnter={() => {
+                                            if (isProducts) setActiveMegaMenu('products');
+                                            else if (isAbout) setActiveMegaMenu('about');
+                                            else setActiveMegaMenu(null);
+                                        }}
                                     >
-                                        {link.text}
-                                    </NavLink>
-                                </div>
-                            );
-                        })}
+                                        <NavLink
+                                            to={link.to}
+                                            className={({ isActive }) =>
+                                                `text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
+                                                    isActive || location.pathname.startsWith(link.to)
+                                                        ? 'text-chocolate-950 font-medium'
+                                                        : 'text-stone-500 hover:text-stone-900 font-normal'
+                                                }`
+                                            }
+                                        >
+                                            {link.text}
+                                        </NavLink>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </nav>
 
-                    {/* Actions — columna derecha, alineada a la derecha */}
-                    <div className="flex items-center justify-end gap-4 relative z-50">
+                    {/* Actions — derecha */}
+                    <div className="flex items-center gap-4 relative z-50">
                         <button
                             onClick={() => setSearchOpen(true)}
                             className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
