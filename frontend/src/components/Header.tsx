@@ -147,8 +147,8 @@ const HeaderComponent: FC = () => {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className={`fixed w-full h-14 top-0 z-40 transition-all duration-300 border-b ${
                     isScrolled || activeMegaMenu
-                        ? 'bg-chocolate-900/95 backdrop-saturate-[180%] backdrop-blur-2xl border-chocolate-950'
-                        : 'bg-chocolate-900/80 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
+                        ? 'bg-chocolate-950/98 backdrop-saturate-[180%] backdrop-blur-2xl border-black/40'
+                        : 'bg-chocolate-950/90 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
                 }`}
             >
                 <div className="relative h-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
@@ -190,7 +190,7 @@ const HeaderComponent: FC = () => {
                                             `flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-900 ${
                                                 isActive || location.pathname.startsWith(link.to)
                                                     ? 'text-white font-medium'
-                                                    : 'text-white/60 hover:text-white font-normal'
+                                                    : 'text-white/80 hover:text-white font-normal'
                                             }`
                                         }
                                     >
@@ -205,7 +205,7 @@ const HeaderComponent: FC = () => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSearchOpen(true)}
-                            className="text-white/60 hover:text-white transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-900"
+                            className="text-white/80 hover:text-white transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-950"
                             aria-label="Buscar"
                         >
                             <Search className="w-[18px] h-[18px]" />
@@ -219,7 +219,7 @@ const HeaderComponent: FC = () => {
                         </Link>
 
                         <button
-                            className="lg:hidden p-1.5 text-white/60 hover:text-white transition-colors"
+                            className="lg:hidden p-1.5 text-white/80 hover:text-white transition-colors"
                             onClick={() => setIsMobileMenuOpen(true)}
                             aria-label="Abrir menú"
                         >
