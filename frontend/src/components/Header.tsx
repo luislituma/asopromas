@@ -241,40 +241,51 @@ const HeaderComponent: FC = () => {
                         />
                         <motion.div
                             key={activeMegaMenu}
-                            initial={{ opacity: 0, y: -6 }}
+                            initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-                            className="fixed top-14 right-0 z-40 w-[300px] hidden lg:flex flex-col bg-white border-l border-b border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.16, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="fixed top-14 left-0 w-full z-40 hidden lg:block bg-white border-b border-black/[0.08] shadow-[0_8px_20px_rgba(0,0,0,0.06)]"
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
                         >
-                            {/* Título de sección */}
-                            <div className="px-6 pt-5 pb-4 border-b border-stone-100">
-                                <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1">
-                                    {activeMegaMenu === 'products' ? 'Tienda' : 'La Asociación'}
-                                </p>
-                                <p className="text-[18px] font-light text-stone-900 leading-tight">
-                                    {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
-                                </p>
-                            </div>
+                            <div className="max-w-7xl mx-auto px-8 py-7 grid grid-cols-[220px_1fr_1fr] gap-x-12">
 
-                            {/* Secciones */}
-                            <div className="flex-1 overflow-y-auto">
-                                {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section, si) => (
-                                    <div key={section.title} className={si > 0 ? 'border-t border-stone-100' : ''}>
-                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase px-6 pt-4 pb-2">
+                                {/* Columna título */}
+                                <div className="flex flex-col justify-between border-r border-stone-100 pr-12">
+                                    <div>
+                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-2">
+                                            {activeMegaMenu === 'products' ? 'Tienda' : 'La Asociación'}
+                                        </p>
+                                        <p className="text-[22px] font-light text-stone-900 leading-tight">
+                                            {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
+                                        </p>
+                                    </div>
+                                    <Link
+                                        to={activeMegaMenu === 'products' ? '/products' : '/about'}
+                                        className="flex items-center gap-1.5 text-[12px] text-stone-500 hover:text-chocolate-800 transition-colors duration-100 mt-8"
+                                        onClick={() => setActiveMegaMenu(null)}
+                                    >
+                                        Ver todo
+                                        <ArrowRight className="w-3 h-3" />
+                                    </Link>
+                                </div>
+
+                                {/* Columnas de secciones */}
+                                {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
+                                    <div key={section.title}>
+                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-4">
                                             {section.title}
                                         </p>
-                                        <ul>
+                                        <ul className="space-y-0.5">
                                             {section.items.map((item) => (
                                                 <li key={item.to}>
                                                     <Link
                                                         to={item.to}
-                                                        className="group flex flex-col pl-6 pr-5 py-2 border-l-2 border-transparent hover:border-chocolate-700 hover:bg-stone-50/60 transition-all duration-100 focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-chocolate-400"
+                                                        className="group flex flex-col py-2 pl-3 border-l-2 border-transparent hover:border-chocolate-700 hover:bg-stone-50/70 transition-all duration-100 rounded-r focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400"
                                                         onClick={() => setActiveMegaMenu(null)}
                                                     >
-                                                        <span className="text-[13px] text-stone-600 group-hover:text-stone-950 transition-colors duration-100 font-normal">
+                                                        <span className="text-[13px] text-stone-600 group-hover:text-stone-950 transition-colors duration-100">
                                                             {item.text}
                                                         </span>
                                                         {item.desc && (
@@ -288,18 +299,6 @@ const HeaderComponent: FC = () => {
                                         </ul>
                                     </div>
                                 ))}
-                            </div>
-
-                            {/* Footer */}
-                            <div className="px-6 py-3.5 border-t border-stone-100">
-                                <Link
-                                    to={activeMegaMenu === 'products' ? '/products' : '/about'}
-                                    className="flex items-center gap-1.5 text-[12px] text-stone-500 hover:text-chocolate-800 transition-colors duration-100"
-                                    onClick={() => setActiveMegaMenu(null)}
-                                >
-                                    Ver todo en {activeMegaMenu === 'products' ? 'Productos' : 'Nosotros'}
-                                    <ArrowRight className="w-3 h-3" />
-                                </Link>
                             </div>
                         </motion.div>
                     </>
