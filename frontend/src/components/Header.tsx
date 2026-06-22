@@ -17,13 +17,11 @@ const HeaderComponent: FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<typeof productsData>([]);
     const [isScrolled, setIsScrolled] = useState(false);
-    
+
     const location = useLocation();
     const navigate = useNavigate();
-
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    // Scroll Detection
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -31,13 +29,11 @@ const HeaderComponent: FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Close menus on route change
     useEffect(() => {
         setIsMobileMenuOpen(false);
         setActiveMegaMenu(null);
     }, [location.pathname]);
 
-    // Handle ESC key
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -50,17 +46,15 @@ const HeaderComponent: FC = () => {
         return () => document.removeEventListener('keydown', handleEsc);
     }, []);
 
-    // Search Focus
     useEffect(() => {
         if (searchOpen && searchInputRef.current) {
             setTimeout(() => searchInputRef.current?.focus(), 100);
         }
     }, [searchOpen]);
 
-    // Search Logic
     useEffect(() => {
         if (searchTerm.trim().length >= 2) {
-            const filtered = productsData.filter(p => 
+            const filtered = productsData.filter(p =>
                 p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.description.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -88,7 +82,7 @@ const HeaderComponent: FC = () => {
             text: 'Nosotros',
             submenu: [
                 {
-                    title: 'Nuestra Historia',
+                    title: 'Historia',
                     items: [
                         { to: '/about/history', text: 'Historia de ASOPROMAS', desc: 'El comienzo de nuestro sueño' },
                         { to: '/about/mission', text: 'Misión y Visión', desc: 'Nuestro norte como organización' },
@@ -132,123 +126,128 @@ const HeaderComponent: FC = () => {
 
     return (
         <>
-            <motion.header 
+            {/* ── HEADER ── */}
+            <motion.header
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
-                className={`fixed w-full top-0 z-40 transition-all duration-500 border-b ${
-                    isScrolled 
-                        ? 'bg-white/90 backdrop-blur-xl border-stone-200 shadow-sm py-3' 
-                        : 'bg-white/50 backdrop-blur-sm border-transparent py-5'
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className={`fixed w-full top-0 z-40 transition-all duration-300 border-b ${
+                    isScrolled || activeMegaMenu
+                        ? 'bg-white/85 backdrop-saturate-[180%] backdrop-blur-2xl border-black/[0.08]'
+                        : 'bg-white/60 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <div className="flex justify-between items-center">
-                        {/* Logo */}
-                        <Link to="/" className="relative z-50 flex-shrink-0 flex items-center gap-3 group">
-                            <img 
-                                src={logoUrl} 
-                                alt="ASOPROMAS Logo" 
-                                className={`w-auto transition-all duration-500 ease-out ${isScrolled ? 'h-8' : 'h-10'}`}
-                            />
-                            <span className={`font-medium tracking-wide text-chocolate-900 transition-all duration-500 ease-out hidden sm:block group-hover:text-chocolate-700 ${isScrolled ? 'text-lg' : 'text-xl'}`}>
-                                ASOPROMAS
-                            </span>
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between">
+
+                    {/* Logo — tamaño fijo, sin salto en scroll */}
+                    <Link
+                        to="/"
+                        className="relative z-50 flex-shrink-0 flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
+                    >
+                        <img
+                            src={logoUrl}
+                            alt="ASOPROMAS Logo"
+                            className="h-7 w-auto"
+                        />
+                        <span className="text-[13px] font-medium tracking-[0.05em] text-chocolate-900 group-hover:text-chocolate-700 transition-colors hidden sm:block">
+                            ASOPROMAS
+                        </span>
+                    </Link>
+
+                    {/* Desktop Nav */}
+                    <nav className="hidden lg:flex items-center gap-7">
+                        {navLinks.map((link) => {
+                            const isProducts = link.text === 'Productos';
+                            const isAbout = link.text === 'Nosotros';
+
+                            return (
+                                <div
+                                    key={link.to}
+                                    className="flex items-center"
+                                    onMouseEnter={() => {
+                                        if (isProducts) setActiveMegaMenu('products');
+                                        else if (isAbout) setActiveMegaMenu('about');
+                                        else setActiveMegaMenu(null);
+                                    }}
+                                >
+                                    <NavLink
+                                        to={link.to}
+                                        className={({ isActive }) =>
+                                            `text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
+                                                isActive || location.pathname.startsWith(link.to)
+                                                    ? 'text-chocolate-950 font-medium'
+                                                    : 'text-stone-500 hover:text-stone-900 font-normal'
+                                            }`
+                                        }
+                                    >
+                                        {link.text}
+                                    </NavLink>
+                                </div>
+                            );
+                        })}
+                    </nav>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-4 relative z-50">
+                        <button
+                            onClick={() => setSearchOpen(true)}
+                            className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
+                            aria-label="Buscar"
+                        >
+                            <Search className="w-[18px] h-[18px]" />
+                        </button>
+
+                        <Link
+                            to="/ruta-cacao-ancestral"
+                            className="hidden md:inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-chocolate-900 text-white text-[12px] font-medium tracking-[0.02em] hover:bg-chocolate-950 transition-colors"
+                        >
+                            Reservar Ruta
                         </Link>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center space-x-10">
-                            {navLinks.map((link) => {
-
-                                const isProducts = link.text === 'Productos';
-                                const isAbout = link.text === 'Nosotros';
-
-                                return (
-                                    <div 
-                                        key={link.to} 
-                                        className="relative group h-full flex items-center"
-                                        onMouseEnter={() => {
-                                            if (isProducts) setActiveMegaMenu('products');
-                                            else if (isAbout) setActiveMegaMenu('about');
-                                            else setActiveMegaMenu(null);
-                                        }}
-                                    >
-                                        <NavLink
-                                            to={link.to}
-                                            className={({ isActive }) =>
-                                                `flex items-center gap-1 text-[15px] font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
-                                                    isActive || location.pathname.startsWith(link.to)
-                                                        ? 'text-chocolate-800'
-                                                        : 'text-stone-600 hover:text-chocolate-900'
-                                                }`
-                                            }
-                                        >
-                                            {link.text}
-                                        </NavLink>
-                                    </div>
-                                );
-                            })}
-                        </nav>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-6 relative z-50">
-                            <button
-                                onClick={() => setSearchOpen(true)}
-                                className="text-stone-500 hover:text-chocolate-800 transition-colors p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
-                                aria-label="Buscar"
-                            >
-                                <Search className="w-[22px] h-[22px]" />
-                            </button>
-
-                            <Link 
-                                to="/ruta-cacao-ancestral" 
-                                className="hidden md:inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-chocolate-900 text-white text-sm font-medium hover:bg-chocolate-950 transition-colors shadow-md hover:shadow-lg"
-                            >
-                                Reservar Ruta
-                            </Link>
-
-                            <button
-                                className="lg:hidden p-2 text-stone-600"
-                                onClick={() => setIsMobileMenuOpen(true)}
-                            >
-                                <Menu className="w-6 h-6" />
-                            </button>
-                        </div>
+                        <button
+                            className="lg:hidden p-1.5 text-stone-500 hover:text-stone-800 transition-colors"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            aria-label="Abrir menú"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 
-                {/* Mega Menu Dropdown */}
+                {/* ── MEGA MENU ── */}
                 <AnimatePresence>
                     {activeMegaMenu && (
                         <motion.div
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="absolute top-full left-0 w-full bg-white border-b border-stone-200 shadow-xl overflow-hidden"
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                            className="absolute top-full left-0 w-full bg-white/90 backdrop-saturate-[180%] backdrop-blur-2xl border-b border-black/[0.06] overflow-hidden"
                         >
-                            <div className="max-w-7xl mx-auto px-6 py-12">
-                                <div className="grid grid-cols-12 gap-12">
-                                    {/* Links Section */}
-                                    <div className="col-span-8 grid grid-cols-2 gap-12">
+                            <div className="max-w-7xl mx-auto px-6 py-5 pb-7">
+                                <div className="grid grid-cols-12 gap-10">
+
+                                    {/* Links */}
+                                    <div className="col-span-8 grid grid-cols-2 gap-10">
                                         {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
                                             <div key={section.title}>
-                                                <h3 className="text-sm font-semibold text-chocolate-900 tracking-wider uppercase mb-6">
+                                                <p className="text-[10px] font-semibold text-stone-400/80 tracking-[0.14em] uppercase mb-4">
                                                     {section.title}
-                                                </h3>
-                                                <ul className="space-y-5">
+                                                </p>
+                                                <ul className="space-y-3.5">
                                                     {section.items.map((item) => (
                                                         <li key={item.to}>
                                                             <Link
                                                                 to={item.to}
-                                                                className="group block"
+                                                                className="group block rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-1"
                                                                 onClick={() => setActiveMegaMenu(null)}
                                                             >
-                                                                <span className="block text-base font-medium text-stone-800 group-hover:text-chocolate-700 transition-colors">
+                                                                <span className="block text-[13px] font-normal text-stone-700 group-hover:text-chocolate-800 transition-colors duration-150">
                                                                     {item.text}
                                                                 </span>
                                                                 {item.desc && (
-                                                                    <span className="block text-sm text-stone-500 mt-1">
+                                                                    <span className="block text-[11px] text-stone-400 mt-0.5">
                                                                         {item.desc}
                                                                     </span>
                                                                 )}
@@ -260,22 +259,25 @@ const HeaderComponent: FC = () => {
                                         ))}
                                     </div>
 
-                                    {/* Featured Section */}
-                                    <div className="col-span-4 border-l border-stone-100 pl-12">
-                                        <div className="relative h-full w-full rounded-2xl overflow-hidden group cursor-pointer" onClick={() => navigate(activeMegaMenu === 'products' ? '/products' : '/about')}>
-                                            <img 
-                                                src={activeMegaMenu === 'products' ? "/assets/images/products/Barra-Pura-1.jpg" : "/assets/images/products/Asopromas-socios.jpg"} 
+                                    {/* Featured image */}
+                                    <div className="col-span-4 border-l border-black/[0.06] pl-10">
+                                        <div
+                                            className="relative h-full w-full rounded-xl overflow-hidden group cursor-pointer"
+                                            onClick={() => navigate(activeMegaMenu === 'products' ? '/products' : '/about')}
+                                        >
+                                            <img
+                                                src={activeMegaMenu === 'products' ? '/assets/images/products/Barra-Pura-1.jpg' : '/assets/images/products/Asopromas-socios.jpg'}
                                                 alt="Destacado"
                                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                            <div className="absolute bottom-6 left-6 right-6">
-                                                <h4 className="text-white text-xl font-medium mb-2">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                                            <div className="absolute bottom-4 left-4 right-4">
+                                                <p className="text-white text-[13px] font-medium mb-1">
                                                     {activeMegaMenu === 'products' ? 'Explorar Colección' : 'Nuestra Historia'}
-                                                </h4>
-                                                <div className="flex items-center text-stone-300 text-sm group-hover:text-white transition-colors">
+                                                </p>
+                                                <div className="flex items-center text-white/60 text-[11px] group-hover:text-white/90 transition-colors">
                                                     <span>Descubrir más</span>
-                                                    <ArrowRight className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
+                                                    <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition-transform" />
                                                 </div>
                                             </div>
                                         </div>
@@ -287,7 +289,7 @@ const HeaderComponent: FC = () => {
                 </AnimatePresence>
             </motion.header>
 
-            {/* Mobile Drawer Menu */}
+            {/* ── MOBILE DRAWER ── */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <>
@@ -295,37 +297,41 @@ const HeaderComponent: FC = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50"
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
                             onClick={() => setIsMobileMenuOpen(false)}
                         />
                         <motion.div
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 h-full w-[85vw] max-w-sm bg-white z-50 shadow-2xl flex flex-col"
+                            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                            className="fixed top-0 right-0 h-full w-[82vw] max-w-xs bg-white/95 backdrop-blur-2xl z-50 shadow-2xl flex flex-col"
                         >
-                            <div className="p-6 border-b border-stone-100 flex justify-between items-center">
-                                <span className="font-semibold text-chocolate-900 tracking-wider">MENÚ</span>
-                                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-stone-500 hover:text-chocolate-800 rounded-full hover:bg-stone-50">
-                                    <X className="w-6 h-6" />
+                            <div className="h-12 px-5 border-b border-stone-100 flex justify-between items-center flex-shrink-0">
+                                <span className="text-[11px] font-semibold text-stone-400 tracking-[0.12em] uppercase">Menú</span>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-1.5 text-stone-400 hover:text-stone-800 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500"
+                                >
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            
-                            <div className="flex-1 overflow-y-auto py-6 px-6 space-y-8">
+
+                            <div className="flex-1 overflow-y-auto py-5 px-5 space-y-6">
                                 {navLinks.map((link) => (
                                     <div key={link.to}>
                                         {link.submenu ? (
-                                            <div className="space-y-4">
-                                                <span className="text-sm font-semibold text-stone-400 uppercase tracking-widest">{link.text}</span>
-                                                <div className="space-y-4 pl-4 border-l border-stone-100">
+                                            <div className="space-y-3">
+                                                <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-[0.12em]">{link.text}</span>
+                                                <div className="space-y-3 pl-3 border-l border-stone-100">
                                                     {link.submenu.map((sec) => (
-                                                        <div key={sec.title} className="space-y-3">
+                                                        <div key={sec.title} className="space-y-2.5">
                                                             {sec.items.map((item) => (
                                                                 <Link
                                                                     key={item.to}
                                                                     to={item.to}
-                                                                    className="block text-stone-600 hover:text-chocolate-800 font-medium rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
+                                                                    className="block text-[13px] text-stone-600 hover:text-chocolate-800 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
                                                                     onClick={() => setIsMobileMenuOpen(false)}
                                                                 >
                                                                     {item.text}
@@ -338,7 +344,7 @@ const HeaderComponent: FC = () => {
                                         ) : (
                                             <Link
                                                 to={link.to}
-                                                className="block text-lg font-medium text-stone-800 hover:text-chocolate-800"
+                                                className="block text-[15px] font-normal text-stone-700 hover:text-chocolate-800 transition-colors"
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 {link.text}
@@ -348,10 +354,10 @@ const HeaderComponent: FC = () => {
                                 ))}
                             </div>
 
-                            <div className="p-6 bg-stone-50 border-t border-stone-100">
-                                <Link 
-                                    to="/ruta-cacao-ancestral" 
-                                    className="flex w-full items-center justify-center px-6 py-3 rounded-full bg-chocolate-900 text-white font-medium hover:bg-chocolate-950 transition-colors"
+                            <div className="p-5 border-t border-stone-100 flex-shrink-0">
+                                <Link
+                                    to="/ruta-cacao-ancestral"
+                                    className="flex w-full items-center justify-center px-5 py-2.5 rounded-full bg-chocolate-900 text-white text-[13px] font-medium hover:bg-chocolate-950 transition-colors"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     Reservar Ruta
@@ -362,63 +368,64 @@ const HeaderComponent: FC = () => {
                 )}
             </AnimatePresence>
 
-            {/* Elegant Search Modal */}
+            {/* ── SEARCH MODAL ── */}
             <AnimatePresence>
                 {searchOpen && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex flex-col items-center pt-24 px-4 sm:px-6"
+                        transition={{ duration: 0.15 }}
+                        className="fixed inset-0 z-50 flex flex-col items-center pt-20 px-4 sm:px-6"
                     >
-                        {/* Blur Backdrop */}
-                        <div 
-                            className="absolute inset-0 bg-white/90 backdrop-blur-xl"
+                        <div
+                            className="absolute inset-0 bg-white/85 backdrop-saturate-[180%] backdrop-blur-2xl"
                             onClick={() => setSearchOpen(false)}
                         />
 
-                        <motion.div 
-                            initial={{ y: -20, opacity: 0 }}
+                        <motion.div
+                            initial={{ y: -12, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -20, opacity: 0 }}
-                            className="relative w-full max-w-3xl z-10"
+                            exit={{ y: -12, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                            className="relative w-full max-w-2xl z-10"
                         >
                             <button
                                 onClick={() => setSearchOpen(false)}
-                                className="absolute -right-4 -top-16 p-2 text-stone-400 hover:text-chocolate-900 transition-colors"
+                                className="absolute -right-2 -top-14 p-2 text-stone-400 hover:text-stone-700 transition-colors rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500"
                             >
-                                <X className="w-8 h-8" />
+                                <X className="w-6 h-6" />
                                 <span className="sr-only">Cerrar</span>
                             </button>
 
                             <form onSubmit={handleSearchSubmit} className="relative group">
-                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 text-stone-300 group-focus-within:text-chocolate-600 transition-colors" />
+                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-300 group-focus-within:text-chocolate-500 transition-colors" />
                                 <input
                                     ref={searchInputRef}
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Buscar productos..."
-                                    className="w-full bg-white py-6 pl-20 pr-8 text-2xl font-light text-stone-800 placeholder-stone-300 rounded-2xl border-2 border-stone-100 shadow-2xl focus:outline-none focus:border-chocolate-300 focus:ring-0 transition-all"
+                                    className="w-full bg-white py-4 pl-14 pr-6 text-[17px] font-light text-stone-800 placeholder-stone-300 rounded-2xl border border-stone-200 shadow-lg focus:outline-none focus:border-chocolate-300 transition-all"
                                 />
                             </form>
 
-                            {/* Search Results Dropdown-style */}
                             <AnimatePresence>
                                 {searchTerm.trim().length >= 2 && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 10 }}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 6 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="mt-6 bg-white rounded-2xl shadow-xl border border-stone-100 overflow-hidden max-h-[50vh] overflow-y-auto"
+                                        exit={{ opacity: 0, y: 6 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="mt-3 bg-white rounded-2xl border border-stone-100 shadow-xl overflow-hidden max-h-[50vh] overflow-y-auto"
                                     >
                                         {searchResults.length === 0 ? (
-                                            <div className="p-12 text-center text-stone-500 font-light">
-                                                No se encontraron resultados para "{searchTerm}"
+                                            <div className="p-10 text-center text-[13px] text-stone-400 font-light">
+                                                Sin resultados para "{searchTerm}"
                                             </div>
                                         ) : (
-                                            <div className="p-4">
-                                                <p className="px-4 py-2 text-xs font-semibold text-stone-400 uppercase tracking-widest">
+                                            <div className="p-3">
+                                                <p className="px-3 py-2 text-[10px] font-semibold text-stone-400 uppercase tracking-[0.12em]">
                                                     Resultados
                                                 </p>
                                                 {searchResults.map((product) => (
@@ -428,25 +435,25 @@ const HeaderComponent: FC = () => {
                                                             navigate(`/products/${product.id}`);
                                                             setSearchOpen(false);
                                                         }}
-                                                        className="w-full flex items-center gap-6 p-4 rounded-xl hover:bg-stone-50 transition-colors text-left group"
+                                                        className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-stone-50 transition-colors text-left group"
                                                     >
-                                                        <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-stone-100">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-stone-100">
                                                             <img
                                                                 src={product.images[0]}
                                                                 alt={product.name}
-                                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                             />
                                                         </div>
                                                         <div>
-                                                            <h3 className="text-lg font-medium text-stone-800 group-hover:text-chocolate-800 transition-colors">
+                                                            <p className="text-[13px] font-medium text-stone-800 group-hover:text-chocolate-800 transition-colors">
                                                                 {product.name}
-                                                            </h3>
-                                                            <p className="text-sm text-stone-500 line-clamp-1 mt-1">
+                                                            </p>
+                                                            <p className="text-[11px] text-stone-400 line-clamp-1 mt-0.5">
                                                                 {product.description}
                                                             </p>
                                                         </div>
                                                         <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <ArrowRight className="w-5 h-5 text-chocolate-500" />
+                                                            <ArrowRight className="w-4 h-4 text-stone-400" />
                                                         </div>
                                                     </button>
                                                 ))}
