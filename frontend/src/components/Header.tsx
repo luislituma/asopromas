@@ -138,9 +138,9 @@ const HeaderComponent: FC = () => {
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between relative">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 grid grid-cols-3 items-center">
 
-                    {/* Logo — tamaño fijo, sin salto en scroll */}
+                    {/* Logo — columna izquierda */}
                     <Link
                         to="/"
                         className="relative z-50 flex-shrink-0 flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
@@ -155,8 +155,8 @@ const HeaderComponent: FC = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Nav — centrado absolutamente para no depender del ancho del logo/acciones */}
-                    <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {/* Desktop Nav — columna central, perfectamente centrada */}
+                    <nav className="hidden lg:flex items-center justify-center gap-7">
                         {navLinks.map((link) => {
                             const isProducts = link.text === 'Productos';
                             const isAbout = link.text === 'Nosotros';
@@ -188,8 +188,8 @@ const HeaderComponent: FC = () => {
                         })}
                     </nav>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-4 relative z-50">
+                    {/* Actions — columna derecha, alineada a la derecha */}
+                    <div className="flex items-center justify-end gap-4 relative z-50">
                         <button
                             onClick={() => setSearchOpen(true)}
                             className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
