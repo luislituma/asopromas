@@ -138,9 +138,9 @@ const HeaderComponent: FC = () => {
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-full grid grid-cols-[1fr_auto_1fr] items-center">
+                <div className="relative h-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
 
-                    {/* Logo — columna izquierda */}
+                    {/* Logo — izquierda, en flujo normal */}
                     <Link
                         to="/"
                         className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
@@ -151,8 +151,8 @@ const HeaderComponent: FC = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Nav — columna central, siempre centrada */}
-                    <nav className="hidden lg:flex items-center gap-7">
+                    {/* Desktop Nav — absolute centrado en el header */}
+                    <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                         {navLinks.map((link) => {
                             const isProducts = link.text === 'Productos';
                             const isAbout = link.text === 'Nosotros';
@@ -170,7 +170,7 @@ const HeaderComponent: FC = () => {
                                     <NavLink
                                         to={link.to}
                                         className={({ isActive }) =>
-                                            `text-[13px] leading-none transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
+                                            `flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
                                                 isActive || location.pathname.startsWith(link.to)
                                                     ? 'text-chocolate-950 font-medium'
                                                     : 'text-stone-500 hover:text-stone-900 font-normal'
@@ -184,8 +184,8 @@ const HeaderComponent: FC = () => {
                         })}
                     </nav>
 
-                    {/* Actions — columna derecha, alineada al extremo */}
-                    <div className="flex items-center gap-4 justify-end">
+                    {/* Actions — derecha, en flujo normal */}
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSearchOpen(true)}
                             className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
