@@ -138,7 +138,7 @@ const HeaderComponent: FC = () => {
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between relative">
 
                     {/* Logo — tamaño fijo, sin salto en scroll */}
                     <Link
@@ -155,8 +155,8 @@ const HeaderComponent: FC = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden lg:flex items-center gap-7">
+                    {/* Desktop Nav — centrado absolutamente para no depender del ancho del logo/acciones */}
+                    <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
                         {navLinks.map((link) => {
                             const isProducts = link.text === 'Productos';
                             const isAbout = link.text === 'Nosotros';
