@@ -241,64 +241,47 @@ const HeaderComponent: FC = () => {
                         />
                         <motion.div
                             key={activeMegaMenu}
-                            initial={{ x: 24, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: 24, opacity: 0 }}
-                            transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
-                            className="fixed top-14 right-0 z-40 w-[340px] hidden lg:flex flex-col bg-white/96 backdrop-saturate-[180%] backdrop-blur-2xl border-l border-b border-black/[0.06] rounded-bl-2xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] overflow-hidden"
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="fixed top-14 right-0 z-40 w-[300px] hidden lg:flex flex-col bg-white border-l border-b border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
                         >
-                            {/* Imagen cabecera */}
-                            <div className="relative h-36 overflow-hidden flex-shrink-0">
-                                <motion.img
-                                    key={activeMegaMenu + '-img'}
-                                    initial={{ opacity: 0, scale: 1.04 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ duration: 0.35 }}
-                                    src={activeMegaMenu === 'products'
-                                        ? '/assets/images/products/Barra-Pura-1.jpg'
-                                        : '/assets/images/products/Asopromas-socios.jpg'}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
-                                <div className="absolute bottom-4 left-5 right-5">
-                                    <p className="text-[10px] font-semibold text-white/55 tracking-[0.14em] uppercase mb-1">
-                                        {activeMegaMenu === 'products' ? 'Colección' : 'La Asociación'}
-                                    </p>
-                                    <p className="text-[17px] font-medium text-white leading-tight">
-                                        {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
-                                    </p>
-                                </div>
+                            {/* Título de sección */}
+                            <div className="px-6 pt-5 pb-4 border-b border-stone-100">
+                                <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1">
+                                    {activeMegaMenu === 'products' ? 'Tienda' : 'La Asociación'}
+                                </p>
+                                <p className="text-[18px] font-light text-stone-900 leading-tight">
+                                    {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
+                                </p>
                             </div>
 
-                            {/* Links */}
-                            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
-                                {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
-                                    <div key={section.title}>
-                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-2 px-2">
+                            {/* Secciones */}
+                            <div className="flex-1 overflow-y-auto">
+                                {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section, si) => (
+                                    <div key={section.title} className={si > 0 ? 'border-t border-stone-100' : ''}>
+                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase px-6 pt-4 pb-2">
                                             {section.title}
                                         </p>
-                                        <ul className="space-y-0.5">
+                                        <ul>
                                             {section.items.map((item) => (
                                                 <li key={item.to}>
                                                     <Link
                                                         to={item.to}
-                                                        className="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-stone-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400"
+                                                        className="group flex flex-col pl-6 pr-5 py-2 border-l-2 border-transparent hover:border-chocolate-700 hover:bg-stone-50/60 transition-all duration-100 focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-chocolate-400"
                                                         onClick={() => setActiveMegaMenu(null)}
                                                     >
-                                                        <div>
-                                                            <span className="block text-[13px] text-stone-700 group-hover:text-chocolate-800 transition-colors">
-                                                                {item.text}
+                                                        <span className="text-[13px] text-stone-600 group-hover:text-stone-950 transition-colors duration-100 font-normal">
+                                                            {item.text}
+                                                        </span>
+                                                        {item.desc && (
+                                                            <span className="text-[11px] text-stone-400 leading-snug mt-0.5">
+                                                                {item.desc}
                                                             </span>
-                                                            {item.desc && (
-                                                                <span className="block text-[11px] text-stone-400 mt-0.5 leading-snug">
-                                                                    {item.desc}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <ChevronRight className="w-3.5 h-3.5 text-stone-300 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 flex-shrink-0 ml-2" />
+                                                        )}
                                                     </Link>
                                                 </li>
                                             ))}
@@ -307,15 +290,15 @@ const HeaderComponent: FC = () => {
                                 ))}
                             </div>
 
-                            {/* Footer CTA */}
-                            <div className="px-5 py-3.5 border-t border-stone-100 flex-shrink-0">
+                            {/* Footer */}
+                            <div className="px-6 py-3.5 border-t border-stone-100">
                                 <Link
                                     to={activeMegaMenu === 'products' ? '/products' : '/about'}
-                                    className="flex items-center text-[12px] font-medium text-chocolate-700 hover:text-chocolate-950 transition-colors"
+                                    className="flex items-center gap-1.5 text-[12px] text-stone-500 hover:text-chocolate-800 transition-colors duration-100"
                                     onClick={() => setActiveMegaMenu(null)}
                                 >
-                                    Ver todo
-                                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                                    Ver todo en {activeMegaMenu === 'products' ? 'Productos' : 'Nosotros'}
+                                    <ArrowRight className="w-3 h-3" />
                                 </Link>
                             </div>
                         </motion.div>
@@ -424,52 +407,47 @@ const HeaderComponent: FC = () => {
                                             transition={{ type: 'spring', damping: 30, stiffness: 280 }}
                                             className="absolute inset-0 overflow-y-auto"
                                         >
-                                            {/* Imagen cabecera nivel 2 */}
-                                            <div className="relative h-32 overflow-hidden flex-shrink-0">
-                                                <img
-                                                    src={mobileSubmenu === 'products'
-                                                        ? '/assets/images/products/Barra-Pura-1.jpg'
-                                                        : '/assets/images/products/Asopromas-socios.jpg'}
-                                                    alt=""
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/55" />
-                                                <p className="absolute bottom-3 left-4 text-[15px] font-medium text-white">
-                                                    {mobileSubmenu === 'products' ? 'Productos' : 'Nosotros'}
+                                            {/* Título sección nivel 2 */}
+                                            <div className="px-5 pt-5 pb-4 border-b border-stone-100">
+                                                <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1">
+                                                    {mobileSubmenu === 'products' ? 'Tienda' : 'La Asociación'}
+                                                </p>
+                                                <p className="text-[18px] font-light text-stone-900">
+                                                    {mobileSubmenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
                                                 </p>
                                             </div>
-                                            <div className="py-3 px-4 space-y-5">
-                                                {(mobileSubmenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
-                                                    <div key={section.title}>
-                                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1.5 px-2">
+                                            <div className="pb-4">
+                                                {(mobileSubmenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section, si) => (
+                                                    <div key={section.title} className={si > 0 ? 'border-t border-stone-100' : ''}>
+                                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase px-5 pt-4 pb-2">
                                                             {section.title}
                                                         </p>
-                                                        <ul className="space-y-0.5">
+                                                        <ul>
                                                             {section.items.map((item) => (
                                                                 <li key={item.to}>
                                                                     <Link
                                                                         to={item.to}
-                                                                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-stone-50 transition-colors"
+                                                                        className="flex flex-col pl-5 pr-4 py-2.5 border-l-2 border-transparent active:border-chocolate-700 active:bg-stone-50"
                                                                         onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                                                     >
-                                                                        <div>
-                                                                            <span className="block text-[13px] text-stone-700">{item.text}</span>
-                                                                            {item.desc && <span className="block text-[11px] text-stone-400 mt-0.5">{item.desc}</span>}
-                                                                        </div>
-                                                                        <ChevronRight className="w-3.5 h-3.5 text-stone-300 flex-shrink-0" />
+                                                                        <span className="text-[14px] text-stone-700">{item.text}</span>
+                                                                        {item.desc && <span className="text-[12px] text-stone-400 mt-0.5">{item.desc}</span>}
                                                                     </Link>
                                                                 </li>
                                                             ))}
                                                         </ul>
                                                     </div>
                                                 ))}
-                                                <Link
-                                                    to={mobileSubmenu === 'products' ? '/products' : '/about'}
-                                                    className="flex items-center px-3 py-2 text-[12px] font-medium text-chocolate-700"
-                                                    onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
-                                                >
-                                                    Ver todo <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                                                </Link>
+                                                <div className="border-t border-stone-100 mx-5 mt-4 pt-4">
+                                                    <Link
+                                                        to={mobileSubmenu === 'products' ? '/products' : '/about'}
+                                                        className="flex items-center gap-1.5 text-[12px] text-stone-500"
+                                                        onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
+                                                    >
+                                                        Ver todo en {mobileSubmenu === 'products' ? 'Productos' : 'Nosotros'}
+                                                        <ArrowRight className="w-3 h-3" />
+                                                    </Link>
+                                                </div>
                                             </div>
                                         </motion.div>
                                     )}
