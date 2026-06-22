@@ -147,8 +147,8 @@ const HeaderComponent: FC = () => {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className={`fixed w-full h-14 top-0 z-40 transition-all duration-300 border-b ${
                     isScrolled || activeMegaMenu
-                        ? 'bg-white/85 backdrop-saturate-[180%] backdrop-blur-2xl border-black/[0.08]'
-                        : 'bg-white/60 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
+                        ? 'bg-chocolate-900/95 backdrop-saturate-[180%] backdrop-blur-2xl border-chocolate-950'
+                        : 'bg-chocolate-900/80 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
                 }`}
             >
                 <div className="relative h-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
@@ -158,8 +158,8 @@ const HeaderComponent: FC = () => {
                         to="/"
                         className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
                     >
-                        <img src={logoUrl} alt="ASOPROMAS Logo" className="h-7 w-auto" />
-                        <span className="text-[13px] font-medium tracking-[0.05em] text-chocolate-900 group-hover:text-chocolate-700 transition-colors hidden sm:block">
+                        <img src={logoUrl} alt="ASOPROMAS Logo" className="h-7 w-auto brightness-0 invert" />
+                        <span className="text-[13px] font-medium tracking-[0.05em] text-white/90 group-hover:text-white transition-colors hidden sm:block">
                             ASOPROMAS
                         </span>
                     </Link>
@@ -187,10 +187,10 @@ const HeaderComponent: FC = () => {
                                     <NavLink
                                         to={link.to}
                                         className={({ isActive }) =>
-                                            `flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
+                                            `flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-900 ${
                                                 isActive || location.pathname.startsWith(link.to)
-                                                    ? 'text-chocolate-950 font-medium'
-                                                    : 'text-stone-500 hover:text-stone-900 font-normal'
+                                                    ? 'text-white font-medium'
+                                                    : 'text-white/60 hover:text-white font-normal'
                                             }`
                                         }
                                     >
@@ -205,7 +205,7 @@ const HeaderComponent: FC = () => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSearchOpen(true)}
-                            className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
+                            className="text-white/60 hover:text-white transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-900"
                             aria-label="Buscar"
                         >
                             <Search className="w-[18px] h-[18px]" />
@@ -213,13 +213,13 @@ const HeaderComponent: FC = () => {
 
                         <Link
                             to="/ruta-cacao-ancestral"
-                            className="hidden md:inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-chocolate-900 text-white text-[12px] font-medium tracking-[0.02em] hover:bg-chocolate-950 transition-colors"
+                            className="hidden md:inline-flex items-center justify-center px-4 py-1.5 rounded-full border border-white/30 text-white/80 text-[12px] font-medium tracking-[0.02em] hover:border-white/70 hover:text-white transition-colors"
                         >
                             Reservar Ruta
                         </Link>
 
                         <button
-                            className="lg:hidden p-1.5 text-stone-500 hover:text-stone-800 transition-colors"
+                            className="lg:hidden p-1.5 text-white/60 hover:text-white transition-colors"
                             onClick={() => setIsMobileMenuOpen(true)}
                             aria-label="Abrir menú"
                         >
