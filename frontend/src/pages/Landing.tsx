@@ -1,6 +1,6 @@
 import { type FC, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 
@@ -15,15 +15,17 @@ const Landing: FC = () => {
     url: '/',
   });
 
+  const prefersReducedMotion = useReducedMotion();
+
   // 1. Hero Parallax
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end end"]
   });
-  const heroScale = useTransform(heroProgress, [0, 1], [1, 1.15]);
+  const heroScale = useTransform(heroProgress, [0, 1], prefersReducedMotion ? [1, 1] : [1, 1.15]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
-  const heroY = useTransform(heroProgress, [0, 1], ["0%", "50%"]);
+  const heroY = useTransform(heroProgress, [0, 1], prefersReducedMotion ? ["0%", "0%"] : ["0%", "50%"]);
 
   // 2. Sticky Storytelling (Asociación) - Framer Motion
   const storyContainerRef = useRef<HTMLElement>(null);
@@ -50,7 +52,7 @@ const Landing: FC = () => {
     target: videoRef,
     offset: ["start end", "center center"]
   });
-  const videoScale = useTransform(videoProgress, [0, 1], [0.85, 1]);
+  const videoScale = useTransform(videoProgress, [0, 1], prefersReducedMotion ? [1, 1] : [0.85, 1]);
   const videoOpacity = useTransform(videoProgress, [0, 1], [0.5, 1]);
 
   // 4. Parallax Catalog
@@ -60,9 +62,9 @@ const Landing: FC = () => {
     offset: ["start end", "end start"]
   });
 
-  const card1Y = useTransform(catalogProgress, [0, 1], [100, -100]);
-  const card2Y = useTransform(catalogProgress, [0, 1], [0, 0]); // Centro estático
-  const card3Y = useTransform(catalogProgress, [0, 1], [150, -150]);
+  const card1Y = useTransform(catalogProgress, [0, 1], prefersReducedMotion ? [0, 0] : [60, -60]);
+  const card2Y = useTransform(catalogProgress, [0, 1], [0, 0]);
+  const card3Y = useTransform(catalogProgress, [0, 1], prefersReducedMotion ? [0, 0] : [80, -80]);
 
   return (
     <div className="flex flex-col min-h-screen bg-stone-50 font-sans text-stone-800">
@@ -84,10 +86,8 @@ const Landing: FC = () => {
           >
             <source src={heroVideoSrc} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/35 via-stone-950/15 to-stone-950/70"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.18)_70%,rgba(0,0,0,0.4)_100%)]"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/75 via-transparent to-stone-950/25"></div>
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-stone-950 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/30 via-transparent to-stone-950/55"></div>
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-stone-950 to-transparent"></div>
         </motion.div>
 
         <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl mt-20">

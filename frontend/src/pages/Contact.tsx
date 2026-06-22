@@ -48,19 +48,19 @@ const Contact: FC = () => {
 
     const contactInfo = [
         {
-            icon: <Mail className="h-6 w-6 text-brown-600" />,
+            icon: <Mail className="h-6 w-6 text-chocolate-600" />,
             title: "Correo",
             details: "info@asopromas.com",
             link: "mailto:info@asopromas.com"
         },
         {
-            icon: <Phone className="h-6 w-6 text-brown-600" />,
+            icon: <Phone className="h-6 w-6 text-chocolate-600" />,
             title: "Teléfono",
             details: "+593 96 170 6421",
             link: "tel:+593961706421"
         },
         {
-            icon: <MapPin className="h-6 w-6 text-brown-600" />,
+            icon: <MapPin className="h-6 w-6 text-chocolate-600" />,
             title: "Ubicación",
             details: "Zamora Chinchipe, Ecuador",
             link: "https://maps.app.goo.gl/vBXruvC58KCSA6xcA"
@@ -93,12 +93,12 @@ const Contact: FC = () => {
                                 target={item.title === "Ubicación" ? "_blank" : undefined}
                                 rel={item.title === "Ubicación" ? "noopener noreferrer" : undefined}
                             >
-                                <div className="flex-shrink-0 rounded-full p-3 bg-brown-50 group-hover:bg-brown-100 transition-colors">
+                                <div className="flex-shrink-0 rounded-full p-3 bg-chocolate-50 group-hover:bg-chocolate-100 transition-colors">
                                     {item.icon}
                                 </div>
                                 <div>
                                     <h3 className="font-medium text-gray-900">{item.title}</h3>
-                                    <p className="text-gray-600 group-hover:text-brown-600 transition-colors">
+                                    <p className="text-gray-600 group-hover:text-chocolate-600 transition-colors">
                                         {item.details}
                                     </p>
                                 </div>
@@ -134,7 +134,7 @@ const Contact: FC = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-chocolate-500 focus:ring-chocolate-500 px-4 py-2"
                                 placeholder="Tu nombre"
                             />
                         </div>
@@ -150,7 +150,7 @@ const Contact: FC = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-chocolate-500 focus:ring-chocolate-500 px-4 py-2"
                                 placeholder="tu.correo@ejemplo.com"
                             />
                         </div>
@@ -166,7 +166,7 @@ const Contact: FC = () => {
                                 value={formData.subject}
                                 onChange={handleChange}
                                 required
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-chocolate-500 focus:ring-chocolate-500 px-4 py-2"
                                 placeholder="¿De qué se trata?"
                             />
                         </div>
@@ -182,7 +182,7 @@ const Contact: FC = () => {
                                 onChange={handleChange}
                                 required
                                 rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brown-500 focus:ring-brown-500 px-4 py-2"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-chocolate-500 focus:ring-chocolate-500 px-4 py-2"
                                 placeholder="Tu mensaje aquí..."
                             ></textarea>
                         </div>
@@ -192,8 +192,8 @@ const Contact: FC = () => {
                                 type="submit"
                                 disabled={isSubmitted}
                                 className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                                            ${isSubmitted ? 'bg-green-600' : 'bg-[#8B4513] hover:bg-[#6f3610]'} 
-                                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B4513] transition-colors
+                                            ${isSubmitted ? 'bg-green-600' : 'bg-chocolate-700 hover:bg-chocolate-900'}
+                                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-chocolate-700 transition-colors
                                             disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 {isSubmitted ? '¡Mensaje Enviado!' : 'Enviar Mensaje'}

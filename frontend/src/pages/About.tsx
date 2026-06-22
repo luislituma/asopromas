@@ -35,7 +35,7 @@ const About: FC = () => {
     {
       icon: <Users className="w-8 h-8 text-chocolate-600" />,
       title: "Nuestros Productores",
-      desc: "200 socios, 51% mujeres rurales con liderazgo en la orgazincacion.",
+      desc: "200 socios, 51% mujeres rurales con liderazgo en la organización.",
       img: "/assets/images/products/Asopromas-socios.jpg",
       link: "/about/producers"
     },
@@ -99,7 +99,7 @@ const About: FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cards.map((card, idx) => (
               <motion.div
                 key={idx}
@@ -152,7 +152,7 @@ const About: FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} viewport={{ once: true }}>
               <Link to="/about/mission" className="group block h-full p-12 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                 <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-chocolate-50 transition-colors duration-500">

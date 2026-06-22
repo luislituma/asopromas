@@ -26,7 +26,7 @@ const Values: FC = () => {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl mx-auto">
           <span className="text-chocolate-400 uppercase tracking-[0.2em] text-sm font-medium mb-4 block">Nuestros Principios</span>
           <h1 className="text-5xl md:text-7xl font-light text-chocolate-950 mb-6">Valores que <span className="font-medium font-serif tracking-wide text-cacao-green-700">Inspiran</span></h1>
-          <p className="text-xl text-stone-500 font-light">La brújula moral que sostiene nuestra asociacion y da forma a todo lo que hacemos.</p>
+          <p className="text-xl text-stone-500 font-light">La brújula moral que sostiene nuestra asociación y da forma a todo lo que hacemos.</p>
         </motion.div>
       </section>
 
