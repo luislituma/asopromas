@@ -156,7 +156,7 @@ const HeaderComponent: FC = () => {
                     </Link>
 
                     {/* Desktop Nav — centrado absolutamente para no depender del ancho del logo/acciones */}
-                    <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
+                    <nav className="hidden lg:flex items-center gap-7 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                         {navLinks.map((link) => {
                             const isProducts = link.text === 'Productos';
                             const isAbout = link.text === 'Nosotros';
