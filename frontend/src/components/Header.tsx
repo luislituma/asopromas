@@ -131,7 +131,7 @@ const HeaderComponent: FC = () => {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className={`fixed w-full top-0 z-40 transition-all duration-300 border-b ${
+                className={`fixed w-full h-14 top-0 z-40 transition-all duration-300 border-b ${
                     isScrolled || activeMegaMenu
                         ? 'bg-white/85 backdrop-saturate-[180%] backdrop-blur-2xl border-black/[0.08]'
                         : 'bg-white/60 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
@@ -149,7 +149,7 @@ const HeaderComponent: FC = () => {
                     </span>
                 </Link>
 
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-center">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-full flex items-center justify-center">
 
                     {/* Desktop Nav — hijo natural del flex, perfectamente centrado */}
                     <nav className="hidden lg:flex items-center gap-7">
