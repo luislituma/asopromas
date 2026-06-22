@@ -108,7 +108,7 @@ const About: FC = () => {
                 transition={{ duration: 0.8, delay: idx * 0.2 }}
                 viewport={{ once: true }}
               >
-                <Link to={card.link} className="group block relative rounded-[2rem] overflow-hidden bg-white shadow-sm hover:shadow-2xl transition-all duration-500 border border-stone-100 h-full flex flex-col">
+                <Link to={card.link} className="group block relative rounded-[2rem] overflow-hidden bg-white shadow-sm hover:shadow-2xl transition-all duration-500 border border-stone-100 h-full flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-2">
                   <div className="relative h-64 overflow-hidden">
                     <img
                       src={card.img}
@@ -154,7 +154,7 @@ const About: FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} viewport={{ once: true }}>
-              <Link to="/about/mission" className="group block h-full p-12 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <Link to="/about/mission" className="group block h-full p-12 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-2">
                 <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-chocolate-50 transition-colors duration-500">
                   <Target className="w-8 h-8 text-stone-400 group-hover:text-chocolate-600 transition-colors duration-500" />
                 </div>
@@ -167,7 +167,7 @@ const About: FC = () => {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }}>
-              <Link to="/about/values" className="group block h-full p-12 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <Link to="/about/values" className="group block h-full p-12 rounded-[2.5rem] bg-white border border-stone-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-2">
                 <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-8 group-hover:bg-amber-50 transition-colors duration-500">
                   <Heart className="w-8 h-8 text-stone-400 group-hover:text-amber-600 transition-colors duration-500" />
                 </div>
@@ -180,7 +180,7 @@ const About: FC = () => {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }} viewport={{ once: true }}>
-              <Link to="/about/certifications" className="group block h-full p-12 rounded-[2.5rem] bg-cacao-green-950 border border-cacao-green-900 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <Link to="/about/certifications" className="group block h-full p-12 rounded-[2.5rem] bg-cacao-green-950 border border-cacao-green-900 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cacao-green-400 focus-visible:ring-offset-2">
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-8 group-hover:bg-cacao-green-800 transition-colors duration-500">
                   <Award className="w-8 h-8 text-cacao-green-200 group-hover:text-white transition-colors duration-500" />
                 </div>

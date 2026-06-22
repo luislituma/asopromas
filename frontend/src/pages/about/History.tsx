@@ -57,7 +57,7 @@ const History: FC = () => {
         </div>
       </section>
       
-      <section className="py-20 text-center">
+      <section className="py-24 text-center">
         <Link to="/about/mission" className="inline-flex items-center gap-2 text-chocolate-700 hover:text-chocolate-900 font-medium">Hacia dónde vamos <ArrowRight className="w-4 h-4"/></Link>
       </section>
     </div>

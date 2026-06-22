@@ -29,7 +29,7 @@ const Sustainability: FC = () => {
       </section>
 
       <section className="py-32 px-6 bg-white">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {initiatives.map((ini, i) => (
             <motion.div 
               key={i}

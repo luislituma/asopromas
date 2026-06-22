@@ -176,7 +176,7 @@ const HeaderComponent: FC = () => {
                                         <NavLink
                                             to={link.to}
                                             className={({ isActive }) =>
-                                                `flex items-center gap-1 text-[15px] font-medium transition-colors ${
+                                                `flex items-center gap-1 text-[15px] font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
                                                     isActive || location.pathname.startsWith(link.to)
                                                         ? 'text-chocolate-800'
                                                         : 'text-stone-600 hover:text-chocolate-900'
@@ -194,7 +194,7 @@ const HeaderComponent: FC = () => {
                         <div className="flex items-center gap-6 relative z-50">
                             <button
                                 onClick={() => setSearchOpen(true)}
-                                className="text-stone-500 hover:text-chocolate-800 transition-colors p-2"
+                                className="text-stone-500 hover:text-chocolate-800 transition-colors p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
                                 aria-label="Buscar"
                             >
                                 <Search className="w-[22px] h-[22px]" />
@@ -322,10 +322,10 @@ const HeaderComponent: FC = () => {
                                                     {link.submenu.map((sec) => (
                                                         <div key={sec.title} className="space-y-3">
                                                             {sec.items.map((item) => (
-                                                                <Link 
-                                                                    key={item.to} 
+                                                                <Link
+                                                                    key={item.to}
                                                                     to={item.to}
-                                                                    className="block text-stone-600 hover:text-chocolate-800 font-medium"
+                                                                    className="block text-stone-600 hover:text-chocolate-800 font-medium rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
                                                                     onClick={() => setIsMobileMenuOpen(false)}
                                                                 >
                                                                     {item.text}
