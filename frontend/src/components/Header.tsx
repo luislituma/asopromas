@@ -1,7 +1,7 @@
 import { type FC, useState, useEffect, useRef, memo } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Menu, ArrowRight } from 'lucide-react';
+import { Search, X, Menu, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
 
 import productsData from '../data/products.json';
@@ -12,6 +12,7 @@ type NavItem = { to: string; text: string; submenu?: SubmenuSection[] };
 
 const HeaderComponent: FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [mobileSubmenu, setMobileSubmenu] = useState<'products' | 'about' | null>(null);
     const [activeMegaMenu, setActiveMegaMenu] = useState<'products' | 'about' | null>(null);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +22,16 @@ const HeaderComponent: FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+
+    const openDrawer = (menu: 'products' | 'about') => {
+        clearTimeout(closeTimer.current);
+        setActiveMegaMenu(menu);
+    };
+    const scheduleClose = () => {
+        closeTimer.current = setTimeout(() => setActiveMegaMenu(null), 180);
+    };
+    const cancelClose = () => clearTimeout(closeTimer.current);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -31,8 +42,11 @@ const HeaderComponent: FC = () => {
 
     useEffect(() => {
         setIsMobileMenuOpen(false);
+        setMobileSubmenu(null);
         setActiveMegaMenu(null);
     }, [location.pathname]);
+
+    useEffect(() => () => clearTimeout(closeTimer.current), []);
 
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -136,7 +150,6 @@ const HeaderComponent: FC = () => {
                         ? 'bg-white/85 backdrop-saturate-[180%] backdrop-blur-2xl border-black/[0.08]'
                         : 'bg-white/60 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
                 }`}
-                onMouseLeave={() => setActiveMegaMenu(null)}
             >
                 <div className="relative h-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
 
@@ -162,9 +175,13 @@ const HeaderComponent: FC = () => {
                                     key={link.to}
                                     className="flex items-center"
                                     onMouseEnter={() => {
-                                        if (isProducts) setActiveMegaMenu('products');
-                                        else if (isAbout) setActiveMegaMenu('about');
-                                        else setActiveMegaMenu(null);
+                                        if (isProducts) openDrawer('products');
+                                        else if (isAbout) openDrawer('about');
+                                        else scheduleClose();
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (!isProducts && !isAbout) return;
+                                        scheduleClose();
                                     }}
                                 >
                                     <NavLink
@@ -211,79 +228,100 @@ const HeaderComponent: FC = () => {
                     </div>
                 </div>
 
-                {/* ── MEGA MENU ── */}
-                <AnimatePresence>
-                    {activeMegaMenu && (
+            </motion.header>
+
+            {/* ── DRAWER LATERAL (Desktop) ── */}
+            <AnimatePresence>
+                {activeMegaMenu && (
+                    <>
+                        {/* Backdrop invisible — cierra al click */}
+                        <div
+                            className="fixed inset-0 z-30 top-14 hidden lg:block"
+                            onClick={() => setActiveMegaMenu(null)}
+                        />
                         <motion.div
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.15, ease: 'easeOut' }}
-                            className="absolute top-full left-0 w-full bg-white/90 backdrop-saturate-[180%] backdrop-blur-2xl border-b border-black/[0.06] overflow-hidden"
+                            key={activeMegaMenu}
+                            initial={{ x: 24, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 24, opacity: 0 }}
+                            transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="fixed top-14 right-0 z-40 w-[340px] hidden lg:flex flex-col bg-white/96 backdrop-saturate-[180%] backdrop-blur-2xl border-l border-b border-black/[0.06] rounded-bl-2xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] overflow-hidden"
+                            onMouseEnter={cancelClose}
+                            onMouseLeave={scheduleClose}
                         >
-                            <div className="max-w-7xl mx-auto px-6 py-5 pb-7">
-                                <div className="grid grid-cols-12 gap-10">
-
-                                    {/* Links */}
-                                    <div className="col-span-8 grid grid-cols-2 gap-10">
-                                        {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
-                                            <div key={section.title}>
-                                                <p className="text-[10px] font-semibold text-stone-400/80 tracking-[0.14em] uppercase mb-4">
-                                                    {section.title}
-                                                </p>
-                                                <ul className="space-y-3.5">
-                                                    {section.items.map((item) => (
-                                                        <li key={item.to}>
-                                                            <Link
-                                                                to={item.to}
-                                                                className="group block rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-1"
-                                                                onClick={() => setActiveMegaMenu(null)}
-                                                            >
-                                                                <span className="block text-[13px] font-normal text-stone-700 group-hover:text-chocolate-800 transition-colors duration-150">
-                                                                    {item.text}
-                                                                </span>
-                                                                {item.desc && (
-                                                                    <span className="block text-[11px] text-stone-400 mt-0.5">
-                                                                        {item.desc}
-                                                                    </span>
-                                                                )}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Featured image */}
-                                    <div className="col-span-4 border-l border-black/[0.06] pl-10">
-                                        <div
-                                            className="relative h-full w-full rounded-xl overflow-hidden group cursor-pointer"
-                                            onClick={() => navigate(activeMegaMenu === 'products' ? '/products' : '/about')}
-                                        >
-                                            <img
-                                                src={activeMegaMenu === 'products' ? '/assets/images/products/Barra-Pura-1.jpg' : '/assets/images/products/Asopromas-socios.jpg'}
-                                                alt="Destacado"
-                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                                            <div className="absolute bottom-4 left-4 right-4">
-                                                <p className="text-white text-[13px] font-medium mb-1">
-                                                    {activeMegaMenu === 'products' ? 'Explorar Colección' : 'Nuestra Historia'}
-                                                </p>
-                                                <div className="flex items-center text-white/60 text-[11px] group-hover:text-white/90 transition-colors">
-                                                    <span>Descubrir más</span>
-                                                    <ArrowRight className="w-3 h-3 ml-1 transform group-hover:translate-x-0.5 transition-transform" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            {/* Imagen cabecera */}
+                            <div className="relative h-36 overflow-hidden flex-shrink-0">
+                                <motion.img
+                                    key={activeMegaMenu + '-img'}
+                                    initial={{ opacity: 0, scale: 1.04 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.35 }}
+                                    src={activeMegaMenu === 'products'
+                                        ? '/assets/images/products/Barra-Pura-1.jpg'
+                                        : '/assets/images/products/Asopromas-socios.jpg'}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+                                <div className="absolute bottom-4 left-5 right-5">
+                                    <p className="text-[10px] font-semibold text-white/55 tracking-[0.14em] uppercase mb-1">
+                                        {activeMegaMenu === 'products' ? 'Colección' : 'La Asociación'}
+                                    </p>
+                                    <p className="text-[17px] font-medium text-white leading-tight">
+                                        {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
+                                    </p>
                                 </div>
                             </div>
+
+                            {/* Links */}
+                            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+                                {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
+                                    <div key={section.title}>
+                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-2 px-2">
+                                            {section.title}
+                                        </p>
+                                        <ul className="space-y-0.5">
+                                            {section.items.map((item) => (
+                                                <li key={item.to}>
+                                                    <Link
+                                                        to={item.to}
+                                                        className="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-stone-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400"
+                                                        onClick={() => setActiveMegaMenu(null)}
+                                                    >
+                                                        <div>
+                                                            <span className="block text-[13px] text-stone-700 group-hover:text-chocolate-800 transition-colors">
+                                                                {item.text}
+                                                            </span>
+                                                            {item.desc && (
+                                                                <span className="block text-[11px] text-stone-400 mt-0.5 leading-snug">
+                                                                    {item.desc}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <ChevronRight className="w-3.5 h-3.5 text-stone-300 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 flex-shrink-0 ml-2" />
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Footer CTA */}
+                            <div className="px-5 py-3.5 border-t border-stone-100 flex-shrink-0">
+                                <Link
+                                    to={activeMegaMenu === 'products' ? '/products' : '/about'}
+                                    className="flex items-center text-[12px] font-medium text-chocolate-700 hover:text-chocolate-950 transition-colors"
+                                    onClick={() => setActiveMegaMenu(null)}
+                                >
+                                    Ver todo
+                                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                                </Link>
+                            </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.header>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* ── MOBILE DRAWER ── */}
             <AnimatePresence>
@@ -295,66 +333,154 @@ const HeaderComponent: FC = () => {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
                             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                         />
                         <motion.div
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-                            className="fixed top-0 right-0 h-full w-[82vw] max-w-xs bg-white/95 backdrop-blur-2xl z-50 shadow-2xl flex flex-col"
+                            className="fixed top-0 right-0 h-full w-[82vw] max-w-xs bg-white/95 backdrop-blur-2xl z-50 shadow-2xl flex flex-col overflow-hidden"
                         >
-                            <div className="h-12 px-5 border-b border-stone-100 flex justify-between items-center flex-shrink-0">
-                                <span className="text-[11px] font-semibold text-stone-400 tracking-[0.12em] uppercase">Menú</span>
+                            {/* Cabecera del drawer */}
+                            <div className="h-12 px-4 border-b border-stone-100 flex items-center flex-shrink-0 relative">
+                                <AnimatePresence mode="wait">
+                                    {mobileSubmenu ? (
+                                        <motion.button
+                                            key="back"
+                                            initial={{ opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -8 }}
+                                            transition={{ duration: 0.15 }}
+                                            onClick={() => setMobileSubmenu(null)}
+                                            className="flex items-center gap-1.5 text-stone-500 hover:text-stone-800 transition-colors"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                            <span className="text-[12px] font-medium">Menú</span>
+                                        </motion.button>
+                                    ) : (
+                                        <motion.span
+                                            key="title"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="text-[11px] font-semibold text-stone-400 tracking-[0.12em] uppercase"
+                                        >
+                                            Menú
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
                                 <button
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-1.5 text-stone-400 hover:text-stone-800 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500"
+                                    onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-stone-400 hover:text-stone-800 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto py-5 px-5 space-y-6">
-                                {navLinks.map((link) => (
-                                    <div key={link.to}>
-                                        {link.submenu ? (
-                                            <div className="space-y-3">
-                                                <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-[0.12em]">{link.text}</span>
-                                                <div className="space-y-3 pl-3 border-l border-stone-100">
-                                                    {link.submenu.map((sec) => (
-                                                        <div key={sec.title} className="space-y-2.5">
-                                                            {sec.items.map((item) => (
-                                                                <Link
-                                                                    key={item.to}
-                                                                    to={item.to}
-                                                                    className="block text-[13px] text-stone-600 hover:text-chocolate-800 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
-                                                                    onClick={() => setIsMobileMenuOpen(false)}
-                                                                >
-                                                                    {item.text}
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    ))}
+                            {/* Contenido con push navigation */}
+                            <div className="flex-1 overflow-hidden relative">
+                                <AnimatePresence mode="wait">
+                                    {!mobileSubmenu ? (
+                                        /* ── NIVEL 1 ── */
+                                        <motion.div
+                                            key="level1"
+                                            initial={{ x: 0 }}
+                                            animate={{ x: 0 }}
+                                            exit={{ x: '-100%' }}
+                                            transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+                                            className="absolute inset-0 overflow-y-auto py-4 px-4 space-y-1"
+                                        >
+                                            {navLinks.map((link) => (
+                                                <div key={link.to}>
+                                                    {link.submenu ? (
+                                                        <button
+                                                            onClick={() => setMobileSubmenu(link.text === 'Nosotros' ? 'about' : 'products')}
+                                                            className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors text-left"
+                                                        >
+                                                            <span className="text-[15px] text-stone-700">{link.text}</span>
+                                                            <ChevronRight className="w-4 h-4 text-stone-300" />
+                                                        </button>
+                                                    ) : (
+                                                        <Link
+                                                            to={link.to}
+                                                            className="flex items-center px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors text-[15px] text-stone-700 hover:text-chocolate-800"
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                        >
+                                                            {link.text}
+                                                        </Link>
+                                                    )}
                                                 </div>
+                                            ))}
+                                        </motion.div>
+                                    ) : (
+                                        /* ── NIVEL 2 ── */
+                                        <motion.div
+                                            key="level2"
+                                            initial={{ x: '100%' }}
+                                            animate={{ x: 0 }}
+                                            exit={{ x: '100%' }}
+                                            transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+                                            className="absolute inset-0 overflow-y-auto"
+                                        >
+                                            {/* Imagen cabecera nivel 2 */}
+                                            <div className="relative h-32 overflow-hidden flex-shrink-0">
+                                                <img
+                                                    src={mobileSubmenu === 'products'
+                                                        ? '/assets/images/products/Barra-Pura-1.jpg'
+                                                        : '/assets/images/products/Asopromas-socios.jpg'}
+                                                    alt=""
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/55" />
+                                                <p className="absolute bottom-3 left-4 text-[15px] font-medium text-white">
+                                                    {mobileSubmenu === 'products' ? 'Productos' : 'Nosotros'}
+                                                </p>
                                             </div>
-                                        ) : (
-                                            <Link
-                                                to={link.to}
-                                                className="block text-[15px] font-normal text-stone-700 hover:text-chocolate-800 transition-colors"
-                                                onClick={() => setIsMobileMenuOpen(false)}
-                                            >
-                                                {link.text}
-                                            </Link>
-                                        )}
-                                    </div>
-                                ))}
+                                            <div className="py-3 px-4 space-y-5">
+                                                {(mobileSubmenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
+                                                    <div key={section.title}>
+                                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1.5 px-2">
+                                                            {section.title}
+                                                        </p>
+                                                        <ul className="space-y-0.5">
+                                                            {section.items.map((item) => (
+                                                                <li key={item.to}>
+                                                                    <Link
+                                                                        to={item.to}
+                                                                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-stone-50 transition-colors"
+                                                                        onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
+                                                                    >
+                                                                        <div>
+                                                                            <span className="block text-[13px] text-stone-700">{item.text}</span>
+                                                                            {item.desc && <span className="block text-[11px] text-stone-400 mt-0.5">{item.desc}</span>}
+                                                                        </div>
+                                                                        <ChevronRight className="w-3.5 h-3.5 text-stone-300 flex-shrink-0" />
+                                                                    </Link>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ))}
+                                                <Link
+                                                    to={mobileSubmenu === 'products' ? '/products' : '/about'}
+                                                    className="flex items-center px-3 py-2 text-[12px] font-medium text-chocolate-700"
+                                                    onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
+                                                >
+                                                    Ver todo <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                                                </Link>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
-                            <div className="p-5 border-t border-stone-100 flex-shrink-0">
+                            <div className="p-4 border-t border-stone-100 flex-shrink-0">
                                 <Link
                                     to="/ruta-cacao-ancestral"
                                     className="flex w-full items-center justify-center px-5 py-2.5 rounded-full bg-chocolate-900 text-white text-[13px] font-medium hover:bg-chocolate-950 transition-colors"
-                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                 >
                                     Reservar Ruta
                                 </Link>
