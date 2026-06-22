@@ -138,60 +138,55 @@ const HeaderComponent: FC = () => {
                 }`}
                 onMouseLeave={() => setActiveMegaMenu(null)}
             >
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-12 flex items-center justify-between relative">
+                {/* Logo — absolute izquierda, centrado verticalmente */}
+                <Link
+                    to="/"
+                    className="absolute left-6 lg:left-8 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
+                >
+                    <img src={logoUrl} alt="ASOPROMAS Logo" className="h-7 w-auto" />
+                    <span className="text-[13px] font-medium tracking-[0.05em] text-chocolate-900 group-hover:text-chocolate-700 transition-colors hidden sm:block">
+                        ASOPROMAS
+                    </span>
+                </Link>
 
-                    {/* Logo — izquierda */}
-                    <Link
-                        to="/"
-                        className="relative z-50 flex-shrink-0 flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 rounded-sm"
-                    >
-                        <img
-                            src={logoUrl}
-                            alt="ASOPROMAS Logo"
-                            className="h-7 w-auto"
-                        />
-                        <span className="text-[13px] font-medium tracking-[0.05em] text-chocolate-900 group-hover:text-chocolate-700 transition-colors hidden sm:block">
-                            ASOPROMAS
-                        </span>
-                    </Link>
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-center">
 
-                    {/* Desktop Nav — absolute inset-0, centrado en ambos ejes, pointer-events-none en el wrapper */}
-                    <nav className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none">
-                        <div className="flex items-center gap-7 pointer-events-auto">
-                            {navLinks.map((link) => {
-                                const isProducts = link.text === 'Productos';
-                                const isAbout = link.text === 'Nosotros';
+                    {/* Desktop Nav — hijo natural del flex, perfectamente centrado */}
+                    <nav className="hidden lg:flex items-center gap-7">
+                        {navLinks.map((link) => {
+                            const isProducts = link.text === 'Productos';
+                            const isAbout = link.text === 'Nosotros';
 
-                                return (
-                                    <div
-                                        key={link.to}
-                                        className="flex items-center"
-                                        onMouseEnter={() => {
-                                            if (isProducts) setActiveMegaMenu('products');
-                                            else if (isAbout) setActiveMegaMenu('about');
-                                            else setActiveMegaMenu(null);
-                                        }}
+                            return (
+                                <div
+                                    key={link.to}
+                                    className="flex items-center"
+                                    onMouseEnter={() => {
+                                        if (isProducts) setActiveMegaMenu('products');
+                                        else if (isAbout) setActiveMegaMenu('about');
+                                        else setActiveMegaMenu(null);
+                                    }}
+                                >
+                                    <NavLink
+                                        to={link.to}
+                                        className={({ isActive }) =>
+                                            `text-[13px] leading-none transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
+                                                isActive || location.pathname.startsWith(link.to)
+                                                    ? 'text-chocolate-950 font-medium'
+                                                    : 'text-stone-500 hover:text-stone-900 font-normal'
+                                            }`
+                                        }
                                     >
-                                        <NavLink
-                                            to={link.to}
-                                            className={({ isActive }) =>
-                                                `text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-400 focus-visible:ring-offset-2 ${
-                                                    isActive || location.pathname.startsWith(link.to)
-                                                        ? 'text-chocolate-950 font-medium'
-                                                        : 'text-stone-500 hover:text-stone-900 font-normal'
-                                                }`
-                                            }
-                                        >
-                                            {link.text}
-                                        </NavLink>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                        {link.text}
+                                    </NavLink>
+                                </div>
+                            );
+                        })}
                     </nav>
+                </div>
 
-                    {/* Actions — derecha */}
-                    <div className="flex items-center gap-4 relative z-50">
+                {/* Actions — absolute derecha, centrado verticalmente */}
+                <div className="absolute right-6 lg:right-8 top-1/2 -translate-y-1/2 flex items-center gap-4 z-50">
                         <button
                             onClick={() => setSearchOpen(true)}
                             className="text-stone-400 hover:text-stone-800 transition-colors p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500 focus-visible:ring-offset-1"
@@ -215,7 +210,6 @@ const HeaderComponent: FC = () => {
                             <Menu className="w-5 h-5" />
                         </button>
                     </div>
-                </div>
 
                 {/* ── MEGA MENU ── */}
                 <AnimatePresence>
