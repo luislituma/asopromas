@@ -23,9 +23,8 @@ const Landing: FC = () => {
     target: heroRef,
     offset: ["start start", "end end"]
   });
-  const heroScale = useTransform(heroProgress, [0, 1], prefersReducedMotion ? [1, 1] : [1, 1.15]);
-  const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
-  const heroY = useTransform(heroProgress, [0, 1], prefersReducedMotion ? ["0%", "0%"] : ["0%", "50%"]);
+  const heroScale = useTransform(heroProgress, [0, 1], prefersReducedMotion ? [1, 1] : [1.05, 1.15]);
+  const heroY = useTransform(heroProgress, [0, 1], prefersReducedMotion ? ["0%", "0%"] : ["0%", "-7%"]);
 
   // 2. Sticky Storytelling (Asociación) - Framer Motion
   const storyContainerRef = useRef<HTMLElement>(null);
@@ -73,7 +72,7 @@ const Landing: FC = () => {
       <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden bg-stone-950">
         <motion.div
           className="absolute inset-0 z-0 origin-center"
-          style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}
+          style={{ scale: heroScale, y: heroY }}
         >
           <video
             className="w-full h-full object-cover object-center md:object-[center_20%] opacity-60 grayscale-[10%] scale-105"
@@ -131,14 +130,6 @@ const Landing: FC = () => {
             </Link>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.4 }}
-            className="hidden md:flex flex-col items-center justify-center"
-          >
-            <div className="w-px h-16 bg-gradient-to-b from-white/50 to-transparent"></div>
-          </motion.div>
         </div>
       </section>
 
