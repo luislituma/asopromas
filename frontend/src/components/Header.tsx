@@ -1,7 +1,7 @@
 import { type FC, useState, useEffect, useRef, memo } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Menu, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, X, Menu, ArrowRight, ChevronRight, ChevronLeft, Leaf } from 'lucide-react';
 import logoUrl from '../assets/icons/logo.svg';
 
 import productsData from '../data/products.json';
@@ -145,11 +145,7 @@ const HeaderComponent: FC = () => {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className={`fixed w-full h-14 top-0 z-40 transition-all duration-300 border-b ${
-                    isScrolled || activeMegaMenu
-                        ? 'bg-chocolate-950/98 backdrop-saturate-[180%] backdrop-blur-2xl border-black/40'
-                        : 'bg-chocolate-950/90 backdrop-saturate-[180%] backdrop-blur-xl border-transparent'
-                }`}
+                className="fixed w-full h-14 top-0 z-40 border-b bg-chocolate-950 border-black/40"
             >
                 <div className="relative h-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
 
@@ -192,7 +188,7 @@ const HeaderComponent: FC = () => {
                                             return [
                                                 'flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-950 relative',
                                                 isOpen
-                                                    ? 'text-white font-medium after:absolute after:bottom-[-18px] after:left-0 after:right-0 after:h-[2px] after:bg-white/50 after:rounded-full'
+                                                    ? 'text-cacao-gold-300 font-medium after:absolute after:bottom-[-18px] after:left-0 after:right-0 after:h-[2px] after:bg-cacao-gold-400 after:rounded-full'
                                                     : active
                                                         ? 'text-white font-medium'
                                                         : 'text-white/80 hover:text-white font-normal',
@@ -218,8 +214,9 @@ const HeaderComponent: FC = () => {
 
                         <Link
                             to="/ruta-cacao-ancestral"
-                            className="hidden md:inline-flex items-center justify-center px-4 py-1.5 rounded-full border border-white/30 text-white/80 text-[12px] font-medium tracking-[0.02em] hover:border-white/70 hover:text-white transition-colors"
+                            className="relative overflow-hidden hidden md:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/60 bg-gradient-to-br from-cacao-green-600 to-cacao-green-800 text-white text-[12px] font-medium tracking-[0.02em] shadow-[0_2px_10px_rgba(52,111,79,0.45)] hover:from-cacao-green-500 hover:to-cacao-green-700 hover:border-white/90 hover:shadow-[0_4px_14px_rgba(52,111,79,0.6)] transition-all duration-200 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent before:animate-shine before:pointer-events-none"
                         >
+                            <Leaf className="w-3 h-3 opacity-80" />
                             Reservar Ruta
                         </Link>
 
@@ -245,36 +242,16 @@ const HeaderComponent: FC = () => {
                             onClick={() => setActiveMegaMenu(null)}
                         />
                         <motion.div
-                            key={activeMegaMenu}
+                            key="submenu-panel"
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.16, ease: [0.25, 0.1, 0.25, 1] }}
+                            transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
                             className="fixed top-14 left-0 w-full z-40 hidden lg:block bg-chocolate-950 border-b border-black/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
                         >
-                            <div className="max-w-7xl mx-auto px-8 py-8 grid grid-cols-[200px_1fr_1fr] gap-x-14">
-
-                                {/* Columna título — anclaje visual al nav link */}
-                                <div className="flex flex-col justify-between border-r border-white/[0.07] pr-10">
-                                    <div>
-                                        <p className="text-[10px] font-semibold text-white/35 tracking-[0.16em] uppercase mb-3">
-                                            {activeMegaMenu === 'products' ? 'Tienda' : 'La Asociación'}
-                                        </p>
-                                        <p className="text-[21px] font-light text-white leading-snug">
-                                            {activeMegaMenu === 'products' ? 'Nuestros\nProductos' : 'Nosotros'}
-                                        </p>
-                                    </div>
-                                    <Link
-                                        to={activeMegaMenu === 'products' ? '/products' : '/about'}
-                                        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/40 hover:text-white/80 transition-colors duration-150 mt-10 tracking-[0.04em]"
-                                        onClick={() => setActiveMegaMenu(null)}
-                                    >
-                                        Ver todo
-                                        <ArrowRight className="w-3 h-3" />
-                                    </Link>
-                                </div>
+                            <div className="max-w-xl mx-auto px-8 py-8 grid grid-cols-[1fr_1fr] gap-x-10">
 
                                 {/* Columnas de secciones */}
                                 {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
@@ -283,14 +260,14 @@ const HeaderComponent: FC = () => {
                                             <p className="text-[10px] font-semibold text-white/35 tracking-[0.16em] uppercase">
                                                 {section.title}
                                             </p>
-                                            <div className="flex-1 h-px bg-white/[0.07]" />
+                                            <div className="flex-1 h-px bg-cacao-green-700/40" />
                                         </div>
                                         <ul className="space-y-0.5">
                                             {section.items.map((item) => (
                                                 <li key={item.to}>
                                                     <Link
                                                         to={item.to}
-                                                        className="group flex flex-col py-2 pl-3 border-l-2 border-transparent hover:border-white/40 hover:bg-white/[0.04] transition-all duration-100 rounded-r focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                                                        className="group flex flex-col py-2 pl-3 border-l-2 border-transparent hover:border-cacao-gold-400/70 hover:bg-cacao-green-950/50 transition-all duration-100 rounded-r focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cacao-gold-400/50"
                                                         onClick={() => setActiveMegaMenu(null)}
                                                     >
                                                         <span className="text-[13px] text-white/70 group-hover:text-white transition-colors duration-100">
@@ -434,7 +411,7 @@ const HeaderComponent: FC = () => {
                                                                 <li key={item.to}>
                                                                     <Link
                                                                         to={item.to}
-                                                                        className="flex flex-col pl-5 pr-4 py-2.5 border-l-2 border-transparent active:border-white/40 active:bg-white/[0.04]"
+                                                                        className="flex flex-col pl-5 pr-4 py-2.5 border-l-2 border-transparent active:border-cacao-gold-400/70 active:bg-cacao-green-950/50"
                                                                         onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                                                     >
                                                                         <span className="text-[14px] text-white/70">{item.text}</span>
@@ -445,10 +422,10 @@ const HeaderComponent: FC = () => {
                                                         </ul>
                                                     </div>
                                                 ))}
-                                                <div className="border-t border-white/[0.07] mx-5 mt-4 pt-4">
+                                                <div className="border-t border-cacao-green-700/30 mx-5 mt-4 pt-4">
                                                     <Link
                                                         to={mobileSubmenu === 'products' ? '/products' : '/about'}
-                                                        className="flex items-center gap-1.5 text-[12px] text-white/40 hover:text-white/80 transition-colors"
+                                                        className="flex items-center gap-1.5 text-[12px] text-cacao-gold-400/60 hover:text-cacao-gold-300 transition-colors"
                                                         onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                                     >
                                                         Ver todo en {mobileSubmenu === 'products' ? 'Productos' : 'Nosotros'}
@@ -461,12 +438,13 @@ const HeaderComponent: FC = () => {
                                 </AnimatePresence>
                             </div>
 
-                            <div className="p-4 border-t border-stone-100 flex-shrink-0">
+                            <div className="p-4 border-t border-white/10 flex-shrink-0">
                                 <Link
                                     to="/ruta-cacao-ancestral"
-                                    className="flex w-full items-center justify-center px-5 py-2.5 rounded-full bg-chocolate-900 text-white text-[13px] font-medium hover:bg-chocolate-950 transition-colors"
+                                    className="relative overflow-hidden flex w-full items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-white/60 bg-gradient-to-br from-cacao-green-600 to-cacao-green-800 text-white text-[13px] font-medium shadow-[0_2px_10px_rgba(52,111,79,0.45)] hover:from-cacao-green-500 hover:to-cacao-green-700 hover:border-white/90 hover:shadow-[0_4px_14px_rgba(52,111,79,0.6)] transition-all duration-200 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent before:animate-shine before:pointer-events-none"
                                     onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                 >
+                                    <Leaf className="w-3.5 h-3.5 opacity-80" />
                                     Reservar Ruta
                                 </Link>
                             </div>

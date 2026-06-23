@@ -6,6 +6,15 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        shine: {
+          '0%':      { transform: 'translateX(-100%) skewX(-15deg)' },
+          '60%, 100%': { transform: 'translateX(250%) skewX(-15deg)' },
+        },
+      },
+      animation: {
+        shine: 'shine 2.8s ease-in-out infinite',
+      },
       colors: {
         chocolate: {
           50: '#f9f6f3',
@@ -19,6 +28,11 @@ export default {
           800: '#694132',
           900: '#55362a',
           950: '#2d1b14'
+        },
+        'cacao-gold': {
+          300: '#F2C55C',
+          400: '#E8A830',
+          500: '#C8850A',
         },
         'cacao-green': {
           50: '#f2f7f4',
