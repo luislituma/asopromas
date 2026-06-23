@@ -186,13 +186,18 @@ const HeaderComponent: FC = () => {
                                 >
                                     <NavLink
                                         to={link.to}
-                                        className={({ isActive }) =>
-                                            `flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-900 ${
-                                                isActive || location.pathname.startsWith(link.to)
-                                                    ? 'text-white font-medium'
-                                                    : 'text-white/80 hover:text-white font-normal'
-                                            }`
-                                        }
+                                        className={({ isActive }) => {
+                                            const isOpen = (isProducts && activeMegaMenu === 'products') || (isAbout && activeMegaMenu === 'about');
+                                            const active = isActive || location.pathname.startsWith(link.to);
+                                            return [
+                                                'flex items-center text-[13px] transition-colors duration-150 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-1 focus-visible:ring-offset-chocolate-950 relative',
+                                                isOpen
+                                                    ? 'text-white font-medium after:absolute after:bottom-[-18px] after:left-0 after:right-0 after:h-[2px] after:bg-white/50 after:rounded-full'
+                                                    : active
+                                                        ? 'text-white font-medium'
+                                                        : 'text-white/80 hover:text-white font-normal',
+                                            ].join(' ');
+                                        }}
                                     >
                                         {link.text}
                                     </NavLink>
@@ -245,25 +250,25 @@ const HeaderComponent: FC = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
                             transition={{ duration: 0.16, ease: [0.25, 0.1, 0.25, 1] }}
-                            className="fixed top-14 left-0 w-full z-40 hidden lg:block bg-chocolate-900 border-b border-chocolate-950 shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
+                            className="fixed top-14 left-0 w-full z-40 hidden lg:block bg-chocolate-950 border-b border-black/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
                             onMouseEnter={cancelClose}
                             onMouseLeave={scheduleClose}
                         >
-                            <div className="max-w-7xl mx-auto px-8 py-7 grid grid-cols-[220px_1fr_1fr] gap-x-12">
+                            <div className="max-w-7xl mx-auto px-8 py-8 grid grid-cols-[200px_1fr_1fr] gap-x-14">
 
-                                {/* Columna título */}
-                                <div className="flex flex-col justify-between border-r border-chocolate-800 pr-12">
+                                {/* Columna título — anclaje visual al nav link */}
+                                <div className="flex flex-col justify-between border-r border-white/[0.07] pr-10">
                                     <div>
-                                        <p className="text-[10px] font-semibold text-chocolate-400 tracking-[0.14em] uppercase mb-2">
+                                        <p className="text-[10px] font-semibold text-white/35 tracking-[0.16em] uppercase mb-3">
                                             {activeMegaMenu === 'products' ? 'Tienda' : 'La Asociación'}
                                         </p>
-                                        <p className="text-[22px] font-light text-white leading-tight">
-                                            {activeMegaMenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
+                                        <p className="text-[21px] font-light text-white leading-snug">
+                                            {activeMegaMenu === 'products' ? 'Nuestros\nProductos' : 'Nosotros'}
                                         </p>
                                     </div>
                                     <Link
                                         to={activeMegaMenu === 'products' ? '/products' : '/about'}
-                                        className="flex items-center gap-1.5 text-[12px] text-chocolate-300 hover:text-white transition-colors duration-100 mt-8"
+                                        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/40 hover:text-white/80 transition-colors duration-150 mt-10 tracking-[0.04em]"
                                         onClick={() => setActiveMegaMenu(null)}
                                     >
                                         Ver todo
@@ -274,22 +279,25 @@ const HeaderComponent: FC = () => {
                                 {/* Columnas de secciones */}
                                 {(activeMegaMenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section) => (
                                     <div key={section.title}>
-                                        <p className="text-[10px] font-semibold text-chocolate-400 tracking-[0.14em] uppercase mb-4">
-                                            {section.title}
-                                        </p>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <p className="text-[10px] font-semibold text-white/35 tracking-[0.16em] uppercase">
+                                                {section.title}
+                                            </p>
+                                            <div className="flex-1 h-px bg-white/[0.07]" />
+                                        </div>
                                         <ul className="space-y-0.5">
                                             {section.items.map((item) => (
                                                 <li key={item.to}>
                                                     <Link
                                                         to={item.to}
-                                                        className="group flex flex-col py-2 pl-3 border-l-2 border-transparent hover:border-amber-400 hover:bg-chocolate-800/50 transition-all duration-100 rounded-r focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                                                        className="group flex flex-col py-2 pl-3 border-l-2 border-transparent hover:border-white/40 hover:bg-white/[0.04] transition-all duration-100 rounded-r focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                                                         onClick={() => setActiveMegaMenu(null)}
                                                     >
-                                                        <span className="text-[13px] text-chocolate-100/80 group-hover:text-white transition-colors duration-100">
+                                                        <span className="text-[13px] text-white/70 group-hover:text-white transition-colors duration-100">
                                                             {item.text}
                                                         </span>
                                                         {item.desc && (
-                                                            <span className="text-[11px] text-chocolate-400 leading-snug mt-0.5">
+                                                            <span className="text-[11px] text-white/30 leading-snug mt-0.5">
                                                                 {item.desc}
                                                             </span>
                                                         )}
@@ -322,10 +330,10 @@ const HeaderComponent: FC = () => {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-                            className="fixed top-0 right-0 h-full w-[82vw] max-w-xs bg-white/95 backdrop-blur-2xl z-50 shadow-2xl flex flex-col overflow-hidden"
+                            className="fixed top-0 right-0 h-full w-[82vw] max-w-xs bg-chocolate-950 z-50 shadow-2xl flex flex-col overflow-hidden"
                         >
                             {/* Cabecera del drawer */}
-                            <div className="h-12 px-4 border-b border-stone-100 flex items-center flex-shrink-0 relative">
+                            <div className="h-12 px-4 border-b border-white/10 flex items-center flex-shrink-0 relative">
                                 <AnimatePresence mode="wait">
                                     {mobileSubmenu ? (
                                         <motion.button
@@ -335,7 +343,7 @@ const HeaderComponent: FC = () => {
                                             exit={{ opacity: 0, x: -8 }}
                                             transition={{ duration: 0.15 }}
                                             onClick={() => setMobileSubmenu(null)}
-                                            className="flex items-center gap-1.5 text-stone-500 hover:text-stone-800 transition-colors"
+                                            className="flex items-center gap-1.5 text-white/50 hover:text-white transition-colors"
                                         >
                                             <ChevronLeft className="w-4 h-4" />
                                             <span className="text-[12px] font-medium">Menú</span>
@@ -347,7 +355,7 @@ const HeaderComponent: FC = () => {
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             transition={{ duration: 0.15 }}
-                                            className="text-[11px] font-semibold text-stone-400 tracking-[0.12em] uppercase"
+                                            className="text-[11px] font-semibold text-white/35 tracking-[0.12em] uppercase"
                                         >
                                             Menú
                                         </motion.span>
@@ -355,7 +363,7 @@ const HeaderComponent: FC = () => {
                                 </AnimatePresence>
                                 <button
                                     onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-stone-400 hover:text-stone-800 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocolate-500"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-white/40 hover:text-white rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -379,15 +387,15 @@ const HeaderComponent: FC = () => {
                                                     {link.submenu ? (
                                                         <button
                                                             onClick={() => setMobileSubmenu(link.text === 'Nosotros' ? 'about' : 'products')}
-                                                            className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors text-left"
+                                                            className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-white/[0.06] transition-colors text-left"
                                                         >
-                                                            <span className="text-[15px] text-stone-700">{link.text}</span>
-                                                            <ChevronRight className="w-4 h-4 text-stone-300" />
+                                                            <span className="text-[15px] text-white/80">{link.text}</span>
+                                                            <ChevronRight className="w-4 h-4 text-white/25" />
                                                         </button>
                                                     ) : (
                                                         <Link
                                                             to={link.to}
-                                                            className="flex items-center px-3 py-3 rounded-xl hover:bg-stone-50 transition-colors text-[15px] text-stone-700 hover:text-chocolate-800"
+                                                            className="flex items-center px-3 py-3 rounded-xl hover:bg-white/[0.06] transition-colors text-[15px] text-white/80 hover:text-white"
                                                             onClick={() => setIsMobileMenuOpen(false)}
                                                         >
                                                             {link.text}
@@ -407,18 +415,18 @@ const HeaderComponent: FC = () => {
                                             className="absolute inset-0 overflow-y-auto"
                                         >
                                             {/* Título sección nivel 2 */}
-                                            <div className="px-5 pt-5 pb-4 border-b border-stone-100">
-                                                <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase mb-1">
+                                            <div className="px-5 pt-5 pb-4 border-b border-white/10">
+                                                <p className="text-[10px] font-semibold text-white/35 tracking-[0.14em] uppercase mb-1">
                                                     {mobileSubmenu === 'products' ? 'Tienda' : 'La Asociación'}
                                                 </p>
-                                                <p className="text-[18px] font-light text-stone-900">
+                                                <p className="text-[18px] font-light text-white">
                                                     {mobileSubmenu === 'products' ? 'Nuestros Productos' : 'Nosotros'}
                                                 </p>
                                             </div>
                                             <div className="pb-4">
                                                 {(mobileSubmenu === 'products' ? navLinks[4].submenu : navLinks[3].submenu)?.map((section, si) => (
-                                                    <div key={section.title} className={si > 0 ? 'border-t border-stone-100' : ''}>
-                                                        <p className="text-[10px] font-semibold text-stone-400 tracking-[0.14em] uppercase px-5 pt-4 pb-2">
+                                                    <div key={section.title} className={si > 0 ? 'border-t border-white/[0.07]' : ''}>
+                                                        <p className="text-[10px] font-semibold text-white/35 tracking-[0.14em] uppercase px-5 pt-4 pb-2">
                                                             {section.title}
                                                         </p>
                                                         <ul>
@@ -426,21 +434,21 @@ const HeaderComponent: FC = () => {
                                                                 <li key={item.to}>
                                                                     <Link
                                                                         to={item.to}
-                                                                        className="flex flex-col pl-5 pr-4 py-2.5 border-l-2 border-transparent active:border-chocolate-700 active:bg-stone-50"
+                                                                        className="flex flex-col pl-5 pr-4 py-2.5 border-l-2 border-transparent active:border-white/40 active:bg-white/[0.04]"
                                                                         onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                                                     >
-                                                                        <span className="text-[14px] text-stone-700">{item.text}</span>
-                                                                        {item.desc && <span className="text-[12px] text-stone-400 mt-0.5">{item.desc}</span>}
+                                                                        <span className="text-[14px] text-white/70">{item.text}</span>
+                                                                        {item.desc && <span className="text-[12px] text-white/30 mt-0.5">{item.desc}</span>}
                                                                     </Link>
                                                                 </li>
                                                             ))}
                                                         </ul>
                                                     </div>
                                                 ))}
-                                                <div className="border-t border-stone-100 mx-5 mt-4 pt-4">
+                                                <div className="border-t border-white/[0.07] mx-5 mt-4 pt-4">
                                                     <Link
                                                         to={mobileSubmenu === 'products' ? '/products' : '/about'}
-                                                        className="flex items-center gap-1.5 text-[12px] text-stone-500"
+                                                        className="flex items-center gap-1.5 text-[12px] text-white/40 hover:text-white/80 transition-colors"
                                                         onClick={() => { setIsMobileMenuOpen(false); setMobileSubmenu(null); }}
                                                     >
                                                         Ver todo en {mobileSubmenu === 'products' ? 'Productos' : 'Nosotros'}
