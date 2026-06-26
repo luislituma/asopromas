@@ -1,5 +1,8 @@
 # Contexto Completo — ASOPROMAS (Sistema de Gestión Agrícola)
 
+## Identidad de marca
+Ver `BRAND.md` — consultar antes de tocar cualquier color, clase Tailwind o componente visual.
+
 > **Instrucciones para la IA:** Este documento es el contexto de traspaso del proyecto ASOPROMAS. Fue generado en junio 2026 a partir de: (1) revisión directa del código fuente del repo `github.com/luislituma/asopromas`, y (2) sesión de análisis de modelo de negocio con el desarrollador. Refleja el estado real del sistema, no la documentación de versiones anteriores. Léelo completo antes de proponer código o cambios.
 
 ---

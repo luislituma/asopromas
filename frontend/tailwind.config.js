@@ -16,6 +16,22 @@ export default {
         shine: 'shine 2.8s ease-in-out infinite',
       },
       colors: {
+        // ── Tokens de marca BRAND.md ──
+        'asop-dark':  '#3C1E00',
+        'asop-mid':   '#694B1E',
+        'asop-text':  '#1A1A1A',
+        'asop-green': '#2B4D3F',
+        'asop-deep':  '#1A3028',
+        'asop-cert':  '#7A9E3B',
+        'asop-cream': '#F2EAD8',
+        'asop-cta':   '#C45A28',
+        'kuj-orange': '#D8683C',
+        'kuj-green':  '#385034',
+        'kuj-brown':  '#402818',
+        'kuj-cream':  '#FDF6EE',
+        'kuj-dark':   '#1E2A1A',
+        'brand-divider': '#E0D5C8',
+        // ── Escala legacy (ERP interno) ──
         chocolate: {
           50: '#f9f6f3',
           100: '#f0e9e1',
