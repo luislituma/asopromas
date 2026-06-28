@@ -17,8 +17,6 @@ const HeaderComponent: FC = () => {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<typeof productsData>([]);
-    const [isScrolled, setIsScrolled] = useState(false);
-
     const location = useLocation();
     const navigate = useNavigate();
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -32,13 +30,6 @@ const HeaderComponent: FC = () => {
         closeTimer.current = setTimeout(() => setActiveMegaMenu(null), 180);
     };
     const cancelClose = () => clearTimeout(closeTimer.current);
-
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     useEffect(() => {
         setIsMobileMenuOpen(false);
