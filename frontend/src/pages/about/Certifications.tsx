@@ -14,6 +14,7 @@ const CERTS = [
     name: 'USDA Organic',
     entity: 'U.S. Department of Agriculture',
     entityShort: 'USDA — EE.UU.',
+    codes: [],
     validity: 'Vigente hasta 2027',
     validityColor: 'bg-green-50 text-green-700',
     icon: <Award className="w-6 h-6" />,
@@ -35,6 +36,7 @@ const CERTS = [
     name: 'Certificación Orgánica Ecuador',
     entity: 'Agencia de Regulación y Control Fitosanitario',
     entityShort: 'Agrocalidad — Ecuador',
+    codes: ['POA: 1125-4', 'POA KIWA: 001-AC'],
     validity: 'Vigente 2026',
     validityColor: 'bg-green-50 text-green-700',
     icon: <Leaf className="w-6 h-6" />,
@@ -56,6 +58,7 @@ const CERTS = [
     name: 'Buenas Prácticas Agrícolas',
     entity: 'Agencia de Regulación y Control Fitosanitario',
     entityShort: 'Agrocalidad — Ecuador',
+    codes: [],
     validity: 'Vigente 2026',
     validityColor: 'bg-amber-50 text-amber-700',
     icon: <ShieldCheck className="w-6 h-6" />,
@@ -77,6 +80,7 @@ const CERTS = [
     name: 'Certificación Unión Europea',
     entity: 'Reglamento (UE) 2018/848 — Producción Ecológica',
     entityShort: 'Unión Europea',
+    codes: ['EC-BIO-141', 'Ecuador Agriculture'],
     validity: 'Vigente 2026',
     validityColor: 'bg-blue-50 text-blue-700',
     icon: <Globe className="w-6 h-6" />,
@@ -150,11 +154,17 @@ const Certifications: FC = () => {
           className="relative z-10 max-w-3xl mx-auto mt-14 grid grid-cols-4 gap-5"
         >
           {CERTS.map((c) => (
-            <div
-              key={c.id}
-              className="bg-white border border-brand-divider rounded-2xl p-6 flex items-center justify-center aspect-square shadow-sm"
-            >
-              <img src={c.logo} alt={c.name} className="max-h-20 max-w-full object-contain" />
+            <div key={c.id} className="flex flex-col items-center gap-2">
+              <div className="bg-white border border-brand-divider rounded-2xl p-6 flex items-center justify-center aspect-square shadow-sm w-full">
+                <img src={c.logo} alt={c.name} className="max-h-20 max-w-full object-contain" />
+              </div>
+              {c.codes.length > 0 && (
+                <div className="text-center space-y-0.5">
+                  {c.codes.map(code => (
+                    <p key={code} className="text-xs text-white/50 font-mono">{code}</p>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </motion.div>
@@ -220,6 +230,11 @@ const Certifications: FC = () => {
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-asop-green/10 text-asop-green">
                         <Globe className="w-3.5 h-3.5" /> {cert.market}
                       </span>
+                      {cert.codes.map(code => (
+                        <span key={code} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-mono bg-asop-dark/5 text-asop-dark/60 border border-asop-dark/10">
+                          {code}
+                        </span>
+                      ))}
                     </div>
 
                     <p className="text-asop-dark/70 font-light leading-relaxed mb-8 text-base">

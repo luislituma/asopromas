@@ -9,10 +9,10 @@ import bpaLogo from '../assets/images/certifications/bpa.jpg';
 import euLogo from '../assets/images/certifications/certificacion-uue.png';
 
 const CERTS = [
-  { src: usdaLogo,       alt: 'USDA Organic',                   label: ''              },
-  { src: orgEcuadorLogo, alt: 'Certificación Orgánica Ecuador',  label: ''          },
-  { src: bpaLogo,        alt: 'Buenas Prácticas Agrícolas',      label: ''},
-  { src: euLogo,         alt: 'Certificación Unión Europea',     label: ''          },
+  { src: usdaLogo,       alt: 'USDA Organic',                   label: 'USDA Organic',               codes: []                                    },
+  { src: orgEcuadorLogo, alt: 'Certificación Orgánica Ecuador',  label: 'Orgánico Ecuador',            codes: ['POA: 1125-4', 'POA KIWA: 001-AC']   },
+  { src: bpaLogo,        alt: 'Buenas Prácticas Agrícolas',      label: 'Buenas Prácticas Agrícolas',  codes: []                                    },
+  { src: euLogo,         alt: 'Certificación Unión Europea',     label: 'Certificación UE',            codes: ['EC-BIO-141', 'Ecuador Agriculture']  },
 ];
 
 // Use Vite env var if provided (for CDN-hosted video). Fallback to Cloudinary URL then local file for dev.
@@ -363,7 +363,7 @@ const Landing: FC = () => {
               </span>
             </h2>
             <p className="text-lg text-asop-dark/60 font-light max-w-2xl mx-auto leading-relaxed">
-              Contamos con certificaicones nacionalese internacionales.
+              Contamos con certificaciones nacionales e internacionales.
             </p>
           </motion.div>
 
@@ -371,12 +371,12 @@ const Landing: FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 items-stretch mb-14">
             {CERTS.map((cert, i) => (
               <motion.div
-                key={cert.label}
+                key={cert.alt}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="flex flex-col items-center gap-4 group"
+                className="flex flex-col items-center gap-3 group"
               >
                 <div className="bg-white rounded-2xl p-7 shadow-sm border border-brand-divider group-hover:shadow-md group-hover:border-asop-cert/30 transition-all duration-300 w-full aspect-square flex items-center justify-center">
                   <img
@@ -385,9 +385,16 @@ const Landing: FC = () => {
                     className="max-h-20 max-w-full object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
                   />
                 </div>
-                <p className="text-sm font-medium text-asop-green text-center leading-snug px-1">
-                  {cert.label}
-                </p>
+                <div className="text-center px-1">
+                  <p className="text-sm font-medium text-asop-green leading-snug">{cert.label}</p>
+                  {cert.codes.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {cert.codes.map(code => (
+                        <p key={code} className="text-xs text-asop-dark/45 font-mono">{code}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
