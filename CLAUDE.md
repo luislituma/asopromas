@@ -60,8 +60,18 @@ asopromas/
 │       │   ├── auth/            # Login, perfil, reset password
 │       │   └── about/           # Contenido institucional (landing/marketing)
 │       └── types/
+├── src/assets/images/certifications/  # Logos de certificaciones (4 archivos)
+│   ├── certificacion-usda.jpg
+│   ├── certificacion-organica-ecuador.png
+│   ├── bpa.jpg
+│   └── certificacion-uue.png
 └── supabase/migrations/         # 27 migraciones SQL (01–27). La migración 28 está pendiente
 ```
+
+**Sitio público — estado de páginas `about/` relevantes (junio 2026):**
+- `Landing.tsx` — tiene sección 5 "Certificaciones" entre Catálogo y CTA: 4 logos en color, códigos de certificación bajo cada logo, hover scale, link a `/about/certifications`. Dato de cada logo definido en constante `CERTS` al inicio del archivo.
+- `Certifications.tsx` — reescrita completamente (rama `certificaciones`): hero oscuro con overview de 4 logos en blanco, 4 tarjetas detalladas alternadas (logo + descripción + garantías + códigos como badges), banner EUDR con 3 métricas clave.
+- Datos de certificación: `CERTS` array en cada archivo. Códigos vigentes: Orgánico Ecuador → `POA: 1125-4`, `POA KIWA: 001-AC`; UE → `EC-BIO-141`, `Ecuador Agriculture`.
 
 **Archivos sueltos de debugging en `frontend/`** (candidatos a limpiar, no son parte de la app):
 `check_carlos.ts`, `fix_data.ts`, `check_dups.mjs`, `test_crash.js`, `move_files.ps1`, `supabase_temporal.sql`, `get_communities.mjs`, `get_data.js`, `preview_lotes_update.mjs`
