@@ -1,8 +1,19 @@
 import { type FC, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import usdaLogo from '../assets/images/certifications/certificacion-usda.jpg';
+import orgEcuadorLogo from '../assets/images/certifications/certificacion-organica-ecuador.png';
+import bpaLogo from '../assets/images/certifications/bpa.jpg';
+import euLogo from '../assets/images/certifications/certificacion-uue.png';
+
+const CERTS = [
+  { src: usdaLogo,       alt: 'USDA Organic',                   label: ''              },
+  { src: orgEcuadorLogo, alt: 'Certificación Orgánica Ecuador',  label: ''          },
+  { src: bpaLogo,        alt: 'Buenas Prácticas Agrícolas',      label: ''},
+  { src: euLogo,         alt: 'Certificación Unión Europea',     label: ''          },
+];
 
 // Use Vite env var if provided (for CDN-hosted video). Fallback to Cloudinary URL then local file for dev.
 const heroVideoSrc = (import.meta as any).env?.VITE_HERO_VIDEO_URL || 'https://res.cloudinary.com/djvcofmr0/video/upload/v1779490371/Asopromas_fzp0xv.mp4' || '/assets/video/Hero.mp4';
@@ -324,7 +335,86 @@ const Landing: FC = () => {
         </div>
       </section>
 
-      {/* 5. Call to Action (CTA) */}
+      {/* 5. Certificaciones */}
+      <section className="py-24 bg-asop-cream relative overflow-hidden border-t border-brand-divider">
+        {/* Textura de fondo sutil */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #2B4D3F 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
+
+        <div className="container mx-auto px-6 max-w-6xl relative z-10">
+
+          {/* Encabezado */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 text-asop-cert font-medium tracking-[0.25em] uppercase text-xs mb-5">
+              <ShieldCheck className="w-4 h-4" />
+              Calidad Verificada
+            </div>
+            <h2 className="text-4xl md:text-5xl font-light text-asop-deep mb-5">
+              Producción con{' '}
+              <span className="font-serif font-medium tracking-wide text-asop-green">
+                Certificación
+              </span>
+            </h2>
+            <p className="text-lg text-asop-dark/60 font-light max-w-2xl mx-auto leading-relaxed">
+              Contamos con certificaicones nacionalese internacionales.
+            </p>
+          </motion.div>
+
+          {/* Grid de logos */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 items-stretch mb-14">
+            {CERTS.map((cert, i) => (
+              <motion.div
+                key={cert.label}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="flex flex-col items-center gap-4 group"
+              >
+                <div className="bg-white rounded-2xl p-7 shadow-sm border border-brand-divider group-hover:shadow-md group-hover:border-asop-cert/30 transition-all duration-300 w-full aspect-square flex items-center justify-center">
+                  <img
+                    src={cert.src}
+                    alt={cert.alt}
+                    className="max-h-20 max-w-full object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
+                  />
+                </div>
+                <p className="text-sm font-medium text-asop-green text-center leading-snug px-1">
+                  {cert.label}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Separador + CTA secundario */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-brand-divider"
+          >
+            <p className="text-sm text-asop-dark/50 font-light text-center sm:text-left">
+              Comprometidos con la trazabilidad EUDR y la producción libre de deforestación.
+            </p>
+            <Link
+              to="/about/certifications"
+              className="shrink-0 inline-flex items-center gap-2 text-asop-green border border-asop-green/30 hover:border-asop-green hover:bg-asop-green/5 px-7 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
+            >
+              Ver certificaciones <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* 6. Call to Action (CTA) */}
       <section className="py-32 bg-white relative overflow-hidden border-t border-stone-100">
         <div className="container mx-auto px-6 max-w-4xl text-center relative z-10">
           <motion.div
